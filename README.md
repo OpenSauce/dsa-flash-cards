@@ -12,12 +12,13 @@ Inside this directory will then be the langauge specific sub-directories.
 
 For example:
 
-* Big O Notation
+* data structures
     * Any
-* Queues
-    * Go
+* queues
+    * c++
+    * go
         * dequeue.yml
-    * Javascript
+    * javascript
 
 This format will likely change as per needs.
 
