@@ -29,9 +29,9 @@ Initially this will have a basic structure, but can be updated as necessary.
 It is important that all flashcards are created with consistent naming and format.
 
 ```yaml
-    title: "Queue"
-    Front: |
-        `func (q *Queue) Pop() (MyQueueElement, bool) {
+title: "Queue"
+Front: |
+    func (q *Queue) Pop() (MyQueueElement, bool) {
         if q.len <= 0 {
             return MyQueueElement{}, false
         }
@@ -40,8 +40,8 @@ It is important that all flashcards are created with consistent naming and forma
         q.readHead = (q.readHead + 1) % MAX_QUEUE_SIZE
         q.len--
         return result, true
-        }
-    Back: "Pop"
+    }
+Back: "Pop"
 ```
 
 ## Contributing
