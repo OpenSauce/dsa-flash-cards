@@ -32,12 +32,12 @@ It is important that all flashcards are created with consistent naming and forma
 title: "Queue"
 Front: |
     func (queue *Queue) Dequeue() int {
-        if len(q) <= 0 {
+        if len(queue) <= 0 {
             return -1
         }
-        val := queue[0]
+        head := queue[0]
         queue = queue[1:]
-        return val
+        return head
     }
 Back: "Dequeue"
 ```
