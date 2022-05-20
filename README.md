@@ -13,7 +13,7 @@ Inside this directory will then be the langauge specific sub-directories.
 For example:
 
 * data structures
-    * Any
+    * any
 * queues
     * c++
     * go
