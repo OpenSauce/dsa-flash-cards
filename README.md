@@ -16,7 +16,7 @@ For example:
     * Any
 * Queues
     * Go
-        * pop.yml
+        * dequeue.yml
     * Javascript
 
 This format will likely change as per needs.
@@ -31,17 +31,15 @@ It is important that all flashcards are created with consistent naming and forma
 ```yaml
 title: "Queue"
 Front: |
-    func (q *Queue) Pop() (MyQueueElement, bool) {
-        if q.len <= 0 {
-            return MyQueueElement{}, false
+    func (queue *Queue) Dequeue() int {
+        if len(q) <= 0 {
+            return -1
         }
-        result := q.content[q.readHead]
-        q.content[q.readHead] = MyQueueElement{}
-        q.readHead = (q.readHead + 1) % MAX_QUEUE_SIZE
-        q.len--
-        return result, true
+        val := queue[0]
+        queue = queue[1:]
+        return val
     }
-Back: "Pop"
+Back: "Dequeue"
 ```
 
 ## Contributing
