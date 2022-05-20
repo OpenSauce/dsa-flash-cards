@@ -31,7 +31,7 @@ It is important that all flashcards are created with consistent naming and forma
 ```yaml
 title: "Queue"
 Front: |
-    func (queue *Queue) Dequeue() int {
+    func (queue *Queue) <?>() int {
         if len(queue) <= 0 {
             return -1
         }
@@ -40,6 +40,7 @@ Front: |
         return head
     }
 Back: "Dequeue"
+Options: "Pop,Queue"
 ```
 
 ## Contributing
