@@ -1,0 +1,8 @@
+title: "Big O Notation"
+Front: |
+    Insert/remove from beginning: O(1)
+    Insert/remove from middle: O(n)
+    Insert/remove from end: O(n)
+    Lookup: O(n)
+Back: "Linked List"
+Options: "Array,Doubly Linked List"
