@@ -1,0 +1,25 @@
+# ── BUBBLE SORT ────────────────────────────────────────────────────────────
+- title: "Bubble Sort - Overview"
+  difficulty: "easy"
+  tags: ["bubble sort", "identify", "sorting"]
+  Front: |
+    Which sorting algorithm …
+
+    - Repeatedly swaps **adjacent** out‑of‑order elements
+    - Has worst‑case **O(n²)** time
+    - Is often taught first for its simplicity?
+  Back: "Bubble Sort"
+
+- title: "Bubble Sort – Implementation"
+  difficulty: "easy"
+  tags: ["bubble sort", "implementation"]
+  Front: |
+    for i := 0; i < n-1; i++ {
+        for j := 0; j < n-1-i; j++ {
+            if a[j] > a[j+1] {
+                a[j], a[j+1] = a[j+1], a[j]
+            }
+        }
+    }
+  Back: "Bubble Sort (O(n²))"
+

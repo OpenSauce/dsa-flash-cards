@@ -1,0 +1,43 @@
+# ── UNION‑FIND / DISJOINT SET UNION ─────────────────────────────────────────
+- title: "Union‑Find - Overview"
+  difficulty: "medium"
+  tags: ["union find", "identify"]
+  Front: |
+    Which data structure …
+
+    - Keeps track of **disjoint sets**
+    - Supports **union** and **find** (with path compression) almost O(1)?
+  Back: "Union‑Find (Disjoint Set Union)"
+
+# Find with path compression
+- title: "Union‑Find – Find (Path Compression)"
+  difficulty: "medium"
+  tags: ["union find", "find"]
+  Front: |
+    func find(x int) int {
+        if parent[x] != x {
+            parent[x] = find(parent[x])
+        }
+        return parent[x]
+    }
+  Back: "Find / root (α(n) ≈ O(1))"
+
+# Union by rank
+- title: "Union‑Find – Union (By Rank)"
+  difficulty: "medium"
+  tags: ["union find", "union"]
+  Front: |
+    func union(a, b int) {
+        ra, rb := find(a), find(b)
+        if ra == rb { return }
+        if rank[ra] < rank[rb] {
+            parent[ra] = rb
+        } else if rank[ra] > rank[rb] {
+            parent[rb] = ra
+        } else {
+            parent[rb] = ra
+            rank[ra]++
+        }
+    }
+  Back: "Union (α(n) ≈ O(1))"
+

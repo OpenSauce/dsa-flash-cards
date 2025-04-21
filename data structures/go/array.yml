@@ -1,0 +1,58 @@
+# ── OVERVIEW ────────────────────────────────────────────────────────────────
+- title: "Array – Overview"
+  difficulty: "easy"
+  tags: ["array", "identify"]
+  Front: |
+    Which data structure …
+
+    - Stores elements in a **contiguous block of memory**
+    - Provides **constant‑time access by index**
+    - Requires **O(n)** shifts to insert or delete in the middle
+  Back: "Array"
+
+# ── OPERATION CARDS ─────────────────────────────────────────────────────────
+- title: "Array – Access by Index"
+  difficulty: "easy"
+  tags: ["array", "access"]
+  Front: |
+    arr := []int{10, 20, 30, 40}
+    x   := arr[2]
+  Back: "Access by index (O(1))"
+
+- title: "Array – Search by Value"
+  difficulty: "easy"
+  tags: ["array", "search"]
+  Front: |
+    target := 30
+    idx := -1
+    for i, v := range []int{10, 20, 30, 40} {
+        if v == target {
+            idx = i
+            break
+        }
+    }
+  Back: "Linear search (O(n))"
+
+- title: "Array – Insert at End"
+  difficulty: "easy"
+  tags: ["array", "insert"]
+  Front: |
+    arr := []int{1, 2, 3}
+    arr = append(arr, 4)
+  Back: "Insert at end / push‑back (amortised O(1))"
+
+- title: "Array – Delete at End"
+  difficulty: "easy"
+  tags: ["array", "delete"]
+  Front: |
+    arr := []int{1, 2, 3, 4}
+    arr  = arr[:len(arr)-1]
+  Back: "Delete at end / pop‑back (O(1))"
+
+- title: "Array – Insert at Beginning"
+  difficulty: "easy"
+  tags: ["array", "insert"]
+  Front: |
+    arr := []int{2, 3, 4}
+    arr  = append([]int{1}, arr...)
+  Back: "Insert at beginning (O(n))"

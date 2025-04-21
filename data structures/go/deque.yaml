@@ -1,0 +1,27 @@
+# ── DEQUE (DOUBLE‑ENDED QUEUE) ──────────────────────────────────────────────
+- title: "Deque - Overview"
+  difficulty: "easy"
+  tags: ["deque", "identify"]
+  Front: |
+    Which data structure …
+
+    - Supports insertion and removal at **both front and back**
+    - Can be implemented with a circular buffer or linked list
+    - Provides **O(1)** push/pop at either end?
+  Back: "Deque (Double‑Ended Queue)"
+
+- title: "Deque – Push Front"
+  difficulty: "easy"
+  tags: ["deque", "push"]
+  Front: |
+    dq = append([]int{val}, dq...)
+  Back: "Push front (O(1) amortised)"
+
+- title: "Deque – Pop Back"
+  difficulty: "easy"
+  tags: ["deque", "pop"]
+  Front: |
+    val := dq[len(dq)-1]
+    dq  = dq[:len(dq)-1]
+  Back: "Pop back (O(1) amortised)"
+

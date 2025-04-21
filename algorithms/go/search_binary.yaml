@@ -1,0 +1,27 @@
+# ── BINARY SEARCH ──────────────────────────────────────────────────────────
+- title: "Binary Search - Overview"
+  difficulty: "easy"
+  tags: ["binary search", "identify"]
+  Front: |
+    Which search algorithm …
+
+    - Works on a **sorted** array
+    - Repeatedly halves the search interval
+    - Runs in **O(log n)** time?
+  Back: "Binary Search"
+
+- title: "Binary Search – Iterative"
+  difficulty: "easy"
+  tags: ["binary search", "implementation"]
+  Front: |
+    func binarySearch(a []int, key int) int {
+        lo, hi := 0, len(a)-1
+        for lo <= hi {
+            mid := (lo + hi) / 2
+            if a[mid] == key { return mid }
+            if a[mid] < key { lo = mid + 1 } else { hi = mid - 1 }
+        }
+        return -1
+    }
+  Back: "Binary Search (O(log n))"
+

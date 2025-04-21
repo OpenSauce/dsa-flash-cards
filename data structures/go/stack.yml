@@ -1,0 +1,39 @@
+# ── OVERVIEW ────────────────────────────────────────────────────────────────
+- title: "Stack – Overview"
+  difficulty: "easy"
+  tags: ["stack", "identify"]
+  Front: |
+    Which data structure …
+
+    - Operates on a **last‑in, first‑out** principle
+    - Supports **push** and **pop** in **O(1)**
+    - Is used for recursion call stacks and undo features
+  Back: "Stack"
+
+# ── OPERATION CARDS ─────────────────────────────────────────────────────────
+- title: "Stack – Push"
+  difficulty: "easy"
+  tags: ["stack", "push"]
+  Front: |
+    stack := []int{}
+    stack  = append(stack, 10)
+  Back: "Push (O(1))"
+
+- title: "Stack – Pop"
+  difficulty: "easy"
+  tags: ["stack", "pop"]
+  Front: |
+    top  := stack[len(stack)-1]
+    stack = stack[:len(stack)-1]
+  Back: "Pop (O(1))"
+
+- title: "Stack – Search"
+  difficulty: "easy"
+  tags: ["stack", "search"]
+  Front: |
+    found := false
+    target := 5
+    for _, v := range stack {
+        if v == target { found = true; break }
+    }
+  Back: "Linear search (O(n))"

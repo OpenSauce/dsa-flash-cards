@@ -1,0 +1,30 @@
+# ── RED‑BLACK TREE ─────────────────────────────────────────────────────────
+- title: "Red‑Black Tree - Overview"
+  difficulty: "hard"
+  tags: ["red black tree", "identify"]
+  Front: |
+    Which self‑balancing BST …
+
+    - Colors nodes **red or black** and maintains 5 invariants
+    - Guarantees tree height ≤ 2·log₂(n)
+    - Offers **O(log n)** search/insert/delete?
+  Back: "Red‑Black Tree"
+
+- title: "RBT – Insert (Outline)"
+  difficulty: "hard"
+  tags: ["red black tree", "insert"]
+  Front: |
+    // standard BST insert, color node red,
+    // then fix‑up with rotations and recoloring
+  Back: "Insert with fix‑up (O(log n))"
+
+- title: "RBT – Search"
+  difficulty: "medium"
+  tags: ["red black tree", "search"]
+  Front: |
+    cur := root
+    for cur != nil && cur.Val != key {
+        if key < cur.Val { cur = cur.Left } else { cur = cur.Right }
+    }
+  Back: "Search (O(log n))"
+

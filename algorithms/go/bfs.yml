@@ -1,0 +1,29 @@
+# ── BREADTH‑FIRST SEARCH ───────────────────────────────────────────────────
+- title: "Breadth‑First Search - Overview"
+  difficulty: "easy"
+  tags: ["bfs", "identify", "graph traversal"]
+  Front: |
+    Which graph traversal …
+
+    - Uses a **queue** to visit nodes level by level
+    - Finds shortest path in **unweighted** graphs
+    - Runs in **O(V+E)** time?
+  Back: "Breadth‑First Search (BFS)"
+
+- title: "BFS – Queue Implementation"
+  difficulty: "easy"
+  tags: ["bfs", "implementation"]
+  Front: |
+    q := []int{start}
+    dist := map[int]int{start: 0}
+    for len(q) > 0 {
+        v := q[0]; q = q[1:]
+        for _, nb := range g[v] {
+            if _, seen := dist[nb]; !seen {
+                dist[nb] = dist[v] + 1
+                q = append(q, nb)
+            }
+        }
+    }
+  Back: "BFS traversal (O(V+E))"
+

@@ -1,0 +1,39 @@
+# ── OVERVIEW ────────────────────────────────────────────────────────────────
+- title: "Queue – Overview"
+  difficulty: "easy"
+  tags: ["queue", "identify"]
+  Front: |
+    Which data structure …
+
+    - Operates on a **first‑in, first‑out** principle
+    - Uses **enqueue** at the rear and **dequeue** at the front
+    - Is common in task scheduling, buffering, and BFS
+  Back: "Queue"
+
+# ── OPERATION CARDS ─────────────────────────────────────────────────────────
+- title: "Queue – Enqueue"
+  difficulty: "easy"
+  tags: ["queue", "enqueue"]
+  Front: |
+    q := []int{}
+    q  = append(q, 1)
+  Back: "Enqueue (O(1))"
+
+- title: "Queue – Dequeue"
+  difficulty: "easy"
+  tags: ["queue", "dequeue"]
+  Front: |
+    front := q[0]
+    q      = q[1:]
+  Back: "Dequeue (O(1))"
+
+- title: "Queue – Search"
+  difficulty: "easy"
+  tags: ["queue", "search"]
+  Front: |
+    found := false
+    target := 3
+    for _, v := range q {
+        if v == target { found = true; break }
+    }
+  Back: "Linear search (O(n))"

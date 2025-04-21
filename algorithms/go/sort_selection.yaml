@@ -1,0 +1,25 @@
+# ── SELECTION SORT ─────────────────────────────────────────────────────────
+- title: "Selection Sort - Overview"
+  difficulty: "easy"
+  tags: ["selection sort", "identify", "sorting"]
+  Front: |
+    Which sorting algorithm …
+
+    - Repeatedly selects the **minimum** remaining element
+    - Swaps it into the correct position
+    - Always runs in **O(n²)** time?
+  Back: "Selection Sort"
+
+- title: "Selection Sort – Implementation"
+  difficulty: "easy"
+  tags: ["selection sort", "implementation"]
+  Front: |
+    for i := 0; i < n-1; i++ {
+        min := i
+        for j := i + 1; j < n; j++ {
+            if a[j] < a[min] { min = j }
+        }
+        a[i], a[min] = a[min], a[i]
+    }
+  Back: "Selection Sort (O(n²))"
+

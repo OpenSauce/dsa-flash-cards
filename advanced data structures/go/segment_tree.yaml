@@ -1,0 +1,58 @@
+# ── SEGMENT TREE ────────────────────────────────────────────────────────────
+- title: "Segment Tree - Overview"
+  difficulty: "hard"
+  tags: ["segment tree", "identify"]
+  Front: |
+    Which data structure …
+
+    - Recursively partitions an array into **intervals**
+    - Supports **range queries** and **point updates** in **O(log n)**?
+  Back: "Segment Tree"
+
+# Build tree (bottom‑up)
+- title: "Segment Tree – Build"
+  difficulty: "medium"
+  tags: ["segment tree", "build"]
+  Front: |
+    size := 1
+    for size < n { size <<= 1 }
+    seg := make([]int, 2*size)
+    for i := 0; i < n; i++ {
+        seg[size+i] = arr[i]
+    }
+    for i := size-1; i > 0; i-- {
+        seg[i] = seg[2*i] + seg[2*i+1]
+    }
+  Back: "Build tree – O(n)"
+
+# Range sum query
+- title: "Segment Tree – Range Query"
+  difficulty: "hard"
+  tags: ["segment tree", "query"]
+  Front: |
+    func query(l, r int) int {      // inclusive [l,r)
+        l += size; r += size
+        res := 0
+        for l < r {
+            if l&1 == 1 { res += seg[l]; l++ }
+            if r&1 == 1 { r--; res += seg[r] }
+            l >>= 1; r >>= 1
+        }
+        return res
+    }
+  Back: "Range query – O(log n)"
+
+# Point update
+- title: "Segment Tree – Point Update"
+  difficulty: "hard"
+  tags: ["segment tree", "update"]
+  Front: |
+    func update(pos, val int) {
+        i := size + pos
+        seg[i] = val
+        for i >>= 1; i > 0; i >>= 1 {
+            seg[i] = seg[2*i] + seg[2*i+1]
+        }
+    }
+  Back: "Point update – O(log n)"
+

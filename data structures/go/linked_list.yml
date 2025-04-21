@@ -1,0 +1,46 @@
+# ── OVERVIEW ────────────────────────────────────────────────────────────────
+- title: "Linked List – Overview"
+  difficulty: "easy"
+  tags: ["linked list", "identify"]
+  Front: |
+    Which data structure …
+
+    - Consists of nodes connected by **pointers**
+    - Allows **O(1)** insertion or deletion at the head
+    - Lacks direct (index) access, so search is **O(n)**
+  Back: "Linked List"
+
+# ── OPERATION CARDS ─────────────────────────────────────────────────────────
+- title: "Linked List – Insert at Head"
+  difficulty: "easy"
+  tags: ["linked list", "insert"]
+  Front: |
+    type Node struct {
+        Val  int
+        Next *Node
+    }
+    head := &Node{Val: 1}
+    head  = &Node{Val: 0, Next: head}
+  Back: "Insert at head (O(1))"
+
+- title: "Linked List – Insert at Tail (Singly)"
+  difficulty: "easy"
+  tags: ["linked list", "insert"]
+  Front: |
+    tail := head
+    for tail.Next != nil {
+        tail = tail.Next
+    }
+    tail.Next = &Node{Val: 5}
+  Back: "Insert at tail without tail pointer (O(n))"
+
+- title: "Linked List – Search by Value"
+  difficulty: "easy"
+  tags: ["linked list", "search"]
+  Front: |
+    cur := head
+    target := 3
+    for cur != nil && cur.Val != target {
+        cur = cur.Next
+    }
+  Back: "Linear search (O(n))"

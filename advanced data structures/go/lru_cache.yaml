@@ -1,0 +1,38 @@
+# ── LRU CACHE ──────────────────────────────────────────────────────────────
+- title: "LRU Cache - Overview"
+  difficulty: "medium"
+  tags: ["lru cache", "identify"]
+  Front: |
+    Which data structure …
+
+    - Combines a **hash map + doubly linked list**
+    - Keeps most‑recently‑used items at the front
+    - Supports **get** and **put/evict** in **O(1)**?
+  Back: "LRU Cache"
+
+- title: "LRU Cache – Get"
+  difficulty: "medium"
+  tags: ["lru cache", "get"]
+  Front: |
+    if node, ok := m[key]; ok {
+        moveToFront(node)
+        return node.val
+    }
+    return -1
+  Back: "Get & promote to front (O(1))"
+
+- title: "LRU Cache – Put"
+  difficulty: "medium"
+  tags: ["lru cache", "put"]
+  Front: |
+    if node, ok := m[key]; ok {
+        node.val = val
+        moveToFront(node)
+    } else {
+        if len(m) == cap { evictTail() }
+        node := &Node{key: key, val: val}
+        addFront(node)
+        m[key] = node
+    }
+  Back: "Put (add/update & possible eviction) (O(1))"
+

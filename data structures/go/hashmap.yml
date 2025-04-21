@@ -1,0 +1,29 @@
+# ── OVERVIEW ────────────────────────────────────────────────────────────────
+- title: "Hash Map – Overview"
+  difficulty: "easy"
+  tags: ["hashmap", "identify"]
+  Front: |
+    Which data structure …
+
+    - Maps **keys to values** via a **hash function**
+    - Aims for **O(1)** average‑case insert, delete, and lookup
+    - Suffers collisions that can degrade to **O(n)**
+  Back: "Hash Map"
+
+# ── OPERATION CARDS ─────────────────────────────────────────────────────────
+- title: "Hash Map – Insert"
+  difficulty: "easy"
+  tags: ["hashmap", "insert"]
+  Front: |
+    m := map[string]int{}
+    m["apple"] = 42
+  Back: "Insert (average O(1))"
+
+- title: "Hash Map – Lookup by Key"
+  difficulty: "easy"
+  tags: ["hashmap", "lookup"]
+  Front: |
+    value, ok := m["apple"]
+    _ = value; _ = ok
+  Back: "Lookup by key (average O(1), worst O(n))"
+

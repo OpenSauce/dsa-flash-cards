@@ -1,0 +1,38 @@
+# ── TRIE / PREFIX TREE ──────────────────────────────────────────────────────
+- title: "Trie - Overview"
+  difficulty: "medium"
+  tags: ["trie", "identify"]
+  Front: |
+    Which tree‑like structure …
+
+    - Stores strings character‑by‑character down edges
+    - Provides **O(k)** insert/search where k = length of string?
+  Back: "Trie (Prefix Tree)"
+
+# Insert word
+- title: "Trie – Insert"
+  difficulty: "medium"
+  tags: ["trie", "insert"]
+  Front: |
+    node := root
+    for _, ch := range word {
+        if node.next[ch] == nil {
+            node.next[ch] = &Trie{}
+        }
+        node = node.next[ch]
+    }
+    node.isEnd = true
+  Back: "Insert word – O(k)"
+
+# Search word
+- title: "Trie – Search"
+  difficulty: "medium"
+  tags: ["trie", "search"]
+  Front: |
+    node := root
+    for _, ch := range word {
+        if node = node.next[ch]; node == nil { break }
+    }
+    found := node != nil && node.isEnd
+  Back: "Search word – O(k)"
+

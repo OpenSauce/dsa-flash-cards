@@ -1,0 +1,25 @@
+# ── MERGE SORT ─────────────────────────────────────────────────────────────
+- title: "Merge Sort - Overview"
+  difficulty: "medium"
+  tags: ["merge sort", "identify", "sorting", "divide and conquer"]
+  Front: |
+    Which sorting algorithm …
+
+    - Uses **divide‑and‑conquer** to split, sort, and merge halves
+    - Guarantees **O(n log n)** time
+    - Requires **O(n)** extra space?
+  Back: "Merge Sort"
+
+- title: "Merge Sort – Recursive"
+  difficulty: "medium"
+  tags: ["merge sort", "implementation"]
+  Front: |
+    func mergeSort(a []int) []int {
+        if len(a) <= 1 { return a }
+        mid := len(a) / 2
+        left  := mergeSort(a[:mid])
+        right := mergeSort(a[mid:])
+        return merge(left, right)
+    }
+  Back: "Merge Sort (O(n log n), O(n) space)"
+

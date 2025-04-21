@@ -1,0 +1,27 @@
+# ── INSERTION SORT ─────────────────────────────────────────────────────────
+- title: "Insertion Sort - Overview"
+  difficulty: "easy"
+  tags: ["insertion sort", "identify", "sorting"]
+  Front: |
+    Which sorting algorithm …
+
+    - Builds the final array one item at a time
+    - Shifts larger elements right to insert the current key
+    - Runs in **O(n²)** worst‑case but **O(n)** on nearly‑sorted data?
+  Back: "Insertion Sort"
+
+- title: "Insertion Sort – Implementation"
+  difficulty: "easy"
+  tags: ["insertion sort", "implementation"]
+  Front: |
+    for i := 1; i < n; i++ {
+        key := a[i]
+        j   := i - 1
+        for j >= 0 && a[j] > key {
+            a[j+1] = a[j]
+            j--
+        }
+        a[j+1] = key
+    }
+  Back: "Insertion Sort (O(n²) worst, O(n) best)"
+

@@ -1,0 +1,23 @@
+# ── LINEAR SEARCH ──────────────────────────────────────────────────────────
+- title: "Linear Search - Overview"
+  difficulty: "easy"
+  tags: ["linear search", "identify"]
+  Front: |
+    Which search algorithm …
+
+    - Scans each element **sequentially**
+    - Requires no ordering
+    - Runs in **O(n)** time?
+  Back: "Linear Search"
+
+- title: "Linear Search – Iterative"
+  difficulty: "easy"
+  tags: ["linear search", "implementation"]
+  Front: |
+    func linearSearch(arr []int, key int) int {
+        for i, v := range arr {
+            if v == key { return i }
+        }
+        return -1
+    }
+  Back: "Linear Search (O(n))"

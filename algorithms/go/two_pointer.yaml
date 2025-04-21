@@ -1,0 +1,22 @@
+# ── TWO‑POINTER TECHNIQUE ──────────────────────────────────────────────────
+- title: "Two‑Pointer Technique - Overview"
+  difficulty: "easy"
+  tags: ["two pointer", "identify", "array"]
+  Front: |
+    Which array/string technique …
+
+    - Uses **two indices** that move toward each other or at different speeds
+    - Solves many problems in **O(n)** without extra space (e.g., pair sum, palindrome)?
+  Back: "Two‑Pointer Technique"
+
+- title: "Two‑Pointer – Pair Sum (Sorted)"
+  difficulty: "easy"
+  tags: ["two pointer", "implementation"]
+  Front: |
+    l, r := 0, len(a)-1
+    for l < r {
+        s := a[l] + a[r]
+        if s == target { return true }
+        if s < target { l++ } else { r-- }
+    }
+  Back: "Find pair with target sum – O(n)"

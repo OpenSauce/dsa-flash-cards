@@ -1,0 +1,124 @@
+
+- title: "Big O Notation - Array"
+  difficulty: "easy"
+  tags: ["array", "complexity", "lookup"]
+  Front: |
+    - Insert/remove at beginning: `O(n)`
+    - Insert/remove in middle: `O(n)`
+    - Insert/remove at end: `O(1)`
+    - Lookup by value: `O(n)`
+    - Lookup by index: `O(1)`
+  Back: "Array"
+
+- title: "Big O Notation - Linked List (Singly)"
+  difficulty: "easy"
+  tags: ["linked list", "complexity"]
+  Front: |
+    - Insert/remove at beginning: `O(1)`
+    - Insert/remove in middle: `O(n)`
+    - Insert/remove at end: `O(n)`
+    - Lookup by value: `O(n)`
+    - Lookup by index: `O(n)`
+  Back: "Singly Linked List"
+
+- title: "Big O Notation - Linked List (Doubly)"
+  difficulty: "medium"
+  tags: ["linked list", "doubly", "complexity"]
+  Front: |
+    - Insert/remove at beginning: `O(1)`
+    - Insert/remove in middle: `O(n)`
+    - Insert/remove at end: `O(1)`
+    - Lookup by value: `O(n)`
+    - Lookup by index: `O(n)`
+  Back: "Doubly Linked List"
+
+- title: "Big O Notation - Stack"
+  difficulty: "easy"
+  tags: ["stack", "complexity"]
+  Front: |
+    - Push: `O(1)`
+    - Pop: `O(1)`
+    - Peek: `O(1)`
+    - Search: `O(n)`
+  Back: "Stack"
+
+- title: "Big O Notation - Queue"
+  difficulty: "easy"
+  tags: ["queue", "complexity"]
+  Front: |
+    - Enqueue: `O(1)`
+    - Dequeue: `O(1)`
+    - Peek: `O(1)`
+    - Search: `O(n)`
+  Back: "Queue"
+
+- title: "Big O Notation - Hash Map"
+  difficulty: "medium"
+  tags: ["hashmap", "complexity", "collision"]
+  Front: |
+    - Insert: `O(1)` average, `O(n)` worst  
+    - Delete: `O(1)` average, `O(n)` worst  
+    - Lookup by key: `O(1)` average, `O(n)` worst  
+    - Lookup by value: `O(n)`
+  Back: "Hash Map"
+
+- title: "Big O Notation - Binary Search Tree (Unbalanced)"
+  difficulty: "medium"
+  tags: ["bst", "tree", "unbalanced", "complexity"]
+  Front: |
+    - Insert: `O(n)`
+    - Delete: `O(n)`
+    - Search: `O(n)`
+    - In-order traversal: `O(n)`
+  Back: "Binary Search Tree (Unbalanced)"
+
+- title: "Big O Notation - Balanced Binary Search Tree"
+  difficulty: "medium"
+  tags: ["bst", "tree", "balanced", "complexity"]
+  Front: |
+    - Insert: `O(log n)`
+    - Delete: `O(log n)`
+    - Search: `O(log n)`
+    - In-order traversal: `O(n)`
+  Back: "Balanced Binary Search Tree"
+
+- title: "Big O Notation - Binary Heap"
+  difficulty: "medium"
+  tags: ["heap", "priority queue", "complexity"]
+  Front: |
+    - Insert: `O(log n)`
+    - Delete Max/Min: `O(log n)`
+    - Peek Max/Min: `O(1)`
+    - Search: `O(n)`
+  Back: "Binary Heap"
+
+- title: "Big O Notation - Trie"
+  difficulty: "medium"
+  tags: ["trie", "prefix", "complexity"]
+  Front: |
+    - Insert: `O(k)`
+    - Search: `O(k)`
+    - Delete: `O(k)`
+  Back: "Trie"
+
+- title: "Big O Notation - Graph (Adjacency List)"
+  difficulty: "medium"
+  tags: ["graph", "adjacency list", "bfs", "dfs", "complexity"]
+  Front: |
+    - Add vertex: `O(1)`
+    - Add edge: `O(1)`
+    - Remove vertex: `O(V + E)`
+    - Remove edge: `O(E)`
+    - BFS/DFS: `O(V + E)`
+  Back: "Graph (Adjacency List)"
+
+- title: "Big O Notation - Graph (Adjacency Matrix)"
+  difficulty: "medium"
+  tags: ["graph", "adjacency matrix", "bfs", "dfs", "complexity"]
+  Front: |
+    - Add vertex: `O(V²)`
+    - Add edge: `O(1)`
+    - Remove vertex: `O(V²)`
+    - Remove edge: `O(1)`
+    - BFS/DFS: `O(V²)`
+  Back: "Graph (Adjacency Matrix)"

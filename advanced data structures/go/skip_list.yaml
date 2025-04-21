@@ -1,0 +1,33 @@
+# ── SKIP LIST ───────────────────────────────────────────────────────────────
+- title: "Skip List - Overview"
+  difficulty: "hard"
+  tags: ["skip list", "identify"]
+  Front: |
+    Which probabilistic data structure …
+
+    - Layers multiple forward pointers over a linked list
+    - Achieves **O(log n)** expected search/insert/delete?
+  Back: "Skip List"
+
+# Search
+- title: "Skip List – Search"
+  difficulty: "hard"
+  tags: ["skip list", "search"]
+  Front: |
+    x := head
+    for level := maxLevel-1; level >= 0; level-- {
+        for x.next[level] != nil && x.next[level].key < key {
+            x = x.next[level]
+        }
+    }
+    x = x.next[0]
+  Back: "Search (expected O(log n))"
+
+# Insert (outline)
+- title: "Skip List – Insert"
+  difficulty: "hard"
+  tags: ["skip list", "insert"]
+  Front: |
+    // find update[] nodes, random level, splice in new node
+  Back: "Insert (expected O(log n))"
+

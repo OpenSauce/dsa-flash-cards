@@ -1,0 +1,25 @@
+# ── OVERVIEW ────────────────────────────────────────────────────────────────
+- title: "Binary Tree – Overview"
+  difficulty: "easy"
+  tags: ["binary tree", "identify"]
+  Front: |
+    Which data structure …
+
+    - Is a hierarchical collection where each node has **up to two children**
+    - Has **no ordering constraint** between child nodes
+    - Forms the foundation for heaps, BSTs, etc.
+  Back: "Binary Tree"
+
+# ── OPERATION CARD ──────────────────────────────────────────────────────────
+- title: "Binary Tree – In‑order Traversal"
+  difficulty: "easy"
+  tags: ["binary tree", "traversal"]
+  Front: |
+    func inorder(n *Node) {
+        if n == nil { return }
+        inorder(n.Left)
+        fmt.Print(n.Val)
+        inorder(n.Right)
+    }
+  Back: "Traversal (O(n))"
+
