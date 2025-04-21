@@ -1,50 +1,66 @@
-# DS&A Flashcards
+# DS&A Flashcards
 
-A repository to collate and store the data structures and algorithms flashcards to be used within dsaflash.cards.
+Flashcards for mastering **Data Structures & Algorithms** — the content behind **dsaflash.cards**.
 
-## Getting Started
+---
 
-### Directory Structure
+## Project Structure
 
-For now we will keep it simple. 
-In the root directory a folder can be created for a "set" of cards. 
-Inside this directory will then be the langauge specific sub-directories.
+```text
+/
+├─ data_structures/          # basic DS decks
+├─ advanced_data_structures/ # segment tree, trie, …
+├─ algorithms/               # sorting, two‑pointer, DP, …
+└─ README.md
+```
 
-For example:
+*Every deck is a standalone `.yaml` file.*
 
-* data structures
-    * any
-* queues
-    * c++
-    * go
-        * dequeue.yml
-    * javascript
+If a deck needs language‑specific code, add sub‑folders:
 
-This format will likely change as per needs.
+```text
+data_structures/
+└─ stack/
+   ├─ any/           # language‑agnostic cards
+   └─ go/
+      └─ stack.yaml
+```
 
-### Flashcard Structure
+---
 
-The flashcard is going to be a YAML file.
-Initially this will have a basic structure, but can be updated as necessary. 
-
-It is important that all flashcards are created with consistent naming and format.
+## Flashcard Format (`.yaml`)
 
 ```yaml
-title: "Queue"
+title: "Queue – Dequeue"
 Front: |
-    func (queue *Queue) <?>() int {
-        if len(queue) <= 0 {
-            return -1
-        }
-        head := queue[0]
-        queue = queue[1:]
-        return head
+    func (q *Queue) Dequeue() int {
+        if len(*q) == 0 { return -1 }
+        x := (*q)[0]
+        *q = (*q)[1:]
+        return x
     }
-Back: "Dequeue"
-Options: "Pop,Queue"
+Back: "Dequeue (O(1))"
+difficulty: "easy"
+tags: ["queue", "dequeue"]
 ```
+
+| Field        | Purpose                                    |
+|--------------|--------------------------------------------|
+| `title`      | Human‑readable card name (file header)     |
+| `Front`      | Prompt — code, question, or description    |
+| `Back`       | Answer / explanation                       |
+| `difficulty` | *Optional* — easy, medium, hard            |
+| `tags`       | *Optional* — quick search & grouping       |
+
+Keep naming and formatting consistent — **one concept per file**.
+
+---
 
 ## Contributing
 
-We will need contributors of different languages and topics so feel free to make a merge request and/or issue. 
-You will need to follow the above structure guidelines unless otherwise discussed.
+Pull requests and issues are welcome!
+
+* Follow the folder layout above.  
+* Use the YAML schema shown.  
+* One card per concept; feel free to add `difficulty` and `tags`.  
+* Discuss major structure changes in an issue before opening a PR.
