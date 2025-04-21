@@ -28,6 +28,12 @@
   difficulty: "hard"
   tags: ["skip list", "insert"]
   Front: |
-    // find update[] nodes, random level, splice in new node
-  Back: "Insert (expected O(log n))"
+    lvl  := randomLevel()
+    node := newNode(key, lvl)
+
+    for i := 0; i < lvl; i++ {          // splice into each level
+        node.next[i]   = update[i].next[i]
+        update[i].next[i] = node
+    }
+  Back: "Insert new node with random level (expected O(log n))"
 

@@ -44,3 +44,18 @@
         cur = cur.Next
     }
   Back: "Linear search (O(n))"
+
+- title: "Linked List – Reverse (Iterative)"
+  difficulty: "easy"
+  tags: ["linked list", "reverse"]
+  Front: |
+    var prev *Node
+    cur := head
+    for cur != nil {
+        nxt := cur.Next
+        cur.Next = prev
+        prev = cur
+        cur = nxt
+    }
+    head = prev
+  Back: "Reverse singly linked list (O(n))"

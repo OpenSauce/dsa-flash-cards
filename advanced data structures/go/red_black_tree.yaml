@@ -10,13 +10,49 @@
     - Offers **O(log n)** search/insert/delete?
   Back: "Red‑Black Tree"
 
-- title: "RBT – Insert (Outline)"
+- title: "RBT – Insert"
   difficulty: "hard"
   tags: ["red black tree", "insert"]
   Front: |
-    // standard BST insert, color node red,
-    // then fix‑up with rotations and recoloring
-  Back: "Insert with fix‑up (O(log n))"
+    func insert(root **Node, key int) {
+        // 1. standard BST insert, color RED
+        var parent *Node
+        cur := *root
+        for cur != nil {
+            parent = cur
+            if key < cur.Val { cur = cur.Left } else { cur = cur.Right }
+        }
+        n := &Node{Val: key, Color: RED, Parent: parent}
+        switch {
+        case parent == nil:
+            *root = n
+        case key < parent.Val:
+            parent.Left = n
+        default:
+            parent.Right = n
+        }
+
+        // 2. fix‑up: recolor / rotate until properties hold
+        for n != *root && n.Parent.Color == RED {
+            if n.Parent == n.Parent.Parent.Left {
+                uncle := n.Parent.Parent.Right
+                if uncle != nil && uncle.Color == RED { // case 1
+                    n.Parent.Color, uncle.Color = BLACK, BLACK
+                    n.Parent.Parent.Color = RED
+                    n = n.Parent.Parent
+                } else {
+                    if n == n.Parent.Right {            // case 2
+                        n = n.Parent
+                        rotateLeft(root, n)
+                    }
+                    n.Parent.Color, n.Parent.Parent.Color = BLACK, RED // case 3
+                    rotateRight(root, n.Parent.Parent)
+                }
+            } else { /* mirror cases */ }
+        }
+        (*root).Color = BLACK
+    }
+  Back: "Insert with rotations & recoloring (O(log n))"
 
 - title: "RBT – Search"
   difficulty: "medium"
