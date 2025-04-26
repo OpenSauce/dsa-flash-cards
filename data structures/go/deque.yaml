@@ -24,8 +24,8 @@
   tags: ["deque", "pop"]
   Front: |
     ```go
-   val := dq[len(dq)-1]
-   dq  = dq[:len(dq)-1]
-   ```
+    val := dq[len(dq)-1]
+    dq  = dq[:len(dq)-1]
+    ```
   Back: "Pop back (O(1) amortised)"
 
