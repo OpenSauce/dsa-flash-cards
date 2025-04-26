@@ -12,4 +12,3 @@ rules:
     min-spaces-from-content: 1
   new-line-at-end-of-file:
     present: true
-

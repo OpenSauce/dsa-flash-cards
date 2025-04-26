@@ -14,9 +14,9 @@
   difficulty: "easy"
   tags: ["deque", "push"]
   Front: |
-   ```go
-   dq = append([]int{val}, dq...)
-   ```
+    ```go
+    dq = append([]int{val}, dq...)
+    ```
   Back: "Push front (O(1) amortised)"
 
 - title: "Deque – Pop Back"
@@ -28,4 +28,3 @@
     dq  = dq[:len(dq)-1]
     ```
   Back: "Pop back (O(1) amortised)"
-

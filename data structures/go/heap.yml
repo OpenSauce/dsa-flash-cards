@@ -15,46 +15,45 @@
   difficulty: "medium"
   tags: ["heap", "insert"]
   Front: |
-   ```go
-   h := []int{1, 3, 5}
-   h  = append(h, 0)
-   i := len(h) - 1
-   for i > 0 {
-       p := (i - 1) / 2
-       if h[p] <= h[i] { break }
-       h[p], h[i] = h[i], h[p]
-       i = p
-   }
-   ```
+    ```go
+    h := []int{1, 3, 5}
+    h  = append(h, 0)
+    i := len(h) - 1
+    for i > 0 {
+        p := (i - 1) / 2
+        if h[p] <= h[i] { break }
+        h[p], h[i] = h[i], h[p]
+        i = p
+    }
+    ```
   Back: "Insert (O(log n))"
 
 - title: "Binary Heap – Peek Min"
   difficulty: "easy"
   tags: ["heap", "peek"]
   Front: |
-   ```go
-   min := h[0]
-   _ = min
-   ```
+    ```go
+    min := h[0]
+    _ = min
+    ```
   Back: "Peek min/max (O(1))"
 
 - title: "Binary Heap – Delete Min"
   difficulty: "medium"
   tags: ["heap", "delete"]
   Front: |
-   ```go
-   h[0] = h[len(h)-1]
-   h    = h[:len(h)-1]
-   i := 0
-   for {
-       l, r := 2*i+1, 2*i+2
-       smallest := i
-       if l < len(h) && h[l] < h[smallest] { smallest = l }
-       if r < len(h) && h[r] < h[smallest] { smallest = r }
-       if smallest == i { break }
-       h[i], h[smallest] = h[smallest], h[i]
-       i = smallest
-   }
-   ```
+    ```go
+    h[0] = h[len(h)-1]
+    h    = h[:len(h)-1]
+    i := 0
+    for {
+        l, r := 2*i+1, 2*i+2
+        smallest := i
+        if l < len(h) && h[l] < h[smallest] { smallest = l }
+        if r < len(h) && h[r] < h[smallest] { smallest = r }
+        if smallest == i { break }
+        h[i], h[smallest] = h[smallest], h[i]
+        i = smallest
+    }
+    ```
   Back: "Delete min/max (O(log n))"
-
