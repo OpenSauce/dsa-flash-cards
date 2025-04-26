@@ -1,4 +1,4 @@
-# ── UNION‑FIND / DISJOINT SET UNION ─────────────────────────────────────────
+# ── UNION‑FIND / DISJOINT SET UNION ─────────────────────────────────────────
 - title: "Union‑Find - Overview"
   difficulty: "medium"
   tags: ["union find", "identify"]
@@ -14,19 +14,22 @@
   difficulty: "medium"
   tags: ["union find", "find"]
   Front: |
+    ```go
     func find(x int) int {
         if parent[x] != x {
             parent[x] = find(parent[x])
         }
         return parent[x]
     }
-  Back: "Find / root (α(n) ≈ O(1))"
+    ```
+  Back: "Find / root (α(n) ≈ O(1))"
 
 # Union by rank
 - title: "Union‑Find – Union (By Rank)"
   difficulty: "medium"
   tags: ["union find", "union"]
   Front: |
+    ```go
     func union(a, b int) {
         ra, rb := find(a), find(b)
         if ra == rb { return }
@@ -39,5 +42,5 @@
             rank[ra]++
         }
     }
+    ```
   Back: "Union (α(n) ≈ O(1))"
-

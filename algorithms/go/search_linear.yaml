@@ -1,4 +1,4 @@
-# ── LINEAR SEARCH ──────────────────────────────────────────────────────────
+# ── LINEAR SEARCH ──────────────────────────────────────────────────────────
 - title: "Linear Search - Overview"
   difficulty: "easy"
   tags: ["linear search", "identify"]
@@ -14,10 +14,12 @@
   difficulty: "easy"
   tags: ["linear search", "implementation"]
   Front: |
+    ```go
     func linearSearch(arr []int, key int) int {
         for i, v := range arr {
             if v == key { return i }
         }
         return -1
     }
+    ```
   Back: "Linear Search (O(n))"

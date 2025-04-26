@@ -15,25 +15,31 @@
   difficulty: "easy"
   tags: ["queue", "enqueue"]
   Front: |
+    ```go
     q := []int{}
     q  = append(q, 1)
+    ```
   Back: "Enqueue (O(1))"
 
 - title: "Queue – Dequeue"
   difficulty: "easy"
   tags: ["queue", "dequeue"]
   Front: |
+    ```go
     front := q[0]
     q      = q[1:]
+    ```
   Back: "Dequeue (O(1))"
 
 - title: "Queue – Search"
   difficulty: "easy"
   tags: ["queue", "search"]
   Front: |
+    ```go
     found := false
     target := 3
     for _, v := range q {
         if v == target { found = true; break }
     }
+    ```
   Back: "Linear search (O(n))"

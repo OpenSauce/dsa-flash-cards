@@ -15,6 +15,7 @@
   difficulty: "medium"
   tags: ["bst", "search"]
   Front: |
+    ```go
     func search(root *Node, key int) *Node {
         for root != nil && root.Val != key {
             if key < root.Val {
@@ -25,12 +26,14 @@
         }
         return root
     }
+    ```
   Back: "Search (O(log n) on balanced tree)"
 
 - title: "BST – Insert (Unbalanced worst‑case)"
   difficulty: "medium"
   tags: ["bst", "insert"]
   Front: |
+    ```go
     func insert(root *Node, key int) *Node {
         if root == nil { return &Node{Val: key} }
         if key < root.Val {
@@ -40,5 +43,5 @@
         }
         return root
     }
+    ```
   Back: "Insert (O(n) worst‑case)"
-

@@ -1,4 +1,4 @@
-# ── QUICK SORT ─────────────────────────────────────────────────────────────
+# ── QUICK SORT ─────────────────────────────────────────────────────────────
 - title: "Quick Sort - Overview"
   difficulty: "medium"
   tags: ["quick sort", "identify", "sorting", "divide and conquer"]
@@ -6,7 +6,7 @@
     Which sorting algorithm …
 
     - Partitions around a **pivot**
-    - Has **O(n log n)** average but **O(n²)** worst‑case
+    - Has **O(n log n)** average but **O(n²)** worst‑case
     - Often fastest in practice with good pivot choice?
   Back: "Quick Sort"
 
@@ -14,6 +14,7 @@
   difficulty: "medium"
   tags: ["quick sort", "implementation"]
   Front: |
+    ```go
     func quickSort(a []int, lo, hi int) {
         if lo < hi {
             p := partition(a, lo, hi)
@@ -21,5 +22,5 @@
             quickSort(a, p+1, hi)
         }
     }
-  Back: "Quick Sort (avg O(n log n), worst O(n²))"
-
+    ```
+  Back: "Quick Sort (avg O(n log n), worst O(n²))"

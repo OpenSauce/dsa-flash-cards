@@ -15,25 +15,31 @@
   difficulty: "easy"
   tags: ["stack", "push"]
   Front: |
+    ```go
     stack := []int{}
     stack  = append(stack, 10)
+    ```
   Back: "Push (O(1))"
 
 - title: "Stack – Pop"
   difficulty: "easy"
   tags: ["stack", "pop"]
   Front: |
+    ```go
     top  := stack[len(stack)-1]
     stack = stack[:len(stack)-1]
+    ```
   Back: "Pop (O(1))"
 
 - title: "Stack – Search"
   difficulty: "easy"
   tags: ["stack", "search"]
   Front: |
+    ```go
     found := false
     target := 5
     for _, v := range stack {
         if v == target { found = true; break }
     }
+    ```
   Back: "Linear search (O(n))"

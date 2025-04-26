@@ -14,17 +14,20 @@
   difficulty: "medium"
   tags: ["lru cache", "get"]
   Front: |
+    ```go
     if node, ok := m[key]; ok {
         moveToFront(node)
         return node.val
     }
     return -1
+    ```
   Back: "Get & promote to front (O(1))"
 
 - title: "LRU Cache – Put"
   difficulty: "medium"
   tags: ["lru cache", "put"]
   Front: |
+    ```go
     if node, ok := m[key]; ok {
         node.val = val
         moveToFront(node)
@@ -34,5 +37,5 @@
         addFront(node)
         m[key] = node
     }
+    ```
   Back: "Put (add/update & possible eviction) (O(1))"
-

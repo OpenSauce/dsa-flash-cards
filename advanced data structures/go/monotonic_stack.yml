@@ -1,4 +1,4 @@
-# ── MONOTONIC STACK ─────────────────────────────────────────────────────────
+# ── MONOTONIC STACK ─────────────────────────────────────────────────────────
 - title: "Monotonic Stack - Overview"
   difficulty: "medium"
   tags: ["monotonic stack", "identify"]
@@ -23,13 +23,14 @@
     }
     st = append(st, x)
     ```
-  Back: "Push (maintain decreasing order) – amortised O(1)"
+  Back: "Push (maintain decreasing order) – amortised O(1)"
 
 # Operation: next greater element query
 - title: "Monotonic Stack – Next Greater Element"
   difficulty: "medium"
   tags: ["monotonic stack", "query"]
   Front: |
+    ```go
     next := make([]int, len(nums))
     st   := []int{}              // store indices
     for i, v := range nums {
@@ -40,4 +41,5 @@
         }
         st = append(st, i)
     }
-  Back: "Compute Next Greater Element – O(n)"
+    ```
+  Back: "Compute Next Greater Element – O(n)"

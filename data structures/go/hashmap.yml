@@ -15,15 +15,18 @@
   difficulty: "easy"
   tags: ["hashmap", "insert"]
   Front: |
+    ```go
     m := map[string]int{}
     m["apple"] = 42
+    ```
   Back: "Insert (average O(1))"
 
 - title: "Hash Map – Lookup by Key"
   difficulty: "easy"
   tags: ["hashmap", "lookup"]
   Front: |
+    ```go
     value, ok := m["apple"]
     _ = value; _ = ok
+    ```
   Back: "Lookup by key (average O(1), worst O(n))"
-

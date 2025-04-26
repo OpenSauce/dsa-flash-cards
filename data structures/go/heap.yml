@@ -15,6 +15,7 @@
   difficulty: "medium"
   tags: ["heap", "insert"]
   Front: |
+    ```go
     h := []int{1, 3, 5}
     h  = append(h, 0)
     i := len(h) - 1
@@ -24,20 +25,24 @@
         h[p], h[i] = h[i], h[p]
         i = p
     }
+    ```
   Back: "Insert (O(log n))"
 
 - title: "Binary Heap – Peek Min"
   difficulty: "easy"
   tags: ["heap", "peek"]
   Front: |
+    ```go
     min := h[0]
     _ = min
+    ```
   Back: "Peek min/max (O(1))"
 
 - title: "Binary Heap – Delete Min"
   difficulty: "medium"
   tags: ["heap", "delete"]
   Front: |
+    ```go
     h[0] = h[len(h)-1]
     h    = h[:len(h)-1]
     i := 0
@@ -50,5 +55,5 @@
         h[i], h[smallest] = h[smallest], h[i]
         i = smallest
     }
+    ```
   Back: "Delete min/max (O(log n))"
-
