@@ -10,5 +10,7 @@ rules:
     level: warning
   comments:
     min-spaces-from-content: 1
-  new-line-at-end-of-file:
-    present: true
+  new-lines:
+    type: unix
+    min: 1
+    max: 2
