@@ -1,0 +1,63 @@
+name: YAML Lint & Format
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  lint-yaml:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install yamllint
+        run: |
+          pip install yamllint
+
+      - name: Run yamllint
+        run: |
+          yamllint flashcards/
+
+  format-yaml:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Prettier and YAML plugin
+        run: |
+          npm install --global prettier prettier-plugin-yaml
+
+      - name: Format YAML files
+        run: |
+          prettier --write "**/*.{yml,yaml}"
+
+      - name: Commit and Push changes
+        run: |
+          git config --global user.name "GitHub Action Bot"
+          git config --global user.email "actions@github.com"
+          git add .
+          git commit -m "Auto-format YAML files" || echo "No changes to commit"
+          git push
+

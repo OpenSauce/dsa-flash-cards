@@ -6,14 +6,15 @@
     Which self‑balancing BST …
 
     - Colors nodes **red or black** and maintains 5 invariants
-    - Guarantees tree height ≤ 2·log₂(n)
-    - Offers **O(log n)** search/insert/delete?
+    - Guarantees tree height ≤ 2·log₂(n)
+    - Offers **O(log n)** search/insert/delete?
   Back: "Red‑Black Tree"
 
 - title: "RBT – Insert"
   difficulty: "hard"
   tags: ["red black tree", "insert"]
   Front: |
+    ```go
     func insert(root **Node, key int) {
         // 1. standard BST insert, color RED
         var parent *Node
@@ -36,31 +37,33 @@
         for n != *root && n.Parent.Color == RED {
             if n.Parent == n.Parent.Parent.Left {
                 uncle := n.Parent.Parent.Right
-                if uncle != nil && uncle.Color == RED { // case 1
+                if uncle != nil && uncle.Color == RED { // case 1
                     n.Parent.Color, uncle.Color = BLACK, BLACK
                     n.Parent.Parent.Color = RED
                     n = n.Parent.Parent
                 } else {
-                    if n == n.Parent.Right {            // case 2
+                    if n == n.Parent.Right {            // case 2
                         n = n.Parent
                         rotateLeft(root, n)
                     }
-                    n.Parent.Color, n.Parent.Parent.Color = BLACK, RED // case 3
+                    n.Parent.Color, n.Parent.Parent.Color = BLACK, RED // case 3
                     rotateRight(root, n.Parent.Parent)
                 }
             } else { /* mirror cases */ }
         }
         (*root).Color = BLACK
     }
-  Back: "Insert with rotations & recoloring (O(log n))"
+    ```
+  Back: "Insert with rotations & recoloring (O(log n))"
 
 - title: "RBT – Search"
   difficulty: "medium"
   tags: ["red black tree", "search"]
   Front: |
+    ```go
     cur := root
     for cur != nil && cur.Val != key {
         if key < cur.Val { cur = cur.Left } else { cur = cur.Right }
     }
-  Back: "Search (O(log n))"
-
+    ```
+  Back: "Search (O(log n))"

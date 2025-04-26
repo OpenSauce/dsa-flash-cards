@@ -1,4 +1,4 @@
-# ── BINARY SEARCH ──────────────────────────────────────────────────────────
+# ── BINARY SEARCH ──────────────────────────────────────────────────────────
 - title: "Binary Search - Overview"
   difficulty: "easy"
   tags: ["binary search", "identify"]
@@ -7,13 +7,14 @@
 
     - Works on a **sorted** array
     - Repeatedly halves the search interval
-    - Runs in **O(log n)** time?
+    - Runs in **O(log n)** time?
   Back: "Binary Search"
 
 - title: "Binary Search – Iterative"
   difficulty: "easy"
   tags: ["binary search", "implementation"]
   Front: |
+    ```go
     func binarySearch(a []int, key int) int {
         lo, hi := 0, len(a)-1
         for lo <= hi {
@@ -23,5 +24,5 @@
         }
         return -1
     }
-  Back: "Binary Search (O(log n))"
-
+    ```
+  Back: "Binary Search (O(log n))"

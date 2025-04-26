@@ -1,4 +1,4 @@
-# ── SLIDING WINDOW ─────────────────────────────────────────────────────────
+# ── SLIDING WINDOW ─────────────────────────────────────────────────────────
 - title: "Sliding Window - Overview"
   difficulty: "easy"
   tags: ["sliding window", "identify"]
@@ -9,15 +9,16 @@
     - Slides it left/right to process data in **O(n)**, updating state incrementally?
   Back: "Sliding Window"
 
-- title: "Sliding Window – Max Sum of Length k"
+- title: "Sliding Window – Max Sum of Length k"
   difficulty: "easy"
   tags: ["sliding window", "implementation"]
   Front: |
+    ```go
     sum, best := 0, -1<<31
     for i, v := range a {
         sum += v
         if i >= k { sum -= a[i-k] }
         if i >= k-1 && sum > best { best = sum }
     }
+    ```
   Back: "Fixed‑size sliding window – O(n)"
-

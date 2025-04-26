@@ -1,4 +1,4 @@
-# ── HEAP SORT ──────────────────────────────────────────────────────────────
+# ── HEAP SORT ──────────────────────────────────────────────────────────────
 - title: "Heap Sort - Overview"
   difficulty: "medium"
   tags: ["heap sort", "identify", "sorting"]
@@ -6,7 +6,7 @@
     Which sorting algorithm …
 
     - Builds a **binary heap** then repeatedly extracts max/min
-    - Runs in **O(n log n)** time
+    - Runs in **O(n log n)** time
     - Sorts **in‑place** with `O(1)` extra memory?
   Back: "Heap Sort"
 
@@ -14,10 +14,11 @@
   difficulty: "medium"
   tags: ["heap sort", "implementation"]
   Front: |
+    ```go
     heapify(a)                // O(n)
     for end := n-1; end > 0; end-- {
         a[0], a[end] = a[end], a[0]
-        siftDown(a, 0, end)   // O(log n)
+        siftDown(a, 0, end)   // O(log n)
     }
-  Back: "Heap Sort (O(n log n), O(1) space)"
-
+    ```
+  Back: "Heap Sort (O(n log n), O(1) space)"

@@ -14,24 +14,28 @@
   difficulty: "easy"
   tags: ["graph", "add edge"]
   Front: |
-    g[u] = append(g[u], v)
-    g[v] = append(g[v], u)
+   ```go
+   g[u] = append(g[u], v)
+   g[v] = append(g[v], u)
+   ```
   Back: "Add undirected edge (O(1) average)"
 
 - title: "Graph – BFS Traversal"
   difficulty: "easy"
   tags: ["graph", "bfs"]
   Front: |
-    q := []int{start}
-    vis := map[int]bool{start: true}
-    for len(q) > 0 {
-        v := q[0]; q = q[1:]
-        for _, nb := range g[v] {
-            if !vis[nb] {
-                vis[nb] = true
-                q = append(q, nb)
-            }
-        }
-    }
+   ```go
+   q := []int{start}
+   vis := map[int]bool{start: true}
+   for len(q) > 0 {
+       v := q[0]; q = q[1:]
+       for _, nb := range g[v] {
+           if !vis[nb] {
+               vis[nb] = true
+               q = append(q, nb)
+           }
+       }
+   }
+   ```
   Back: "Breadth‑First Search (O(V+E))"
 

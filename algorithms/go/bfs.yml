@@ -14,6 +14,7 @@
   difficulty: "easy"
   tags: ["bfs", "implementation"]
   Front: |
+    ```go
     q := []int{start}
     dist := map[int]int{start: 0}
     for len(q) > 0 {
@@ -25,5 +26,5 @@
             }
         }
     }
+    ```
   Back: "BFS traversal (O(V+E))"
-

@@ -15,8 +15,10 @@
   difficulty: "easy"
   tags: ["doubly linked list", "insert"]
   Front: |
-    tail.Next = &Node{Val: 9, Prev: tail}
-    tail      = tail.Next
+   ```go
+   tail.Next = &Node{Val: 9, Prev: tail}
+   tail      = tail.Next
+   ```
   Back: "Insert at tail (O(1))"
 
 # delete node when pointer known
@@ -24,10 +26,12 @@
   difficulty: "easy"
   tags: ["doubly linked list", "delete"]
   Front: |
-    n.Prev.Next = n.Next
-    if n.Next != nil {
-        n.Next.Prev = n.Prev
-    }
+   ```go
+   n.Prev.Next = n.Next
+   if n.Next != nil {
+       n.Next.Prev = n.Prev
+   }
+   ```
   Back: "Delete node with pointer (O(1))"
 
 # search
@@ -35,7 +39,9 @@
   difficulty: "easy"
   tags: ["doubly linked list", "search"]
   Front: |
-    cur := head
-    for cur != nil && cur.Val != x { cur = cur.Next }
+   ```go
+   cur := head
+   for cur != nil && cur.Val != x { cur = cur.Next }
+   ```
   Back: "Linear search (O(n))"
 

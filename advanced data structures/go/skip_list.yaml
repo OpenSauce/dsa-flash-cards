@@ -1,4 +1,4 @@
-# ── SKIP LIST ───────────────────────────────────────────────────────────────
+# ── SKIP LIST ───────────────────────────────────────────────────────────────
 - title: "Skip List - Overview"
   difficulty: "hard"
   tags: ["skip list", "identify"]
@@ -6,7 +6,7 @@
     Which probabilistic data structure …
 
     - Layers multiple forward pointers over a linked list
-    - Achieves **O(log n)** expected search/insert/delete?
+    - Achieves **O(log n)** expected search/insert/delete?
   Back: "Skip List"
 
 # Search
@@ -14,6 +14,7 @@
   difficulty: "hard"
   tags: ["skip list", "search"]
   Front: |
+    ```go
     x := head
     for level := maxLevel-1; level >= 0; level-- {
         for x.next[level] != nil && x.next[level].key < key {
@@ -21,13 +22,15 @@
         }
     }
     x = x.next[0]
-  Back: "Search (expected O(log n))"
+    ```
+  Back: "Search (expected O(log n))"
 
 # Insert (outline)
 - title: "Skip List – Insert"
   difficulty: "hard"
   tags: ["skip list", "insert"]
   Front: |
+    ```go
     lvl  := randomLevel()
     node := newNode(key, lvl)
 
@@ -35,5 +38,5 @@
         node.next[i]   = update[i].next[i]
         update[i].next[i] = node
     }
-  Back: "Insert new node with random level (expected O(log n))"
-
+    ```
+  Back: "Insert new node with random level (expected O(log n))"

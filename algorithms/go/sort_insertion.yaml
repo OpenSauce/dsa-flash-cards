@@ -1,4 +1,4 @@
-# ── INSERTION SORT ─────────────────────────────────────────────────────────
+# ── INSERTION SORT ─────────────────────────────────────────────────────────
 - title: "Insertion Sort - Overview"
   difficulty: "easy"
   tags: ["insertion sort", "identify", "sorting"]
@@ -14,6 +14,7 @@
   difficulty: "easy"
   tags: ["insertion sort", "implementation"]
   Front: |
+    ```go
     for i := 1; i < n; i++ {
         key := a[i]
         j   := i - 1
@@ -23,5 +24,5 @@
         }
         a[j+1] = key
     }
+    ```
   Back: "Insertion Sort (O(n²) worst, O(n) best)"
-

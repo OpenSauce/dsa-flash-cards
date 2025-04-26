@@ -6,26 +6,29 @@
     Which data structure …
 
     - Lists **all suffixes of a string in lexicographic order**
-    - Enables substring search via binary search in **O(m log n)**
-    - Can be built in **O(n log n)** (or O(n) with SA‑IS)?
+    - Enables substring search via binary search in **O(m log n)**
+    - Can be built in **O(n log n)** (or O(n) with SA‑IS)?
   Back: "Suffix Array"
 
-- title: "Suffix Array – Build (Naïve O(n log² n))"
+- title: "Suffix Array – Build (Naïve O(n log² n))"
   difficulty: "hard"
   tags: ["suffix array", "build"]
   Front: |
+    ```go
     type pair struct{ rank, idx int }
     sa := make([]int, n)
     for i := range sa { sa[i] = i }
     sort.Slice(sa, func(i, j int) bool {
         return s[sa[i]:] < s[sa[j]:]
     })
-  Back: "Build suffix array (naïve) (O(n log² n))"
+    ```
+  Back: "Build suffix array (naïve) (O(n log² n))"
 
 - title: "Suffix Array – Substring Search"
   difficulty: "hard"
   tags: ["suffix array", "search"]
   Front: |
+    ```go
     lo, hi := 0, n
     for lo < hi {
         mid := (lo + hi) / 2
@@ -36,5 +39,5 @@
         }
     }
     // check if pattern is prefix of suffix starting at sa[lo]
-  Back: "Binary search over SA (O(m log n))"
-
+    ```
+  Back: "Binary search over SA (O(m log n))"

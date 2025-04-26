@@ -1,4 +1,4 @@
-# ── FENWICK TREE / BINARY INDEXED TREE ──────────────────────────────────────
+# ── FENWICK TREE / BINARY INDEXED TREE ──────────────────────────────────────
 - title: "Fenwick Tree - Overview"
   difficulty: "medium"
   tags: ["fenwick tree", "identify"]
@@ -6,7 +6,7 @@
     Which data structure …
 
     - Stores **prefix sums** in a clever bit‑indexed array
-    - Supports **point updates** and **prefix queries** in **O(log n)**?
+    - Supports **point updates** and **prefix queries** in **O(log n)**?
   Back: "Fenwick Tree (Binary Indexed Tree)"
 
 # Point update
@@ -14,19 +14,22 @@
   difficulty: "medium"
   tags: ["fenwick tree", "update"]
   Front: |
+    ```go
     func add(i, delta int) {
         for i <= n {
             bit[i] += delta
             i += i & -i
         }
     }
-  Back: "Add / Point update – O(log n)"
+    ```
+  Back: "Add / Point update – O(log n)"
 
 # Prefix sum query
 - title: "Fenwick Tree – Prefix Sum"
   difficulty: "medium"
   tags: ["fenwick tree", "query"]
   Front: |
+    ```go
     func prefix(i int) int {
         sum := 0
         for i > 0 {
@@ -35,5 +38,5 @@
         }
         return sum
     }
-  Back: "Prefix sum query – O(log n)"
-
+    ```
+  Back: "Prefix sum query – O(log n)"

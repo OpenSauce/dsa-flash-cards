@@ -1,0 +1,15 @@
+extends: default
+
+rules:
+  line-length:
+    max: 120
+    level: warning
+  indentation:
+    spaces: 2
+  trailing-spaces:
+    level: warning
+  comments:
+    min-spaces-from-content: 1
+  new-line-at-end-of-file:
+    present: true
+

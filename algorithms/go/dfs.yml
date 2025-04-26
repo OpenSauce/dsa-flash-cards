@@ -14,11 +14,12 @@
   difficulty: "easy"
   tags: ["dfs", "implementation"]
   Front: |
+    ```go
     func dfs(v int) {
         vis[v] = true
         for _, nb := range g[v] {
             if !vis[nb] { dfs(nb) }
         }
     }
+    ```
   Back: "DFS traversal (O(V+E))"
-

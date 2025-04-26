@@ -15,11 +15,13 @@
   difficulty: "easy"
   tags: ["binary tree", "traversal"]
   Front: |
-    func inorder(n *Node) {
-        if n == nil { return }
-        inorder(n.Left)
-        fmt.Print(n.Val)
-        inorder(n.Right)
-    }
+   ```go
+   func inorder(n *Node) {
+       if n == nil { return }
+       inorder(n.Left)
+       fmt.Print(n.Val)
+       inorder(n.Right)
+   }
+   ```
   Back: "Traversal (O(n))"
 
