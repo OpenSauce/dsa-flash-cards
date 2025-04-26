@@ -47,7 +47,7 @@ jobs:
 
       - name: Install Prettier and YAML plugin
         run: |
-          npm install --global prettier prettier-plugin-yaml
+          npm install --global prettier
 
       - name: Format YAML files
         run: |
