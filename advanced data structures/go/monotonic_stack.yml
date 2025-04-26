@@ -15,12 +15,14 @@
   difficulty: "medium"
   tags: ["monotonic stack", "push"]
   Front: |
+    ```go
     st := []int{}                // decreasing stack
     x  := curVal
     for len(st) > 0 && st[len(st)-1] < x {
         st = st[:len(st)-1]      // pop smaller
     }
     st = append(st, x)
+    ```
   Back: "Push (maintain decreasing order) – amortised O(1)"
 
 # Operation: next greater element query
