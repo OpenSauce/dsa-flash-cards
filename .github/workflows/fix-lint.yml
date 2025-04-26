@@ -28,7 +28,7 @@ jobs:
 
       - name: Run yamllint
         run: |
-          yamllint flashcards/
+          yamllint .
 
   format-yaml:
     if: github.event_name == 'pull_request'

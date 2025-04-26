@@ -16,3 +16,6 @@ rules:
 
   new-lines:
     type: unix
+
+exclude:
+  - .github/
