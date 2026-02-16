@@ -14,6 +14,8 @@
   difficulty: "easy"
   tags: ["linear search", "implementation"]
   Front: |
+    What search algorithm is this? What is its time complexity?
+
     ```go
     func linearSearch(arr []int, key int) int {
         for i, v := range arr {
@@ -22,4 +24,7 @@
         return -1
     }
     ```
-  Back: "Linear Search (O(n))"
+  Back: |
+    Linear Search (O(n))
+
+    The simplest search — works on unsorted data. Best case O(1) if the target is first. Use binary search on sorted data to drop to O(log n).

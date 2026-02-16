@@ -14,6 +14,8 @@
   difficulty: "easy"
   tags: ["bfs", "implementation"]
   Front: |
+    What graph traversal algorithm is this? What is its time and space complexity?
+
     ```go
     q := []int{start}
     dist := map[int]int{start: 0}
@@ -27,4 +29,7 @@
         }
     }
     ```
-  Back: "BFS traversal (O(V+E))"
+  Back: |
+    BFS traversal (O(V+E))
+
+    Visits all nodes at distance d before any at distance d+1. The `dist` map doubles as a visited set — using it instead of a separate `visited` boolean also gives you shortest‑path distances for free.

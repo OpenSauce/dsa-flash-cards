@@ -14,6 +14,8 @@
   difficulty: "easy"
   tags: ["dfs", "implementation"]
   Front: |
+    What graph traversal algorithm is this? What is its time and space complexity?
+
     ```go
     func dfs(v int) {
         vis[v] = true
@@ -22,4 +24,7 @@
         }
     }
     ```
-  Back: "DFS traversal (O(V+E))"
+  Back: |
+    DFS traversal (O(V+E))
+
+    Recursion uses the call stack implicitly — stack depth equals the longest path, so very deep graphs can overflow. Switch to an explicit stack for graphs with depth > ~10k nodes.

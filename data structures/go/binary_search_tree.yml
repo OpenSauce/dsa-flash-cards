@@ -5,8 +5,8 @@
   Front: |
     Which data structure …
 
-    - Maintains **left < parent < right** ordering
-    - Offers **O(log n)** search/insert/delete when balanced
+    - Maintains **left < parent < right** ordering
+    - Offers **O(log n)** search/insert/delete when balanced
     - Can degrade to **O(n)** if inserted in sorted order without rebalancing
   Back: "Binary Search Tree"
 
@@ -15,6 +15,8 @@
   difficulty: "medium"
   tags: ["bst", "search"]
   Front: |
+    What data structure operation does this implement? What is its time complexity?
+
     ```go
     func search(root *Node, key int) *Node {
         for root != nil && root.Val != key {
@@ -27,12 +29,17 @@
         return root
     }
     ```
-  Back: "Search (O(log n) on balanced tree)"
+  Back: |
+    BST search (O(log n) on balanced tree)
+
+    Each comparison eliminates half the remaining nodes. An unbalanced BST (e.g., all nodes inserted in order) degrades to O(n) — use AVL or red‑black trees to guarantee balance.
 
 - title: "BST – Insert (Unbalanced worst‑case)"
   difficulty: "medium"
   tags: ["bst", "insert"]
   Front: |
+    What data structure operation does this implement? What is its time complexity?
+
     ```go
     func insert(root *Node, key int) *Node {
         if root == nil { return &Node{Val: key} }
@@ -44,4 +51,7 @@
         return root
     }
     ```
-  Back: "Insert (O(n) worst‑case)"
+  Back: |
+    BST insert (O(n) worst‑case)
+
+    Inserting sorted data creates a linked‑list‑shaped tree where every insert walks the full depth. Self‑balancing trees (AVL, red‑black) restructure after each insert to keep height at O(log n).

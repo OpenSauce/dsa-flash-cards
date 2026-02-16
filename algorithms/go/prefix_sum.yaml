@@ -13,6 +13,8 @@
   difficulty: "easy"
   tags: ["prefix sum", "implementation"]
   Front: |
+    What algorithm technique is this? What problem does it solve?
+
     ```go
     pre := make([]int, len(a)+1)
     for i, v := range a { pre[i+1] = pre[i] + v }
@@ -20,4 +22,7 @@
         return pre[r] - pre[l]
     }
     ```
-  Back: "Build O(n), query O(1)"
+  Back: |
+    Prefix sum – build O(n), query O(1)
+
+    Trades O(n) space for O(1) range‑sum queries via the identity `sum(l,r) = pre[r] − pre[l]`. The extra element `pre[0] = 0` avoids special‑casing the range starting at index 0.

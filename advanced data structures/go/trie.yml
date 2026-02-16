@@ -14,6 +14,8 @@
   difficulty: "medium"
   tags: ["trie", "insert"]
   Front: |
+    What operation does this implement, and what is its time complexity?
+
     ```go
     node := root
     for _, ch := range word {
@@ -24,13 +26,18 @@
     }
     node.isEnd = true
     ```
-  Back: "Insert word – O(k)"
+  Back: |
+    Trie insert – O(k)
+
+    Creates nodes on demand for each character. The `isEnd` flag distinguishes complete words from prefixes — without it, searching for "app" would falsely match inside "apple."
 
 # Search word
 - title: "Trie – Search"
   difficulty: "medium"
   tags: ["trie", "search"]
   Front: |
+    What operation does this implement, and what is its time complexity?
+
     ```go
     node := root
     for _, ch := range word {
@@ -38,4 +45,7 @@
     }
     found := node != nil && node.isEnd
     ```
-  Back: "Search word – O(k)"
+  Back: |
+    Trie search – O(k)
+
+    Follows one edge per character. Returns true only if the traversal reaches a node marked `isEnd`. To implement prefix search (autocomplete), skip the `isEnd` check.

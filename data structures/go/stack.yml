@@ -11,30 +11,27 @@
   Back: "Stack"
 
 # ── OPERATION CARDS ─────────────────────────────────────────────────────────
-- title: "Stack – Push"
-  difficulty: "easy"
-  tags: ["stack", "push"]
-  Front: |
-    ```go
-    stack := []int{}
-    stack  = append(stack, 10)
-    ```
-  Back: "Push (O(1))"
-
 - title: "Stack – Pop"
   difficulty: "easy"
   tags: ["stack", "pop"]
   Front: |
+    What data structure operation does this implement? What is its time complexity?
+
     ```go
     top  := stack[len(stack)-1]
     stack = stack[:len(stack)-1]
     ```
-  Back: "Pop (O(1))"
+  Back: |
+    Pop (O(1))
+
+    Removes and returns the most‑recently added element. Always check that the stack is non‑empty first to avoid an index‑out‑of‑range panic.
 
 - title: "Stack – Search"
   difficulty: "easy"
   tags: ["stack", "search"]
   Front: |
+    What data structure operation does this implement? What is its time complexity?
+
     ```go
     found := false
     target := 5
@@ -42,4 +39,7 @@
         if v == target { found = true; break }
     }
     ```
-  Back: "Linear search (O(n))"
+  Back: |
+    Linear search (O(n))
+
+    Stacks are not designed for search — you must iterate through all elements. If you frequently need lookup, consider a hash set alongside the stack.

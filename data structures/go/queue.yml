@@ -11,30 +11,27 @@
   Back: "Queue"
 
 # ── OPERATION CARDS ─────────────────────────────────────────────────────────
-- title: "Queue – Enqueue"
-  difficulty: "easy"
-  tags: ["queue", "enqueue"]
-  Front: |
-    ```go
-    q := []int{}
-    q  = append(q, 1)
-    ```
-  Back: "Enqueue (O(1))"
-
 - title: "Queue – Dequeue"
   difficulty: "easy"
   tags: ["queue", "dequeue"]
   Front: |
+    What data structure operation does this implement? What is its time complexity?
+
     ```go
     front := q[0]
     q      = q[1:]
     ```
-  Back: "Dequeue (O(1))"
+  Back: |
+    Dequeue (O(1))
+
+    Removes the front element. In Go, re‑slicing with `q[1:]` is O(1) but leaks memory over time since the backing array head is never freed. For production use, prefer a ring buffer.
 
 - title: "Queue – Search"
   difficulty: "easy"
   tags: ["queue", "search"]
   Front: |
+    What data structure operation does this implement? What is its time complexity?
+
     ```go
     found := false
     target := 3
@@ -42,4 +39,7 @@
         if v == target { found = true; break }
     }
     ```
-  Back: "Linear search (O(n))"
+  Back: |
+    Linear search (O(n))
+
+    Queues don't support random access, so finding an element requires scanning from front to back. If fast lookup is needed, maintain a parallel set.

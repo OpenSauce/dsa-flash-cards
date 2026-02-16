@@ -7,24 +7,19 @@
 
     - Stores **unique elements only**
     - Provides **add / remove / contains** in **O(1)** average time
-    - Is often implemented as a hash table without values?
+    - Is often implemented as a hash table without values?
   Back: "Hash Set"
-
-- title: "Set – Add Element"
-  difficulty: "easy"
-  tags: ["set", "add"]
-  Front: |
-    ```go
-    s := map[int]struct{}{}
-    s[x] = struct{}{}
-    ```
-  Back: "Add element (O(1) average)"
 
 - title: "Set – Contains"
   difficulty: "easy"
   tags: ["set", "contains"]
   Front: |
+    What data structure operation does this implement? What is its time complexity?
+
     ```go
     _, ok := s[x]
     ```
-  Back: "Contains / membership test (O(1) average)"
+  Back: |
+    Contains / membership test (O(1) average)
+
+    Go's map lookup returns a second boolean indicating presence. This is the core advantage of a set — constant‑time membership testing that avoids the O(n) scan of a list.

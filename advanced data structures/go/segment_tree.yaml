@@ -14,6 +14,8 @@
   difficulty: "medium"
   tags: ["segment tree", "build"]
   Front: |
+    What operation does this implement, and what is its time complexity?
+
     ```go
     size := 1
     for size < n { size <<= 1 }
@@ -25,13 +27,18 @@
         seg[i] = seg[2*i] + seg[2*i+1]
     }
     ```
-  Back: "Build tree – O(n)"
+  Back: |
+    Segment tree build – O(n)
+
+    Leaves hold the original values; each internal node stores the sum of its two children. Building bottom‑up avoids recursion and is cache‑friendlier than top‑down construction.
 
 # Range sum query
 - title: "Segment Tree – Range Query"
   difficulty: "hard"
   tags: ["segment tree", "query"]
   Front: |
+    What operation does this implement, and what is its time complexity?
+
     ```go
     func query(l, r int) int {      // inclusive [l,r)
         l += size; r += size
@@ -44,13 +51,18 @@
         return res
     }
     ```
-  Back: "Range query – O(log n)"
+  Back: |
+    Segment tree range query – O(log n)
+
+    Walks up from the leaves, collecting partial sums from nodes that fall fully inside the query range. At most two nodes per level are visited, giving O(log n) total.
 
 # Point update
 - title: "Segment Tree – Point Update"
   difficulty: "hard"
   tags: ["segment tree", "update"]
   Front: |
+    What operation does this implement, and what is its time complexity?
+
     ```go
     func update(pos, val int) {
         i := size + pos
@@ -60,4 +72,7 @@
         }
     }
     ```
-  Back: "Point update – O(log n)"
+  Back: |
+    Segment tree point update – O(log n)
+
+    Updates the leaf, then propagates the change upward by recomputing each ancestor. Only the nodes on the root‑to‑leaf path are touched.

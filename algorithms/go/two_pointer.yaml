@@ -13,6 +13,8 @@
   difficulty: "easy"
   tags: ["two pointer", "implementation"]
   Front: |
+    What algorithm technique is this? What problem does it solve?
+
     ```go
     l, r := 0, len(a)-1
     for l < r {
@@ -21,4 +23,7 @@
         if s < target { l++ } else { r-- }
     }
     ```
-  Back: "Find pair with target sum – O(n)"
+  Back: |
+    Two‑pointer pair sum on sorted array – O(n)
+
+    The sorted invariant lets you decide which pointer to move: too small → advance left, too large → advance right. This eliminates the need for a hash set and uses O(1) extra space.

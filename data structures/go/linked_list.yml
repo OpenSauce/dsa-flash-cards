@@ -15,6 +15,8 @@
   difficulty: "easy"
   tags: ["linked list", "insert"]
   Front: |
+    What data structure operation does this implement? What is its time complexity?
+
     ```go
     type Node struct {
         Val  int
@@ -23,12 +25,17 @@
     head := &Node{Val: 1}
     head  = &Node{Val: 0, Next: head}
     ```
-  Back: "Insert at head (O(1))"
+  Back: |
+    Insert at head (O(1))
+
+    Creating a new node and pointing it to the old head is constant time. This is the linked list's main advantage over arrays, which require O(n) shifts for front insertion.
 
 - title: "Linked List – Insert at Tail (Singly)"
   difficulty: "easy"
   tags: ["linked list", "insert"]
   Front: |
+    What data structure operation does this implement? What is its time complexity?
+
     ```go
     tail := head
     for tail.Next != nil {
@@ -36,12 +43,17 @@
     }
     tail.Next = &Node{Val: 5}
     ```
-  Back: "Insert at tail without tail pointer (O(n))"
+  Back: |
+    Insert at tail without tail pointer (O(n))
+
+    Without a stored tail pointer you must walk the entire list. Keeping a tail pointer turns this into O(1) — a common optimisation for queue implementations.
 
 - title: "Linked List – Search by Value"
   difficulty: "easy"
   tags: ["linked list", "search"]
   Front: |
+    What data structure operation does this implement? What is its time complexity?
+
     ```go
     cur := head
     target := 3
@@ -49,12 +61,17 @@
         cur = cur.Next
     }
     ```
-  Back: "Linear search (O(n))"
+  Back: |
+    Linear search (O(n))
+
+    No random access means you must traverse node by node. If frequent lookups are needed, consider augmenting the list with a hash map for O(1) access.
 
 - title: "Linked List – Reverse (Iterative)"
   difficulty: "easy"
   tags: ["linked list", "reverse"]
   Front: |
+    What data structure operation does this implement? What is its time complexity?
+
     ```go
     var prev *Node
     cur := head
@@ -66,4 +83,7 @@
     }
     head = prev
     ```
-  Back: "Reverse singly linked list (O(n))"
+  Back: |
+    Reverse singly linked list (O(n))
+
+    Uses three pointers to reverse links in one pass. This is one of the most common interview patterns — the key insight is saving `cur.Next` before overwriting it.

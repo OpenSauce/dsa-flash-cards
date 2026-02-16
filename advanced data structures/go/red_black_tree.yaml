@@ -14,6 +14,8 @@
   difficulty: "hard"
   tags: ["red black tree", "insert"]
   Front: |
+    What operation does this implement, and what is its time complexity?
+
     ```go
     func insert(root **Node, key int) {
         // 1. standard BST insert, color RED
@@ -54,16 +56,24 @@
         (*root).Color = BLACK
     }
     ```
-  Back: "Insert with rotations & recoloring (O(log n))"
+  Back: |
+    Red‑black tree insert with fix‑up (O(log n))
+
+    New nodes are always red to avoid violating black‑height. The fix‑up handles three cases (recolor, left‑rotate, right‑rotate) and does at most 2 rotations per insert, making it cheaper than AVL rebalancing.
 
 - title: "RBT – Search"
   difficulty: "medium"
   tags: ["red black tree", "search"]
   Front: |
+    What operation does this implement, and what is its time complexity?
+
     ```go
     cur := root
     for cur != nil && cur.Val != key {
         if key < cur.Val { cur = cur.Left } else { cur = cur.Right }
     }
     ```
-  Back: "Search (O(log n))"
+  Back: |
+    Red‑black tree search (O(log n))
+
+    Identical to standard BST search. The red‑black invariants guarantee height ≤ 2·log₂(n), so search never degrades to O(n) like an unbalanced BST.

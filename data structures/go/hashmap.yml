@@ -11,22 +11,17 @@
   Back: "Hash Map"
 
 # ── OPERATION CARDS ─────────────────────────────────────────────────────────
-- title: "Hash Map – Insert"
-  difficulty: "easy"
-  tags: ["hashmap", "insert"]
-  Front: |
-    ```go
-    m := map[string]int{}
-    m["apple"] = 42
-    ```
-  Back: "Insert (average O(1))"
-
 - title: "Hash Map – Lookup by Key"
   difficulty: "easy"
   tags: ["hashmap", "lookup"]
   Front: |
+    What data structure operation does this implement? What is its time complexity?
+
     ```go
     value, ok := m["apple"]
     _ = value; _ = ok
     ```
-  Back: "Lookup by key (average O(1), worst O(n))"
+  Back: |
+    Lookup by key (average O(1), worst O(n))
+
+    The two‑value form lets you distinguish "key exists with zero value" from "key missing." Worst case O(n) happens when all keys hash to the same bucket, but Go's map uses randomised hashing to make this unlikely.

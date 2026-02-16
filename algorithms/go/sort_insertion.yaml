@@ -14,6 +14,8 @@
   difficulty: "easy"
   tags: ["insertion sort", "implementation"]
   Front: |
+    What sorting algorithm is this? What is its time and space complexity?
+
     ```go
     for i := 1; i < n; i++ {
         key := a[i]
@@ -25,4 +27,7 @@
         a[j+1] = key
     }
     ```
-  Back: "Insertion Sort (O(n²) worst, O(n) best)"
+  Back: |
+    Insertion Sort (O(n²) worst, O(n) best, O(1) space)
+
+    Efficient for small or nearly‑sorted arrays — many real‑world sorts (like Go's `sort.Slice`) switch to insertion sort below ~12 elements. Stable: equal elements keep their original order.
