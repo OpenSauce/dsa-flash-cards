@@ -26,7 +26,7 @@
   Back: |
     LRU get & promote to front (O(1))
 
-    The hash map gives O(1) lookup; the doubly linked list gives O(1) move‑to‑front. Together they satisfy the LRU contract: the tail is always the least‑recently‑used item.
+    The hash map gives O(1) lookup; the doubly linked list gives O(1) move-to-front. Together they satisfy the LRU contract: the tail is always the least-recently-used item.
 
 - title: "LRU Cache – Put"
   difficulty: "medium"
