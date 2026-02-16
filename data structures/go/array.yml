@@ -32,36 +32,6 @@
 
     Must check every element in the worst case since arrays have no ordering guarantee. Use binary search on sorted arrays to achieve O(log n) instead.
 
-- title: "Array – Insert at End"
-  difficulty: "easy"
-  tags: ["array", "insert"]
-  Front: |
-    What data structure operation does this implement? What is its time complexity?
-
-    ```go
-    arr := []int{1, 2, 3}
-    arr = append(arr, 4)
-    ```
-  Back: |
-    Insert at end / push-back (amortised O(1))
-
-    Go slices double their backing array when capacity is exceeded, so most appends are O(1). Occasional resizing copies all elements, but amortised over many appends the cost stays constant.
-
-- title: "Array – Delete at End"
-  difficulty: "easy"
-  tags: ["array", "delete"]
-  Front: |
-    What data structure operation does this implement? What is its time complexity?
-
-    ```go
-    arr := []int{1, 2, 3, 4}
-    arr  = arr[:len(arr)-1]
-    ```
-  Back: |
-    Delete at end / pop-back (O(1))
-
-    Re-slicing just moves the length pointer without copying or shifting elements. The removed element's memory is not freed until the backing array is garbage-collected.
-
 - title: "Array – Insert at Beginning"
   difficulty: "easy"
   tags: ["array", "insert"]
