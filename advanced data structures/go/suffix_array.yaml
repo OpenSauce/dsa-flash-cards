@@ -7,13 +7,15 @@
 
     - Lists **all suffixes of a string in lexicographic order**
     - Enables substring search via binary search in **O(m log n)**
-    - Can be built in **O(n log n)** (or O(n) with SA‑IS)?
+    - Can be built in **O(n log n)** (or O(n) with SA-IS)?
   Back: "Suffix Array"
 
 - title: "Suffix Array – Build (Naïve O(n log² n))"
   difficulty: "hard"
   tags: ["suffix array", "build"]
   Front: |
+    What operation does this implement, and what is its time complexity?
+
     ```go
     type pair struct{ rank, idx int }
     sa := make([]int, n)
@@ -22,12 +24,17 @@
         return s[sa[i]:] < s[sa[j]:]
     })
     ```
-  Back: "Build suffix array (naïve) (O(n log² n))"
+  Back: |
+    Build suffix array (naïve) – O(n log² n)
+
+    Sorting all suffixes directly. Each string comparison is O(n), giving O(n² log n) naïvely, but ranking-based approaches reduce to O(n log² n). For large strings, use the SA-IS algorithm for O(n).
 
 - title: "Suffix Array – Substring Search"
   difficulty: "hard"
   tags: ["suffix array", "search"]
   Front: |
+    What operation does this implement, and what is its time complexity?
+
     ```go
     lo, hi := 0, n
     for lo < hi {
@@ -40,4 +47,7 @@
     }
     // check if pattern is prefix of suffix starting at sa[lo]
     ```
-  Back: "Binary search over SA (O(m log n))"
+  Back: |
+    Substring search via suffix array – O(m log n)
+
+    Binary search over the sorted suffix array, comparing the pattern against each suffix prefix. Faster than building a suffix tree when you only need search and the alphabet is large.

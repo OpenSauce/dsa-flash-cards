@@ -6,7 +6,7 @@
     Which sorting algorithm …
 
     - Partitions around a **pivot**
-    - Has **O(n log n)** average but **O(n²)** worst‑case
+    - Has **O(n log n)** average but **O(n²)** worst-case
     - Often fastest in practice with good pivot choice?
   Back: "Quick Sort"
 
@@ -14,6 +14,8 @@
   difficulty: "medium"
   tags: ["quick sort", "implementation"]
   Front: |
+    What sorting algorithm is this? What is its time and space complexity?
+
     ```go
     func quickSort(a []int, lo, hi int) {
         if lo < hi {
@@ -23,4 +25,7 @@
         }
     }
     ```
-  Back: "Quick Sort (avg O(n log n), worst O(n²))"
+  Back: |
+    Quick Sort (avg O(n log n), worst O(n²), O(log n) stack space)
+
+    Worst case hits when the pivot is always the min or max (e.g., sorted input with last-element pivot). Mitigate with median-of-three or random pivot selection. In-place and cache-friendly, making it faster than merge sort in practice.

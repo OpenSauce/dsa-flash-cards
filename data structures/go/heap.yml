@@ -6,8 +6,8 @@
     Which data structure …
 
     - Is a **complete binary tree** stored most often in an array
-    - Satisfies the **min‑heap / max‑heap** property
-    - Provides **O(log n)** insertion and deletion, **O(1)** peek
+    - Satisfies the **min-heap / max-heap** property
+    - Provides **O(log n)** insertion and deletion, **O(1)** peek
   Back: "Binary Heap"
 
 # ── OPERATION CARDS ─────────────────────────────────────────────────────────
@@ -15,6 +15,8 @@
   difficulty: "medium"
   tags: ["heap", "insert"]
   Front: |
+    What data structure operation does this implement? What is its time complexity?
+
     ```go
     h := []int{1, 3, 5}
     h  = append(h, 0)
@@ -26,22 +28,32 @@
         i = p
     }
     ```
-  Back: "Insert (O(log n))"
+  Back: |
+    Heap insert / sift-up (O(log n))
+
+    The new element is appended at the end, then "bubbled up" by swapping with its parent until the heap property is restored. The tree's height is log n, bounding the swaps.
 
 - title: "Binary Heap – Peek Min"
   difficulty: "easy"
   tags: ["heap", "peek"]
   Front: |
+    What data structure operation does this implement? What is its time complexity?
+
     ```go
     min := h[0]
     _ = min
     ```
-  Back: "Peek min/max (O(1))"
+  Back: |
+    Peek min/max (O(1))
+
+    The root always holds the extreme value. This constant-time access is why heaps power priority queues — you can always grab the highest-priority item instantly.
 
 - title: "Binary Heap – Delete Min"
   difficulty: "medium"
   tags: ["heap", "delete"]
   Front: |
+    What data structure operation does this implement? What is its time complexity?
+
     ```go
     h[0] = h[len(h)-1]
     h    = h[:len(h)-1]
@@ -56,4 +68,7 @@
         i = smallest
     }
     ```
-  Back: "Delete min/max (O(log n))"
+  Back: |
+    Delete min/max / sift-down (O(log n))
+
+    Replaces the root with the last element, then sifts it down. At each level the node is swapped with its smallest child, restoring the heap invariant in at most log n steps.

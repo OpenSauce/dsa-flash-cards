@@ -5,8 +5,8 @@
   Front: |
     Which sorting algorithm …
 
-    - Repeatedly swaps **adjacent** out‑of‑order elements
-    - Has worst‑case **O(n²)** time
+    - Repeatedly swaps **adjacent** out-of-order elements
+    - Has worst-case **O(n²)** time
     - Is often taught first for its simplicity?
   Back: "Bubble Sort"
 
@@ -14,6 +14,8 @@
   difficulty: "easy"
   tags: ["bubble sort", "implementation"]
   Front: |
+    What sorting algorithm is this? What is its time and space complexity?
+
     ```go
     for i := 0; i < n-1; i++ {
         for j := 0; j < n-1-i; j++ {
@@ -23,4 +25,7 @@
         }
     }
     ```
-  Back: "Bubble Sort (O(n²))"
+  Back: |
+    Bubble Sort (O(n²) time, O(1) space)
+
+    Each pass "bubbles" the next largest element into its final position. Adding an early-exit flag when no swaps occur gives O(n) best case on already-sorted input. Rarely used in practice — prefer insertion sort for small n.

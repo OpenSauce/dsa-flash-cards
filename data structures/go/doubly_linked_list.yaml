@@ -15,32 +15,47 @@
   difficulty: "easy"
   tags: ["doubly linked list", "insert"]
   Front: |
+    What data structure operation does this implement? What is its time complexity?
+
     ```go
     tail.Next = &Node{Val: 9, Prev: tail}
     tail      = tail.Next
     ```
-  Back: "Insert at tail (O(1))"
+  Back: |
+    Insert at tail (O(1))
+
+    With a tail pointer, appending is constant time. The doubly linked list's `Prev` pointer also enables O(1) deletion of any node given a direct reference.
 
 # delete node when pointer known
 - title: "DLL – Delete Node"
   difficulty: "easy"
   tags: ["doubly linked list", "delete"]
   Front: |
+    What data structure operation does this implement? What is its time complexity?
+
     ```go
     n.Prev.Next = n.Next
     if n.Next != nil {
         n.Next.Prev = n.Prev
     }
     ```
-  Back: "Delete node with pointer (O(1))"
+  Back: |
+    Delete node with pointer (O(1))
+
+    Since you have both `Prev` and `Next`, you can unlink a node without traversal. This is the key advantage over singly linked lists, where deletion requires access to the predecessor.
 
 # search
 - title: "DLL – Search by Value"
   difficulty: "easy"
   tags: ["doubly linked list", "search"]
   Front: |
+    What data structure operation does this implement? What is its time complexity?
+
     ```go
     cur := head
     for cur != nil && cur.Val != x { cur = cur.Next }
     ```
-  Back: "Linear search (O(n))"
+  Back: |
+    Linear search (O(n))
+
+    Despite the extra `Prev` pointer, search is still linear. Bidirectional traversal can halve search time if you start from both ends, but worst case remains O(n).

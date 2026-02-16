@@ -13,6 +13,8 @@
   difficulty: "easy"
   tags: ["sliding window", "implementation"]
   Front: |
+    What algorithm technique is this? What problem does it solve?
+
     ```go
     sum, best := 0, -1<<31
     for i, v := range a {
@@ -21,4 +23,7 @@
         if i >= k-1 && sum > best { best = sum }
     }
     ```
-  Back: "Fixed‑size sliding window – O(n)"
+  Back: |
+    Fixed-size sliding window – O(n)
+
+    Avoids recomputing the sum from scratch each time by adding the new element and subtracting the one that left the window. This "add one, remove one" pattern turns an O(nk) brute force into O(n).

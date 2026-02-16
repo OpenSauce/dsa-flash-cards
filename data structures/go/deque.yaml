@@ -1,4 +1,4 @@
-# ── DEQUE (DOUBLE‑ENDED QUEUE) ──────────────────────────────────────────────
+# ── DEQUE (DOUBLE-ENDED QUEUE) ──────────────────────────────────────────────
 - title: "Deque - Overview"
   difficulty: "easy"
   tags: ["deque", "identify"]
@@ -8,23 +8,19 @@
     - Supports insertion and removal at **both front and back**
     - Can be implemented with a circular buffer or linked list
     - Provides **O(1)** push/pop at either end?
-  Back: "Deque (Double‑Ended Queue)"
-
-- title: "Deque – Push Front"
-  difficulty: "easy"
-  tags: ["deque", "push"]
-  Front: |
-    ```go
-    dq = append([]int{val}, dq...)
-    ```
-  Back: "Push front (O(1) amortised)"
+  Back: "Deque (Double-Ended Queue)"
 
 - title: "Deque – Pop Back"
   difficulty: "easy"
   tags: ["deque", "pop"]
   Front: |
+    What data structure operation does this implement? What is its time complexity?
+
     ```go
     val := dq[len(dq)-1]
     dq  = dq[:len(dq)-1]
     ```
-  Back: "Pop back (O(1) amortised)"
+  Back: |
+    Pop back (O(1) amortised)
+
+    Removing from the back of a slice is cheap — just shrink the length. A true deque with a circular buffer gives O(1) for both ends without the memory leak that slice re-slicing causes at the front.

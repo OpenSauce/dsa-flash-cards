@@ -11,10 +11,12 @@
   Back: "Binary Tree"
 
 # ── OPERATION CARD ──────────────────────────────────────────────────────────
-- title: "Binary Tree – In‑order Traversal"
+- title: "Binary Tree – In-order Traversal"
   difficulty: "easy"
   tags: ["binary tree", "traversal"]
   Front: |
+    What data structure operation does this implement? What is its time complexity?
+
     ```go
     func inorder(n *Node) {
         if n == nil { return }
@@ -23,4 +25,7 @@
         inorder(n.Right)
     }
     ```
-  Back: "Traversal (O(n))"
+  Back: |
+    In-order traversal (O(n))
+
+    Visits left subtree, then root, then right. On a BST this produces sorted output. Pre-order and post-order differ only in when the root is visited.

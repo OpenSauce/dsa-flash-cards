@@ -15,6 +15,8 @@
   difficulty: "medium"
   tags: ["monotonic stack", "push"]
   Front: |
+    What operation does this implement, and what is its time complexity?
+
     ```go
     st := []int{}                // decreasing stack
     x  := curVal
@@ -23,13 +25,18 @@
     }
     st = append(st, x)
     ```
-  Back: "Push (maintain decreasing order) – amortised O(1)"
+  Back: |
+    Monotonic stack push (maintain decreasing order) – amortised O(1)
+
+    Each element is pushed and popped at most once across the entire input, so total work is O(n) even though individual pushes may pop multiple elements.
 
 # Operation: next greater element query
 - title: "Monotonic Stack – Next Greater Element"
   difficulty: "medium"
   tags: ["monotonic stack", "query"]
   Front: |
+    What operation does this implement, and what is its time complexity?
+
     ```go
     next := make([]int, len(nums))
     st   := []int{}              // store indices
@@ -42,4 +49,7 @@
         st = append(st, i)
     }
     ```
-  Back: "Compute Next Greater Element – O(n)"
+  Back: |
+    Next Greater Element – O(n)
+
+    When a new value exceeds the stack top, it is the "next greater" for every popped element. Storing indices instead of values lets you write results directly into the output array.

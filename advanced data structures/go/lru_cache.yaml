@@ -6,7 +6,7 @@
     Which data structure …
 
     - Combines a **hash map + doubly linked list**
-    - Keeps most‑recently‑used items at the front
+    - Keeps most-recently-used items at the front
     - Supports **get** and **put/evict** in **O(1)**?
   Back: "LRU Cache"
 
@@ -14,6 +14,8 @@
   difficulty: "medium"
   tags: ["lru cache", "get"]
   Front: |
+    What operation does this implement, and what is its time complexity?
+
     ```go
     if node, ok := m[key]; ok {
         moveToFront(node)
@@ -21,12 +23,17 @@
     }
     return -1
     ```
-  Back: "Get & promote to front (O(1))"
+  Back: |
+    LRU get & promote to front (O(1))
+
+    The hash map gives O(1) lookup; the doubly linked list gives O(1) move-to-front. Together they satisfy the LRU contract: the tail is always the least-recently-used item.
 
 - title: "LRU Cache – Put"
   difficulty: "medium"
   tags: ["lru cache", "put"]
   Front: |
+    What operation does this implement, and what is its time complexity?
+
     ```go
     if node, ok := m[key]; ok {
         node.val = val
@@ -38,4 +45,7 @@
         m[key] = node
     }
     ```
-  Back: "Put (add/update & possible eviction) (O(1))"
+  Back: |
+    LRU put with possible eviction (O(1))
+
+    On capacity overflow, the tail node (least recently used) is evicted. Storing the key inside each node lets you delete the map entry during eviction without a reverse lookup.

@@ -14,6 +14,8 @@
   difficulty: "hard"
   tags: ["skip list", "search"]
   Front: |
+    What operation does this implement, and what is its time complexity?
+
     ```go
     x := head
     for level := maxLevel-1; level >= 0; level-- {
@@ -23,13 +25,18 @@
     }
     x = x.next[0]
     ```
-  Back: "Search (expected O(log n))"
+  Back: |
+    Skip list search (expected O(log n))
+
+    Starts at the highest level and drops down when the next pointer overshoots. Each level roughly halves the nodes traversed, giving logarithmic expected time similar to a balanced BST.
 
 # Insert (outline)
 - title: "Skip List – Insert"
   difficulty: "hard"
   tags: ["skip list", "insert"]
   Front: |
+    What operation does this implement, and what is its time complexity?
+
     ```go
     lvl  := randomLevel()
     node := newNode(key, lvl)
@@ -39,4 +46,7 @@
         update[i].next[i] = node
     }
     ```
-  Back: "Insert new node with random level (expected O(log n))"
+  Back: |
+    Skip list insert with random level (expected O(log n))
+
+    The random level (usually geometric with p=0.5) probabilistically balances the structure without rotations. The `update` array records the last node at each level before the insertion point.
