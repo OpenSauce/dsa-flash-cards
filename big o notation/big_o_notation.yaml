@@ -2,122 +2,186 @@
   difficulty: "easy"
   tags: ["array", "complexity", "lookup"]
   Front: |
-    - Insert/remove at beginning: `O(n)`
-    - Insert/remove in middle: `O(n)`
-    - Insert/remove at end: `O(1)`
-    - Lookup by value: `O(n)`
-    - Lookup by index: `O(1)`
-  Back: "Array"
+    **Array** — What are the time complexities for:
+    - Insert/remove at beginning
+    - Insert/remove in middle
+    - Insert/remove at end
+    - Lookup by value
+    - Lookup by index
+  Back: |
+    - Insert/remove at beginning: **O(n)** — must shift all elements
+    - Insert/remove in middle: **O(n)** — shift elements after the position
+    - Insert/remove at end: **O(1)** — no shifting needed (amortized with dynamic arrays)
+    - Lookup by value: **O(n)** — linear scan required
+    - Lookup by index: **O(1)** — contiguous memory, direct offset calculation
 
 - title: "Big O Notation - Linked List (Singly)"
   difficulty: "easy"
   tags: ["linked list", "complexity"]
   Front: |
-    - Insert/remove at beginning: `O(1)`
-    - Insert/remove in middle: `O(n)`
-    - Insert/remove at end: `O(n)`
-    - Lookup by value: `O(n)`
-    - Lookup by index: `O(n)`
-  Back: "Singly Linked List"
+    **Singly Linked List** — What are the time complexities for:
+    - Insert/remove at beginning
+    - Insert/remove in middle
+    - Insert/remove at end
+    - Lookup by value
+    - Lookup by index
+  Back: |
+    - Insert/remove at beginning: **O(1)** — just update the head pointer
+    - Insert/remove in middle: **O(n)** — must traverse to find the position
+    - Insert/remove at end: **O(n)** — must traverse the entire list (no tail shortcut for removal)
+    - Lookup by value: **O(n)** — linear scan through nodes
+    - Lookup by index: **O(n)** — no random access, must walk from head
 
 - title: "Big O Notation - Linked List (Doubly)"
   difficulty: "medium"
   tags: ["linked list", "doubly", "complexity"]
   Front: |
-    - Insert/remove at beginning: `O(1)`
-    - Insert/remove in middle: `O(n)`
-    - Insert/remove at end: `O(1)`
-    - Lookup by value: `O(n)`
-    - Lookup by index: `O(n)`
-  Back: "Doubly Linked List"
+    **Doubly Linked List** — What are the time complexities for:
+    - Insert/remove at beginning
+    - Insert/remove in middle
+    - Insert/remove at end
+    - Lookup by value
+    - Lookup by index
+  Back: |
+    - Insert/remove at beginning: **O(1)** — update head pointer and prev link
+    - Insert/remove in middle: **O(n)** — must traverse to find the position
+    - Insert/remove at end: **O(1)** — tail pointer allows direct access
+    - Lookup by value: **O(n)** — linear scan through nodes
+    - Lookup by index: **O(n)** — no random access, must walk from head or tail
 
 - title: "Big O Notation - Stack"
   difficulty: "easy"
   tags: ["stack", "complexity"]
   Front: |
-    - Push: `O(1)`
-    - Pop: `O(1)`
-    - Peek: `O(1)`
-    - Search: `O(n)`
-  Back: "Stack"
+    **Stack** — What are the time complexities for:
+    - Push
+    - Pop
+    - Peek
+    - Search
+  Back: |
+    - Push: **O(1)** — add to top of stack
+    - Pop: **O(1)** — remove from top of stack
+    - Peek: **O(1)** — read top element without removing
+    - Search: **O(n)** — must pop or scan through elements
 
 - title: "Big O Notation - Queue"
   difficulty: "easy"
   tags: ["queue", "complexity"]
   Front: |
-    - Enqueue: `O(1)`
-    - Dequeue: `O(1)`
-    - Peek: `O(1)`
-    - Search: `O(n)`
-  Back: "Queue"
+    **Queue** — What are the time complexities for:
+    - Enqueue
+    - Dequeue
+    - Peek
+    - Search
+  Back: |
+    - Enqueue: **O(1)** — add to the back of the queue
+    - Dequeue: **O(1)** — remove from the front of the queue
+    - Peek: **O(1)** — read front element without removing
+    - Search: **O(n)** — must scan through elements
 
 - title: "Big O Notation - Hash Map"
   difficulty: "medium"
   tags: ["hashmap", "complexity", "collision"]
   Front: |
-    - Insert: `O(1)` average, `O(n)` worst  
-    - Delete: `O(1)` average, `O(n)` worst  
-    - Lookup by key: `O(1)` average, `O(n)` worst  
-    - Lookup by value: `O(n)`
-  Back: "Hash Map"
+    **Hash Map** — What are the time complexities for:
+    - Insert
+    - Delete
+    - Lookup by key
+    - Lookup by value
+  Back: |
+    - Insert: **O(1)** average, **O(n)** worst — hash collisions can degrade to linear chain
+    - Delete: **O(1)** average, **O(n)** worst — same collision risk as insert
+    - Lookup by key: **O(1)** average, **O(n)** worst — hash gives direct bucket access
+    - Lookup by value: **O(n)** — must scan all entries, values aren't indexed
 
 - title: "Big O Notation - Binary Search Tree (Unbalanced)"
   difficulty: "medium"
   tags: ["bst", "tree", "unbalanced", "complexity"]
   Front: |
-    - Insert: `O(n)`
-    - Delete: `O(n)`
-    - Search: `O(n)`
-    - In-order traversal: `O(n)`
-  Back: "Binary Search Tree (Unbalanced)"
+    **Binary Search Tree (Unbalanced)** — What are the time complexities for:
+    - Insert
+    - Delete
+    - Search
+    - In-order traversal
+  Back: |
+    - Insert: **O(n)** — tree can degenerate into a linked list
+    - Delete: **O(n)** — must find the node first, which is O(n) worst case
+    - Search: **O(n)** — skewed tree means no halving of search space
+    - In-order traversal: **O(n)** — must visit every node
 
 - title: "Big O Notation - Balanced Binary Search Tree"
   difficulty: "medium"
   tags: ["bst", "tree", "balanced", "complexity"]
   Front: |
-    - Insert: `O(log n)`
-    - Delete: `O(log n)`
-    - Search: `O(log n)`
-    - In-order traversal: `O(n)`
-  Back: "Balanced Binary Search Tree"
+    **Balanced Binary Search Tree** — What are the time complexities for:
+    - Insert
+    - Delete
+    - Search
+    - In-order traversal
+  Back: |
+    - Insert: **O(log n)** — tree height is guaranteed logarithmic
+    - Delete: **O(log n)** — rebalancing maintains logarithmic height
+    - Search: **O(log n)** — halves search space at each level
+    - In-order traversal: **O(n)** — must visit every node
 
 - title: "Big O Notation - Binary Heap"
   difficulty: "medium"
   tags: ["heap", "priority queue", "complexity"]
   Front: |
-    - Insert: `O(log n)`
-    - Delete Max/Min: `O(log n)`
-    - Peek Max/Min: `O(1)`
-    - Search: `O(n)`
-  Back: "Binary Heap"
+    **Binary Heap** — What are the time complexities for:
+    - Insert
+    - Delete Max/Min
+    - Peek Max/Min
+    - Search
+  Back: |
+    - Insert: **O(log n)** — bubble up through at most log n levels
+    - Delete Max/Min: **O(log n)** — remove root and sift down to restore heap property
+    - Peek Max/Min: **O(1)** — root is always the max/min
+    - Search: **O(n)** — heap ordering doesn't help locate arbitrary values
 
 - title: "Big O Notation - Trie"
   difficulty: "medium"
   tags: ["trie", "prefix", "complexity"]
   Front: |
-    - Insert: `O(k)`
-    - Search: `O(k)`
-    - Delete: `O(k)`
-  Back: "Trie"
+    **Trie** — What are the time complexities for:
+    - Insert
+    - Search
+    - Delete
+  Back: |
+    - Insert: **O(k)** — traverse/create one node per character (k = key length)
+    - Search: **O(k)** — follow one edge per character
+    - Delete: **O(k)** — traverse to end, then clean up unused nodes
 
 - title: "Big O Notation - Graph (Adjacency List)"
   difficulty: "medium"
   tags: ["graph", "adjacency list", "bfs", "dfs", "complexity"]
   Front: |
-    - Add vertex: `O(1)`
-    - Add edge: `O(1)`
-    - Remove vertex: `O(V + E)`
-    - Remove edge: `O(E)`
-    - BFS/DFS: `O(V + E)`
-  Back: "Graph (Adjacency List)"
+    **Graph (Adjacency List)** — What are the time complexities for:
+    - Add vertex
+    - Add edge
+    - Remove vertex
+    - Remove edge
+    - BFS/DFS
+  Back: |
+    - Add vertex: **O(1)** — append a new list to the structure
+    - Add edge: **O(1)** — append to the vertex's neighbor list
+    - Remove vertex: **O(V + E)** — must remove vertex and all edges referencing it
+    - Remove edge: **O(E)** — scan the neighbor list to find the edge
+    - BFS/DFS: **O(V + E)** — visit every vertex and traverse every edge
 
 - title: "Big O Notation - Graph (Adjacency Matrix)"
   difficulty: "medium"
   tags: ["graph", "adjacency matrix", "bfs", "dfs", "complexity"]
   Front: |
-    - Add vertex: `O(V²)`
-    - Add edge: `O(1)`
-    - Remove vertex: `O(V²)`
-    - Remove edge: `O(1)`
-    - BFS/DFS: `O(V²)`
-  Back: "Graph (Adjacency Matrix)"
+    **Graph (Adjacency Matrix)** — What are the time complexities for:
+    - Add vertex
+    - Add edge
+    - Remove vertex
+    - Remove edge
+    - BFS/DFS
+  Back: |
+    - Add vertex: **O(V²)** — must resize the matrix (add row and column)
+    - Add edge: **O(1)** — set matrix[u][v] directly
+    - Remove vertex: **O(V²)** — must resize the matrix (remove row and column)
+    - Remove edge: **O(1)** — clear matrix[u][v] directly
+    - BFS/DFS: **O(V²)** — must check all V neighbors for each vertex
