@@ -1,5 +1,5 @@
-# ── TWO‑POINTER TECHNIQUE ──────────────────────────────────────────────────
-- title: "Two‑Pointer Technique - Overview"
+# ── TWO-POINTER TECHNIQUE ──────────────────────────────────────────────────
+- title: "Two-Pointer Technique - Overview"
   difficulty: "easy"
   tags: ["two pointer", "identify", "array"]
   Front: |
@@ -7,9 +7,9 @@
 
     - Uses **two indices** that move toward each other or at different speeds
     - Solves many problems in **O(n)** without extra space (e.g., pair sum, palindrome)?
-  Back: "Two‑Pointer Technique"
+  Back: "Two-Pointer Technique"
 
-- title: "Two‑Pointer – Pair Sum (Sorted)"
+- title: "Two-Pointer – Pair Sum (Sorted)"
   difficulty: "easy"
   tags: ["two pointer", "implementation"]
   Front: |
@@ -24,6 +24,6 @@
     }
     ```
   Back: |
-    Two‑pointer pair sum on sorted array – O(n)
+    Two-pointer pair sum on sorted array – O(n)
 
     The sorted invariant lets you decide which pointer to move: too small → advance left, too large → advance right. This eliminates the need for a hash set and uses O(1) extra space.

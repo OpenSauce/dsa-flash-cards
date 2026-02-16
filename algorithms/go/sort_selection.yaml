@@ -28,4 +28,4 @@
   Back: |
     Selection Sort (O(n²) time, O(1) space)
 
-    Always performs n(n−1)/2 comparisons regardless of input order — no best‑case shortcut. Useful when writes are expensive since it does at most n swaps, but insertion sort is generally preferred.
+    Always performs n(n−1)/2 comparisons regardless of input order — no best-case shortcut. Useful when writes are expensive since it does at most n swaps, but insertion sort is generally preferred.

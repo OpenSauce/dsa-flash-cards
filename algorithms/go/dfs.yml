@@ -1,5 +1,5 @@
-# ── DEPTH‑FIRST SEARCH ─────────────────────────────────────────────────────
-- title: "Depth‑First Search - Overview"
+# ── DEPTH-FIRST SEARCH ─────────────────────────────────────────────────────
+- title: "Depth-First Search - Overview"
   difficulty: "easy"
   tags: ["dfs", "identify", "graph traversal"]
   Front: |
@@ -8,7 +8,7 @@
     - Explores as far as possible along each branch before backtracking
     - Uses **recursion or an explicit stack**
     - Runs in **O(V+E)** time?
-  Back: "Depth‑First Search (DFS)"
+  Back: "Depth-First Search (DFS)"
 
 - title: "DFS – Recursive"
   difficulty: "easy"

@@ -30,4 +30,4 @@
   Back: |
     Binary Search (O(log n))
 
-    Requires a sorted input. Each iteration eliminates half the search space. Watch for the off‑by‑one pitfall: use `lo <= hi` (not `<`) to avoid missing the last element.
+    Requires a sorted input. Each iteration eliminates half the search space. Watch for the off-by-one pitfall: use `lo <= hi` (not `<`) to avoid missing the last element.

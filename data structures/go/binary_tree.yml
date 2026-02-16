@@ -11,7 +11,7 @@
   Back: "Binary Tree"
 
 # ── OPERATION CARD ──────────────────────────────────────────────────────────
-- title: "Binary Tree – In‑order Traversal"
+- title: "Binary Tree – In-order Traversal"
   difficulty: "easy"
   tags: ["binary tree", "traversal"]
   Front: |
@@ -26,6 +26,6 @@
     }
     ```
   Back: |
-    In‑order traversal (O(n))
+    In-order traversal (O(n))
 
-    Visits left subtree, then root, then right. On a BST this produces sorted output. Pre‑order and post‑order differ only in when the root is visited.
+    Visits left subtree, then root, then right. On a BST this produces sorted output. Pre-order and post-order differ only in when the root is visited.

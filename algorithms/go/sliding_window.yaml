@@ -24,6 +24,6 @@
     }
     ```
   Back: |
-    Fixed‑size sliding window – O(n)
+    Fixed-size sliding window – O(n)
 
     Avoids recomputing the sum from scratch each time by adding the new element and subtracting the one that left the window. This "add one, remove one" pattern turns an O(nk) brute force into O(n).

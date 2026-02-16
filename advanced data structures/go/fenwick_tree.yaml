@@ -5,7 +5,7 @@
   Front: |
     Which data structure …
 
-    - Stores **prefix sums** in a clever bit‑indexed array
+    - Stores **prefix sums** in a clever bit-indexed array
     - Supports **point updates** and **prefix queries** in **O(log n)**?
   Back: "Fenwick Tree (Binary Indexed Tree)"
 

@@ -1,5 +1,5 @@
-# ── BREADTH‑FIRST SEARCH ───────────────────────────────────────────────────
-- title: "Breadth‑First Search - Overview"
+# ── BREADTH-FIRST SEARCH ───────────────────────────────────────────────────
+- title: "Breadth-First Search - Overview"
   difficulty: "easy"
   tags: ["bfs", "identify", "graph traversal"]
   Front: |
@@ -8,7 +8,7 @@
     - Uses a **queue** to visit nodes level by level
     - Finds shortest path in **unweighted** graphs
     - Runs in **O(V+E)** time?
-  Back: "Breadth‑First Search (BFS)"
+  Back: "Breadth-First Search (BFS)"
 
 - title: "BFS – Queue Implementation"
   difficulty: "easy"
@@ -32,4 +32,4 @@
   Back: |
     BFS traversal (O(V+E))
 
-    Visits all nodes at distance d before any at distance d+1. The `dist` map doubles as a visited set — using it instead of a separate `visited` boolean also gives you shortest‑path distances for free.
+    Visits all nodes at distance d before any at distance d+1. The `dist` map doubles as a visited set — using it instead of a separate `visited` boolean also gives you shortest-path distances for free.

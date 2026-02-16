@@ -5,8 +5,8 @@
   Front: |
     Which sorting algorithm …
 
-    - Repeatedly swaps **adjacent** out‑of‑order elements
-    - Has worst‑case **O(n²)** time
+    - Repeatedly swaps **adjacent** out-of-order elements
+    - Has worst-case **O(n²)** time
     - Is often taught first for its simplicity?
   Back: "Bubble Sort"
 
@@ -28,4 +28,4 @@
   Back: |
     Bubble Sort (O(n²) time, O(1) space)
 
-    Each pass "bubbles" the next largest element into its final position. Adding an early‑exit flag when no swaps occur gives O(n) best case on already‑sorted input. Rarely used in practice — prefer insertion sort for small n.
+    Each pass "bubbles" the next largest element into its final position. Adding an early-exit flag when no swaps occur gives O(n) best case on already-sorted input. Rarely used in practice — prefer insertion sort for small n.

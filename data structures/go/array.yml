@@ -6,7 +6,7 @@
     Which data structure …
 
     - Stores elements in a **contiguous block of memory**
-    - Provides **constant‑time access by index**
+    - Provides **constant-time access by index**
     - Requires **O(n)** shifts to insert or delete in the middle
   Back: "Array"
 
@@ -43,7 +43,7 @@
     arr = append(arr, 4)
     ```
   Back: |
-    Insert at end / push‑back (amortised O(1))
+    Insert at end / push-back (amortised O(1))
 
     Go slices double their backing array when capacity is exceeded, so most appends are O(1). Occasional resizing copies all elements, but amortised over many appends the cost stays constant.
 
@@ -58,9 +58,9 @@
     arr  = arr[:len(arr)-1]
     ```
   Back: |
-    Delete at end / pop‑back (O(1))
+    Delete at end / pop-back (O(1))
 
-    Re‑slicing just moves the length pointer without copying or shifting elements. The removed element's memory is not freed until the backing array is garbage‑collected.
+    Re-slicing just moves the length pointer without copying or shifting elements. The removed element's memory is not freed until the backing array is garbage-collected.
 
 - title: "Array – Insert at Beginning"
   difficulty: "easy"

@@ -5,7 +5,7 @@
   Front: |
     Which data structure …
 
-    - Operates on a **first‑in, first‑out** principle
+    - Operates on a **first-in, first-out** principle
     - Uses **enqueue** at the rear and **dequeue** at the front
     - Is common in task scheduling, buffering, and BFS
   Back: "Queue"
@@ -24,7 +24,7 @@
   Back: |
     Dequeue (O(1))
 
-    Removes the front element. In Go, re‑slicing with `q[1:]` is O(1) but leaks memory over time since the backing array head is never freed. For production use, prefer a ring buffer.
+    Removes the front element. In Go, re-slicing with `q[1:]` is O(1) but leaks memory over time since the backing array head is never freed. For production use, prefer a ring buffer.
 
 - title: "Queue – Search"
   difficulty: "easy"

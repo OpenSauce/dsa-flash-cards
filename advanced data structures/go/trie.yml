@@ -3,9 +3,9 @@
   difficulty: "medium"
   tags: ["trie", "identify"]
   Front: |
-    Which tree‑like structure …
+    Which tree-like structure …
 
-    - Stores strings character‑by‑character down edges
+    - Stores strings character-by-character down edges
     - Provides **O(k)** insert/search where k = length of string?
   Back: "Trie (Prefix Tree)"
 

@@ -7,7 +7,7 @@
 
     - Represents vertices with **lists of neighbours**
     - Uses **O(V+E)** space
-    - Allows **O(1)** expected add‑edge?
+    - Allows **O(1)** expected add-edge?
   Back: "Graph (Adjacency List)"
 
 - title: "Graph – Add Edge (Undirected)"
@@ -23,7 +23,7 @@
   Back: |
     Add undirected edge (O(1) average)
 
-    Both endpoints get the other appended to their adjacency list. For directed graphs only one append is needed. Checking for duplicate edges requires O(degree) — use a set per vertex if duplicates matter.
+    Both endpoints get the other appended to their adjacency list. For directed graphs only one append is needed. Checking for duplicate edges in u's adjacency list requires O(degree(u)) — use a set per vertex if duplicates matter.
 
 - title: "Graph – BFS Traversal"
   difficulty: "easy"
@@ -45,6 +45,6 @@
     }
     ```
   Back: |
-    Breadth‑First Search (O(V+E))
+    Breadth-First Search (O(V+E))
 
     Explores nodes level by level using a queue, guaranteeing shortest path in unweighted graphs. Mark nodes visited before enqueuing (not after dequeuing) to avoid processing the same node multiple times.

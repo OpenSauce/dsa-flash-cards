@@ -3,10 +3,10 @@
   difficulty: "easy"
   tags: ["prefix sum", "identify"]
   Front: |
-    Which pre‑processing method …
+    Which pre-processing method …
 
     - Builds an array of **cumulative totals**
-    - Answers **range‑sum queries** in **O(1)** after **O(n)** build?
+    - Answers **range-sum queries** in **O(1)** after **O(n)** build?
   Back: "Prefix Sum"
 
 - title: "Prefix Sum – Build & Range Query"
@@ -25,4 +25,4 @@
   Back: |
     Prefix sum – build O(n), query O(1)
 
-    Trades O(n) space for O(1) range‑sum queries via the identity `sum(l,r) = pre[r] − pre[l]`. The extra element `pre[0] = 0` avoids special‑casing the range starting at index 0.
+    Trades O(n) space for O(1) range-sum queries via the identity `sum(l,r) = pre[r] − pre[l]`. The extra element `pre[0] = 0` avoids special-casing the range starting at index 0.

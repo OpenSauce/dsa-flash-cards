@@ -6,7 +6,7 @@
     Which data structure …
 
     - Is a **complete binary tree** stored most often in an array
-    - Satisfies the **min‑heap / max‑heap** property
+    - Satisfies the **min-heap / max-heap** property
     - Provides **O(log n)** insertion and deletion, **O(1)** peek
   Back: "Binary Heap"
 
@@ -29,7 +29,7 @@
     }
     ```
   Back: |
-    Heap insert / sift‑up (O(log n))
+    Heap insert / sift-up (O(log n))
 
     The new element is appended at the end, then "bubbled up" by swapping with its parent until the heap property is restored. The tree's height is log n, bounding the swaps.
 
@@ -46,7 +46,7 @@
   Back: |
     Peek min/max (O(1))
 
-    The root always holds the extreme value. This constant‑time access is why heaps power priority queues — you can always grab the highest‑priority item instantly.
+    The root always holds the extreme value. This constant-time access is why heaps power priority queues — you can always grab the highest-priority item instantly.
 
 - title: "Binary Heap – Delete Min"
   difficulty: "medium"
@@ -69,6 +69,6 @@
     }
     ```
   Back: |
-    Delete min/max / sift‑down (O(log n))
+    Delete min/max / sift-down (O(log n))
 
     Replaces the root with the last element, then sifts it down. At each level the node is swapped with its smallest child, restoring the heap invariant in at most log n steps.

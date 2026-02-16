@@ -5,7 +5,7 @@
   Front: |
     Which data structure …
 
-    - Operates on a **last‑in, first‑out** principle
+    - Operates on a **last-in, first-out** principle
     - Supports **push** and **pop** in **O(1)**
     - Is used for recursion call stacks and undo features
   Back: "Stack"
@@ -24,7 +24,7 @@
   Back: |
     Pop (O(1))
 
-    Removes and returns the most‑recently added element. Always check that the stack is non‑empty first to avoid an index‑out‑of‑range panic.
+    Removes and returns the most-recently added element. Always check that the stack is non-empty first to avoid an index-out-of-range panic.
 
 - title: "Stack – Search"
   difficulty: "easy"

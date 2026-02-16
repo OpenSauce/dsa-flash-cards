@@ -1,5 +1,5 @@
-# ── UNION‑FIND / DISJOINT SET UNION ─────────────────────────────────────────
-- title: "Union‑Find - Overview"
+# ── UNION-FIND / DISJOINT SET UNION ─────────────────────────────────────────
+- title: "Union-Find - Overview"
   difficulty: "medium"
   tags: ["union find", "identify"]
   Front: |
@@ -7,10 +7,10 @@
 
     - Keeps track of **disjoint sets**
     - Supports **union** and **find** (with path compression) almost O(1)?
-  Back: "Union‑Find (Disjoint Set Union)"
+  Back: "Union-Find (Disjoint Set Union)"
 
 # Find with path compression
-- title: "Union‑Find – Find (Path Compression)"
+- title: "Union-Find – Find (Path Compression)"
   difficulty: "medium"
   tags: ["union find", "find"]
   Front: |
@@ -25,12 +25,12 @@
     }
     ```
   Back: |
-    Union‑find with path compression (amortised α(n) ≈ O(1))
+    Union-find with path compression (amortised α(n) ≈ O(1))
 
     Path compression flattens the tree by pointing every visited node directly to the root. Combined with union by rank, this gives nearly constant amortised time per operation.
 
 # Union by rank
-- title: "Union‑Find – Union (By Rank)"
+- title: "Union-Find – Union (By Rank)"
   difficulty: "medium"
   tags: ["union find", "union"]
   Front: |
@@ -53,4 +53,4 @@
   Back: |
     Union by rank (amortised α(n) ≈ O(1))
 
-    Attaching the shorter tree under the taller one keeps height logarithmic. The early return when `ra == rb` prevents creating cycles. Essential for Kruskal's MST and connected‑component queries.
+    Attaching the shorter tree under the taller one keeps height logarithmic. The early return when `ra == rb` prevents creating cycles. Essential for Kruskal's MST and connected-component queries.

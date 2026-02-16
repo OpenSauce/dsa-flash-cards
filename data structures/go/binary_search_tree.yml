@@ -32,9 +32,9 @@
   Back: |
     BST search (O(log n) on balanced tree)
 
-    Each comparison eliminates half the remaining nodes. An unbalanced BST (e.g., all nodes inserted in order) degrades to O(n) — use AVL or red‑black trees to guarantee balance.
+    Each comparison eliminates half the remaining nodes. An unbalanced BST (e.g., all nodes inserted in order) degrades to O(n) — use AVL or red-black trees to guarantee balance.
 
-- title: "BST – Insert (Unbalanced worst‑case)"
+- title: "BST – Insert (Unbalanced worst-case)"
   difficulty: "medium"
   tags: ["bst", "insert"]
   Front: |
@@ -52,6 +52,6 @@
     }
     ```
   Back: |
-    BST insert (O(n) worst‑case)
+    BST insert (O(n) worst-case)
 
-    Inserting sorted data creates a linked‑list‑shaped tree where every insert walks the full depth. Self‑balancing trees (AVL, red‑black) restructure after each insert to keep height at O(log n).
+    Inserting sorted data creates a linked-list-shaped tree where every insert walks the full depth. Self-balancing trees (AVL, red-black) restructure after each insert to keep height at O(log n).

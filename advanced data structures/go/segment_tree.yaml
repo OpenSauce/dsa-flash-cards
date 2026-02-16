@@ -9,7 +9,7 @@
     - Supports **range queries** and **point updates** in **O(log n)**?
   Back: "Segment Tree"
 
-# Build tree (bottom‑up)
+# Build tree (bottom-up)
 - title: "Segment Tree – Build"
   difficulty: "medium"
   tags: ["segment tree", "build"]
@@ -30,7 +30,7 @@
   Back: |
     Segment tree build – O(n)
 
-    Leaves hold the original values; each internal node stores the sum of its two children. Building bottom‑up avoids recursion and is cache‑friendlier than top‑down construction.
+    Leaves hold the original values; each internal node stores the sum of its two children. Building bottom-up avoids recursion and is cache-friendlier than top-down construction.
 
 # Range sum query
 - title: "Segment Tree – Range Query"
@@ -75,4 +75,4 @@
   Back: |
     Segment tree point update – O(log n)
 
-    Updates the leaf, then propagates the change upward by recomputing each ancestor. Only the nodes on the root‑to‑leaf path are touched.
+    Updates the leaf, then propagates the change upward by recomputing each ancestor. Only the nodes on the root-to-leaf path are touched.

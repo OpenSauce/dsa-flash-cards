@@ -22,4 +22,4 @@
   Back: |
     Contains / membership test (O(1) average)
 
-    Go's map lookup returns a second boolean indicating presence. This is the core advantage of a set — constant‑time membership testing that avoids the O(n) scan of a list.
+    Go's map lookup returns a second boolean indicating presence. This is the core advantage of a set — constant-time membership testing that avoids the O(n) scan of a list.

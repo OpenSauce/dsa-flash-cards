@@ -6,7 +6,7 @@
     Which data structure …
 
     - Maps **keys to values** via a **hash function**
-    - Aims for **O(1)** average‑case insert, delete, and lookup
+    - Aims for **O(1)** average-case insert, delete, and lookup
     - Suffers collisions that can degrade to **O(n)**
   Back: "Hash Map"
 
@@ -24,4 +24,4 @@
   Back: |
     Lookup by key (average O(1), worst O(n))
 
-    The two‑value form lets you distinguish "key exists with zero value" from "key missing." Worst case O(n) happens when all keys hash to the same bucket, but Go's map uses randomised hashing to make this unlikely.
+    The two-value form lets you distinguish "key exists with zero value" from "key missing." Worst case O(n) happens when all keys hash to the same bucket, but Go's map uses randomised hashing to make this unlikely.

@@ -7,10 +7,10 @@
 
     - Builds a **binary heap** then repeatedly extracts max/min
     - Runs in **O(n log n)** time
-    - Sorts **in‑place** with `O(1)` extra memory?
+    - Sorts **in-place** with `O(1)` extra memory?
   Back: "Heap Sort"
 
-- title: "Heap Sort – Implementation (Max‑Heap)"
+- title: "Heap Sort – Implementation (Max-Heap)"
   difficulty: "medium"
   tags: ["heap sort", "implementation"]
   Front: |

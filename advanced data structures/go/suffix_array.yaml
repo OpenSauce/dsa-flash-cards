@@ -7,7 +7,7 @@
 
     - Lists **all suffixes of a string in lexicographic order**
     - Enables substring search via binary search in **O(m log n)**
-    - Can be built in **O(n log n)** (or O(n) with SA‑IS)?
+    - Can be built in **O(n log n)** (or O(n) with SA-IS)?
   Back: "Suffix Array"
 
 - title: "Suffix Array – Build (Naïve O(n log² n))"
@@ -27,7 +27,7 @@
   Back: |
     Build suffix array (naïve) – O(n log² n)
 
-    Sorting all suffixes directly. Each string comparison is O(n), giving O(n² log n) naïvely, but ranking‑based approaches reduce to O(n log² n). For large strings, use the SA‑IS algorithm for O(n).
+    Sorting all suffixes directly. Each string comparison is O(n), giving O(n² log n) naïvely, but ranking-based approaches reduce to O(n log² n). For large strings, use the SA-IS algorithm for O(n).
 
 - title: "Suffix Array – Substring Search"
   difficulty: "hard"

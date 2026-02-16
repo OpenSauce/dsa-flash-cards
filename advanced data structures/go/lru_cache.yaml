@@ -6,7 +6,7 @@
     Which data structure …
 
     - Combines a **hash map + doubly linked list**
-    - Keeps most‑recently‑used items at the front
+    - Keeps most-recently-used items at the front
     - Supports **get** and **put/evict** in **O(1)**?
   Back: "LRU Cache"
 

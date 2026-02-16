@@ -1,4 +1,4 @@
-# ── DEQUE (DOUBLE‑ENDED QUEUE) ──────────────────────────────────────────────
+# ── DEQUE (DOUBLE-ENDED QUEUE) ──────────────────────────────────────────────
 - title: "Deque - Overview"
   difficulty: "easy"
   tags: ["deque", "identify"]
@@ -8,7 +8,7 @@
     - Supports insertion and removal at **both front and back**
     - Can be implemented with a circular buffer or linked list
     - Provides **O(1)** push/pop at either end?
-  Back: "Deque (Double‑Ended Queue)"
+  Back: "Deque (Double-Ended Queue)"
 
 - title: "Deque – Pop Back"
   difficulty: "easy"
@@ -23,4 +23,4 @@
   Back: |
     Pop back (O(1) amortised)
 
-    Removing from the back of a slice is cheap — just shrink the length. A true deque with a circular buffer gives O(1) for both ends without the memory leak that slice re‑slicing causes at the front.
+    Removing from the back of a slice is cheap — just shrink the length. A true deque with a circular buffer gives O(1) for both ends without the memory leak that slice re-slicing causes at the front.
