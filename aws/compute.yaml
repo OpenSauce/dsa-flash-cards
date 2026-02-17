@@ -1,0 +1,78 @@
+- title: "AWS Compute - EC2 vs ECS vs Lambda"
+  difficulty: "medium"
+  tags: ["aws", "compute", "EC2", "ECS", "Lambda"]
+  Front: |
+    What is the difference between **EC2**, **ECS**, and **Lambda**? When would you choose each?
+  Back: |
+    **EC2 (Elastic Compute Cloud):** Virtual machines with full OS-level control. You pick the instance type, manage the OS, install software, and handle patching. Maximum flexibility, maximum operational burden.
+
+    **ECS (Elastic Container Service):** Container orchestration. You bring Docker images, AWS manages container placement and scaling across EC2 instances or Fargate (serverless containers). Less infra management than raw EC2, but you still think about task definitions, services, and clusters.
+
+    **Lambda:** Serverless functions triggered by events. No servers to manage, pay only per invocation, auto-scales to zero. Best for short-lived tasks (max 15 min execution).
+
+    **Decision framework:**
+    - Need OS-level control or long-running processes -> **EC2**
+    - Containerized workloads with orchestration needs -> **ECS**
+    - Short-lived, event-driven functions -> **Lambda**
+
+    **Interview tip:** Frame your choice around the workload, not the service. Interviewers want to hear the reasoning, not just the name.
+
+- title: "AWS Compute - EC2 Instance Types"
+  difficulty: "easy"
+  tags: ["aws", "compute", "EC2", "instance types"]
+  Front: |
+    What is an **EC2 instance type** and how do you choose one?
+  Back: |
+    An instance type defines the CPU, memory, storage, and networking capacity of an EC2 virtual machine. AWS organizes them into families optimized for different workloads.
+
+    **Key families:**
+    - **General purpose (t3, m5):** Balanced CPU and memory. Web servers, small databases, dev environments. "t" instances have burstable CPU with credit-based throttling.
+    - **Compute-optimized (c5):** High CPU-to-memory ratio. Batch processing, scientific modeling, video encoding.
+    - **Memory-optimized (r5):** High memory-to-CPU ratio. In-memory caches, real-time analytics, large databases.
+    - **Storage-optimized (i3):** High sequential read/write to local storage. Data warehousing, distributed file systems.
+    - **GPU (p3, g4):** Machine learning training and inference, graphics rendering.
+
+    **How to choose:** Match the bottleneck. CPU-bound workload -> c5. Memory-bound -> r5. General web server -> t3 or m5. Right-sizing the instance matters more than picking the right family for cost optimization.
+
+- title: "AWS Compute - Auto Scaling"
+  difficulty: "medium"
+  tags: ["aws", "compute", "auto scaling", "EC2"]
+  Front: |
+    What is **auto-scaling** and what triggers a scale-out event?
+  Back: |
+    Auto Scaling automatically adjusts the number of EC2 instances based on demand, so you have enough capacity during traffic spikes and don't overpay during quiet periods.
+
+    **Three components:**
+    - **Launch template:** Defines what to scale (AMI, instance type, security groups)
+    - **Auto Scaling Group (ASG):** Defines how many (min, max, desired instance count)
+    - **Scaling policy:** Defines when to scale
+
+    **Common triggers for scale-out:**
+    - **Target tracking:** Maintain average CPU at 60% -- add instances when CPU exceeds target
+    - **Step scaling:** Add 2 instances when CPU > 70%, add 4 when CPU > 90%
+    - **Scheduled scaling:** Add capacity before a known traffic spike (e.g., every Monday 9 AM)
+    - **Custom CloudWatch metrics:** Request count, queue depth, or any application-specific metric
+
+    **Cooldown period:** After a scaling action, the ASG waits (default 300 seconds) before acting again. This prevents thrashing -- scaling out and in repeatedly in response to noisy metrics.
+
+    **Interview tip:** Mention that scale-in is harder than scale-out. Removing instances risks dropping active connections, so graceful draining and connection draining are important.
+
+- title: "AWS Compute - Lambda Cold Starts"
+  difficulty: "medium"
+  tags: ["aws", "compute", "Lambda", "cold start", "serverless"]
+  Front: |
+    What is the **cold start problem** in Lambda and how do you mitigate it?
+  Back: |
+    A cold start occurs when Lambda must create a new execution environment from scratch: download the deployment package, start the runtime, and run your initialization code. This adds latency before your function handles its first request.
+
+    **Typical cold start latency:**
+    - Python/Node.js: 100-500ms
+    - Java/.NET: 1-10 seconds (JVM/CLR startup is expensive)
+
+    **Mitigations:**
+    - **Provisioned Concurrency:** Pre-warms a set number of execution environments. Greatly reduces cold starts for the provisioned capacity, but additional traffic beyond that limit can still see cold starts, and you pay even when idle.
+    - **Smaller deployment packages:** Less code to download means faster initialization. Avoid bundling unused dependencies.
+    - **Choose a faster runtime:** Python and Node.js cold-start significantly faster than Java.
+    - **Keep initialization outside the handler:** Code at module level runs once per environment, not per invocation. Put DB connections and SDK clients there.
+
+    **Trade-off:** Provisioned Concurrency costs money for idle capacity, which undermines Lambda's pay-per-use advantage. It is worth it for latency-sensitive paths (API endpoints) but overkill for background processing.

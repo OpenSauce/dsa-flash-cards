@@ -1,0 +1,62 @@
+- title: "AWS CDN - CloudFront"
+  difficulty: "medium"
+  tags: ["aws", "CDN", "CloudFront", "edge"]
+  Front: |
+    What is **CloudFront** and how does it differ from a traditional reverse proxy?
+  Back: |
+    CloudFront is AWS's Content Delivery Network with 400+ edge locations worldwide. It caches and serves content from the location closest to the user.
+
+    **How it differs from a traditional reverse proxy:**
+
+    **Scale and distribution:** A reverse proxy is typically one or a few servers in front of your origin. CloudFront is a globally distributed network of edge servers. Users in Tokyo hit a Tokyo edge location, not your origin in Virginia.
+
+    **Integrated security:** CloudFront includes AWS Shield (DDoS protection) by default and integrates with AWS WAF for application-layer filtering. A traditional reverse proxy requires separate DDoS mitigation.
+
+    **Access control:** CloudFront supports signed URLs and signed cookies for restricting who can access content (e.g., paid video content). It also integrates with Lambda@Edge to run custom logic at edge locations.
+
+    **Origin flexibility:** CloudFront can serve from S3 buckets, Application Load Balancers, EC2 instances, or any HTTP endpoint -- including non-AWS origins.
+
+    **Note:** The general concept of how CDNs improve performance (reduced latency, origin offloading, traffic spike absorption) applies to CloudFront the same way it applies to any CDN.
+
+    **Interview tip:** When designing a system with global users and static content, mention CloudFront specifically in an AWS context. Pair it with S3 for static assets and an ALB for dynamic content.
+
+- title: "AWS DNS - Route 53"
+  difficulty: "medium"
+  tags: ["aws", "DNS", "Route 53", "routing"]
+  Front: |
+    What is **Route 53** and what routing policies does it support?
+  Back: |
+    Route 53 is AWS's DNS service, named after DNS port 53. It translates domain names to IP addresses and provides health checking and traffic routing.
+
+    **Routing policies:**
+    - **Simple:** One record, one resource. Basic DNS resolution.
+    - **Weighted:** Distribute traffic by percentage (e.g., 80% to deployment A, 20% to deployment B). Useful for canary deployments and gradual rollouts.
+    - **Latency-based:** Route users to the AWS region with the lowest measured latency. Critical for multi-region deployments.
+    - **Failover:** Active-passive setup. Route traffic to the primary, and automatically switch to a standby if the primary fails health checks.
+    - **Geolocation:** Route based on the user's geographic location (continent, country). Useful for compliance (keep EU data in EU regions) or localized content.
+    - **Multi-value answer:** Return up to 8 healthy IP addresses. The client picks one. A lightweight alternative to a load balancer for simple failover.
+
+    **Health checks:** Route 53 monitors endpoint health and removes unhealthy targets from DNS responses automatically. This enables DNS-level failover without a separate load balancer.
+
+    **Interview tip:** In multi-region system design, latency-based routing with failover is the standard Route 53 answer. It routes users to the fastest region and automatically fails over if a region goes down.
+
+- title: "AWS CDN - CloudFront Origin Shield"
+  difficulty: "hard"
+  tags: ["aws", "CDN", "CloudFront", "Origin Shield", "caching"]
+  Front: |
+    What is **CloudFront Origin Shield** and when would you use it?
+  Back: |
+    Origin Shield is an additional caching layer between CloudFront's regional edge caches and your origin server.
+
+    **The problem it solves:** Without Origin Shield, each of CloudFront's regional edge caches independently fetches content from your origin on a cache miss. If content is requested in 10 regions, your origin gets 10 requests. For popular content accessed globally, the origin sees significant load even with CloudFront in front of it.
+
+    **How it works:** With Origin Shield enabled, all regional edge caches fetch through a single Origin Shield cache (in the region you choose). If the content is in Origin Shield's cache, the origin is never contacted. Your origin now sees at most one request per cache miss, regardless of how many regions request the content.
+
+    **When to use it:**
+    - **Origin is load-sensitive:** Your origin cannot handle traffic spikes even with CloudFront absorbing most requests
+    - **Global audience:** Content is accessed from many geographic regions, multiplying origin requests
+    - **Higher cache hit ratio:** The centralized cache layer increases the chance of a cache hit before reaching the origin
+
+    **Trade-off:** Origin Shield adds a small amount of latency (one extra hop) and incremental cost per request. For origins that can handle the load, it may not be worth the added complexity.
+
+    **Interview tip:** Origin Shield demonstrates depth beyond "put a CDN in front of it." It shows you understand multi-tier caching and origin protection strategies.
