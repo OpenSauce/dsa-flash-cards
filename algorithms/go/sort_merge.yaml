@@ -8,7 +8,10 @@
     - Uses **divide-and-conquer** to split, sort, and merge halves
     - Guarantees **O(n log n)** time
     - Requires **O(n)** extra space?
-  Back: "Merge Sort"
+  Back: |
+    **Merge Sort**
+
+    A divide-and-conquer sorting algorithm that splits the array in half, recursively sorts each half, and merges the results in O(n log n) guaranteed time. Use when you need a stable sort or a worst-case O(n log n) guarantee. Trade-off: requires O(n) extra space for the merge step, unlike in-place alternatives like quicksort.
 
 - title: "Merge Sort – Recursive"
   difficulty: "medium"

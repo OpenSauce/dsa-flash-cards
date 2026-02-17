@@ -8,4 +8,7 @@
     - Stores **unique elements only**
     - Provides **add / remove / contains** in **O(1)** average time
     - Is often implemented as a hash table without values?
-  Back: "Hash Set"
+  Back: |
+    **Hash Set**
+
+    A collection that stores unique elements with O(1) average add, remove, and contains operations, typically backed by a hash table. Use when you need fast membership testing or deduplication. Trade-off: unordered iteration and requires hashable keys -- use a tree-based set (O(log n) operations) when you need sorted traversal.

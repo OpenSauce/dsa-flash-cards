@@ -8,7 +8,10 @@
     - Combines a **hash map + doubly linked list**
     - Keeps most-recently-used items at the front
     - Supports **get** and **put/evict** in **O(1)**?
-  Back: "LRU Cache"
+  Back: |
+    **LRU Cache**
+
+    A fixed-capacity cache that evicts the least recently used entry when full, combining a hash map (O(1) lookup) with a doubly linked list (O(1) reordering). Use when you need bounded-memory caching with temporal locality -- web caches, database page buffers, API rate limiting. Trade-off: higher per-entry memory overhead than a simple hash map due to the linked list pointers and dual data structures.
 
 - title: "LRU Cache – Get"
   difficulty: "medium"

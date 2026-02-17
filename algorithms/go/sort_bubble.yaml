@@ -8,7 +8,10 @@
     - Repeatedly swaps **adjacent** out-of-order elements
     - Has worst-case **O(n²)** time
     - Is often taught first for its simplicity?
-  Back: "Bubble Sort"
+  Back: |
+    **Bubble Sort**
+
+    A sorting algorithm that repeatedly swaps adjacent out-of-order elements, running in O(n^2) worst and average case. Primarily used for teaching since it is the simplest sort to understand and implement. Trade-off: strictly worse than insertion sort in practice -- more swaps, no adaptive speedup on nearly-sorted data, and rarely used outside educational contexts.
 
 - title: "Bubble Sort – Implementation"
   difficulty: "easy"

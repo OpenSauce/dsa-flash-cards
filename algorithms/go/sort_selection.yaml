@@ -8,7 +8,10 @@
     - Repeatedly selects the **minimum** remaining element
     - Swaps it into the correct position
     - Always runs in **O(n²)** time?
-  Back: "Selection Sort"
+  Back: |
+    **Selection Sort**
+
+    A sorting algorithm that repeatedly finds the minimum remaining element and swaps it into position, always running in O(n^2) time. Use when the number of writes matters -- it performs at most n swaps, which is useful when writing is expensive (e.g., flash memory). Trade-off: no best-case shortcut like insertion sort; always does n(n-1)/2 comparisons regardless of input order.
 
 - title: "Selection Sort – Implementation"
   difficulty: "easy"

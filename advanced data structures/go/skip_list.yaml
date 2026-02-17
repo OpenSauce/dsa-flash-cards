@@ -7,7 +7,10 @@
 
     - Layers multiple forward pointers over a linked list
     - Achieves **O(log n)** expected search/insert/delete?
-  Back: "Skip List"
+  Back: |
+    **Skip List**
+
+    A probabilistic data structure that layers multiple levels of forward pointers over a sorted linked list, achieving O(log n) expected search, insert, and delete. Use as a simpler alternative to balanced BSTs -- easier to implement and naturally supports concurrent access (e.g., Redis sorted sets, Java ConcurrentSkipListMap). Trade-off: probabilistic guarantees only (no worst-case bound) and higher memory usage due to multi-level pointers.
 
 # Search
 - title: "Skip List – Search"

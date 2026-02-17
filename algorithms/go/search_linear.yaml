@@ -8,7 +8,10 @@
     - Scans each element **sequentially**
     - Requires no ordering
     - Runs in **O(n)** time?
-  Back: "Linear Search"
+  Back: |
+    **Linear Search**
+
+    The simplest search algorithm -- scans each element sequentially in O(n) time, requiring no preprocessing or sorted input. Use on small or unsorted data where the overhead of sorting or building an index is not justified. Trade-off: O(n) per query makes it impractical for repeated searches on large datasets -- switch to binary search (sorted) or hash lookup (O(1) average) when query volume is high.
 
 - title: "Linear Search – Iterative"
   difficulty: "easy"

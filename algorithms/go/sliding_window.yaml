@@ -7,7 +7,10 @@
 
     - Maintains a **window** (contiguous subarray or substring)
     - Slides it left/right to process data in **O(n)**, updating state incrementally?
-  Back: "Sliding Window"
+  Back: |
+    **Sliding Window**
+
+    A technique that maintains a window over a contiguous subarray or substring and slides it across the input, updating state incrementally in O(n). Use for problems involving contiguous sequences -- max sum subarray, longest substring without repeats, minimum window containing a target. Trade-off: only works on contiguous ranges; non-contiguous subset problems require other approaches like dynamic programming.
 
 - title: "Sliding Window – Max Sum of Length k"
   difficulty: "easy"

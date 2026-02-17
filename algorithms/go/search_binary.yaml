@@ -8,7 +8,10 @@
     - Works on a **sorted** array
     - Repeatedly halves the search interval
     - Runs in **O(log n)** time?
-  Back: "Binary Search"
+  Back: |
+    **Binary Search**
+
+    A search algorithm that halves the search space each step on sorted data, running in O(log n) time. Use whenever you have sorted data and need to find a value or a boundary (lower/upper bound). Trade-off: requires the input to be sorted -- if data changes frequently, maintaining sort order may outweigh the search speedup.
 
 - title: "Binary Search – Iterative"
   difficulty: "easy"

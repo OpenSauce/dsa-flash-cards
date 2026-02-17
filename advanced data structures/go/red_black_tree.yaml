@@ -8,7 +8,10 @@
     - Colors nodes **red or black** and maintains 5 invariants
     - Guarantees tree height ≤ 2·log₂(n)
     - Offers **O(log n)** search/insert/delete?
-  Back: "Red-Black Tree"
+  Back: |
+    **Red-Black Tree**
+
+    A self-balancing BST that colors nodes red or black and maintains invariants guaranteeing O(log n) search, insert, and delete. Used internally by many standard libraries (Java TreeMap, C++ std::map) for ordered key-value storage. Trade-off: less strictly balanced than AVL trees (height up to 2 log n vs. 1.44 log n), so lookups can be slightly slower, but insertions and deletions require fewer rotations.
 
 - title: "RBT – Insert"
   difficulty: "hard"

@@ -8,7 +8,10 @@
     - Partitions around a **pivot**
     - Has **O(n log n)** average but **O(n²)** worst-case
     - Often fastest in practice with good pivot choice?
-  Back: "Quick Sort"
+  Back: |
+    **Quick Sort**
+
+    A divide-and-conquer sorting algorithm that partitions around a pivot, achieving O(n log n) average time and sorting in-place. Often the fastest general-purpose sort in practice due to cache locality and low constant factors. Trade-off: O(n^2) worst case when pivots are poorly chosen (e.g., sorted input with fixed pivot) -- mitigate with randomized or median-of-three pivot selection.
 
 - title: "Quick Sort – Lomuto Partition"
   difficulty: "medium"

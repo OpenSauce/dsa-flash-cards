@@ -7,7 +7,10 @@
 
     - Recursively partitions an array into **intervals**
     - Supports **range queries** and **point updates** in **O(log n)**?
-  Back: "Segment Tree"
+  Back: |
+    **Segment Tree**
+
+    A binary tree that partitions an array into intervals, supporting both range queries and point updates in O(log n). Use for problems requiring arbitrary range aggregation (sum, min, max, GCD) with dynamic updates. Trade-off: uses O(n) extra space and is more complex to implement than a Fenwick tree, but handles a wider class of operations including lazy propagation for range updates.
 
 # Build tree (bottom-up)
 - title: "Segment Tree – Build"

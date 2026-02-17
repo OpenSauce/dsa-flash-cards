@@ -7,7 +7,10 @@
 
     - Keeps track of **disjoint sets**
     - Supports **union** and **find** (with path compression) almost O(1)?
-  Back: "Union-Find (Disjoint Set Union)"
+  Back: |
+    **Union-Find (Disjoint Set Union)**
+
+    A data structure that tracks elements partitioned into disjoint sets, supporting union and find in nearly O(1) amortized time with path compression and union by rank. Use for connectivity queries -- Kruskal's MST, connected components, equivalence classes. Trade-off: does not support splitting sets apart (no "un-union"), and finding all members of a specific set requires iterating every element.
 
 # Find with path compression
 - title: "Union-Find – Find (Path Compression)"

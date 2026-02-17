@@ -8,7 +8,10 @@
     - Links each node to both **next _and_ previous** nodes
     - Allows **O(1)** insert/delete at both ends given pointers
     - Still has **O(n)** search by value?
-  Back: "Doubly Linked List"
+  Back: |
+    **Doubly Linked List**
+
+    A linked list where each node points to both its predecessor and successor, enabling O(1) insertion and deletion at both ends or at any node given a direct pointer. Use when you need to remove a node without traversing to find its predecessor, such as in an LRU cache. Trade-off: each node stores two pointers instead of one, doubling per-node overhead compared to a singly linked list.
 
 # insert at tail (with tail pointer)
 - title: "DLL – Insert at Tail"
