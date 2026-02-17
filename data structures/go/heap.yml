@@ -33,21 +33,6 @@
 
     The new element is appended at the end, then "bubbled up" by swapping with its parent until the heap property is restored. The tree's height is log n, bounding the swaps.
 
-- title: "Binary Heap – Peek Min"
-  difficulty: "easy"
-  tags: ["heap", "peek"]
-  Front: |
-    What data structure operation does this implement? What is its time complexity?
-
-    ```go
-    min := h[0]
-    _ = min
-    ```
-  Back: |
-    Peek min/max (O(1))
-
-    The root always holds the extreme value. This constant-time access is why heaps power priority queues — you can always grab the highest-priority item instantly.
-
 - title: "Binary Heap – Delete Min"
   difficulty: "medium"
   tags: ["heap", "delete"]
