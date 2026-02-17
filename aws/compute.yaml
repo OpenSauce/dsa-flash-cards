@@ -70,7 +70,7 @@
     - Java/.NET: 1-10 seconds (JVM/CLR startup is expensive)
 
     **Mitigations:**
-    - **Provisioned Concurrency:** Pre-warms a set number of execution environments. Eliminates cold starts entirely for those instances, but you pay even when idle.
+    - **Provisioned Concurrency:** Pre-warms a set number of execution environments. Greatly reduces cold starts for the provisioned capacity, but additional traffic beyond that limit can still see cold starts, and you pay even when idle.
     - **Smaller deployment packages:** Less code to download means faster initialization. Avoid bundling unused dependencies.
     - **Choose a faster runtime:** Python and Node.js cold-start significantly faster than Java.
     - **Keep initialization outside the handler:** Code at module level runs once per environment, not per invocation. Put DB connections and SDK clients there.

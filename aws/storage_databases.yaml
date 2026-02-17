@@ -10,7 +10,7 @@
 
     **S3 Infrequent Access (IA):** Lower storage cost, but charges a per-GB retrieval fee. Use for backups, disaster recovery files, or data accessed less than once a month.
 
-    **S3 Glacier Instant Retrieval:** Archival storage with millisecond retrieval. Cheapest option for data that is rarely accessed but needs fast retrieval when it is.
+    **S3 Glacier Instant Retrieval:** Archival storage with millisecond retrieval. More expensive than other Glacier tiers but cheaper than Standard/IA. Use when data is rarely accessed but must be restored very quickly.
 
     **S3 Glacier Flexible Retrieval:** Archival with retrieval in minutes to hours. Very cheap storage.
 
