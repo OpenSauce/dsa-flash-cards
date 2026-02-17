@@ -1,0 +1,103 @@
+- title: "Caching - Write-Through vs Write-Back"
+  difficulty: "medium"
+  tags: ["caching", "write-through", "write-back", "consistency"]
+  Front: |
+    What is the difference between **write-through** and **write-back** caching?
+  Back: |
+    **Write-through:** Writes go to cache **AND** backing store simultaneously.
+    - Higher write latency (must wait for both writes)
+    - Strong consistency — cache and store always agree
+    - No data loss risk on cache failure
+
+    **Write-back (write-behind):** Writes go to cache only, flushed to store asynchronously.
+    - Lower write latency (only cache write is synchronous)
+    - Risk of **data loss** if the cache crashes before flushing
+    - Better write throughput
+
+    **Write-around:** Writes bypass cache entirely, only reads are cached.
+    - Avoids cache pollution from write-heavy workloads
+    - First read after a write always misses
+
+    **Interview tip:** Write-through is the safe default. Write-back is chosen when write throughput matters more than durability — always mention the data loss trade-off.
+
+- title: "Caching - Cache Invalidation"
+  difficulty: "hard"
+  tags: ["caching", "invalidation", "consistency", "distributed"]
+  Front: |
+    What is **cache invalidation** and why is it considered one of the hardest problems in computer science?
+  Back: |
+    Cache invalidation is the process of keeping cached data **consistent with the source of truth**.
+
+    **Why it is hard:**
+    - **Race conditions:** A read and a write can interleave, causing the cache to store stale data
+    - **Distributed delays:** In multi-node systems, invalidation messages have network latency — other nodes serve stale reads during propagation
+    - **Thundering herd:** When a popular cache entry expires, many requests simultaneously hit the backing store
+
+    **Common strategies:**
+    - **TTL (time-based):** Entries expire after a fixed duration. Simple but stale within the TTL window.
+    - **Event-driven invalidation:** The writer explicitly deletes or updates the cache entry. Precise but requires coordination.
+    - **Versioning:** Each entry has a version number. Stale versions are rejected on read.
+
+    *"There are only two hard things in computer science: cache invalidation and naming things."* — Phil Karlton
+
+- title: "Caching - Redis vs Memcached"
+  difficulty: "medium"
+  tags: ["caching", "redis", "memcached", "comparison"]
+  Front: |
+    When would you choose **Redis** over **Memcached**, and vice versa?
+  Back: |
+    **Choose Redis when you need:**
+    - **Data structures:** lists, sets, sorted sets, hashes, streams
+    - **Persistence:** RDB snapshots or AOF logging
+    - **Pub/sub** messaging
+    - **Lua scripting** for atomic operations
+    - **Replication** and clustering built-in
+
+    **Choose Memcached when you need:**
+    - **Simple key-value caching** at massive scale
+    - **Multi-threaded** performance (better CPU utilization on high core counts)
+    - **Slab allocator** avoids memory fragmentation
+    - Minimal operational complexity
+
+    **Rule of thumb:** If you need anything beyond simple key-value caching — data structure operations, persistence, pub/sub — use Redis. Memcached wins on raw throughput for pure cache-only workloads.
+
+    **Interview tip:** Default to Redis in system design interviews. It covers more use cases and interviewers rarely penalize you for choosing it.
+
+- title: "Caching - CDN"
+  difficulty: "easy"
+  tags: ["caching", "CDN", "latency", "static assets"]
+  Front: |
+    What is a **CDN** and how does it improve performance?
+  Back: |
+    A **Content Delivery Network** is a geographically distributed network of cache servers (edge locations) that serve content closer to users.
+
+    **What it caches:** Static assets (images, CSS, JS, videos), and optionally dynamic content.
+
+    **How it improves performance:**
+    - **Reduced latency** — shorter physical distance between user and server
+    - **Offloads origin server** — the origin handles fewer requests
+    - **Handles traffic spikes** — edge servers absorb sudden load
+
+    **Two models:**
+    - **Pull-based (lazy):** Edge caches on first request, then serves from cache. Simple but first request is slow.
+    - **Push-based:** Content is pre-populated to edge locations. Faster first request but requires explicit publishing.
+
+    **Interview tip:** Always mention a CDN when designing a system that serves static content globally. It is one of the easiest performance wins to articulate.
+
+- title: "Caching - Eviction Policies"
+  difficulty: "medium"
+  tags: ["caching", "eviction", "LRU", "LFU"]
+  Front: |
+    Name **3 cache eviction policies** and explain when each is best.
+  Back: |
+    1. **LRU (Least Recently Used):** Evicts the entry that has not been accessed for the longest time. General-purpose, good default for most workloads.
+
+    2. **LFU (Least Frequently Used):** Evicts the entry with the fewest total accesses. Best when access patterns have clear **hot/cold data** — popular items stay cached.
+
+    3. **FIFO (First In, First Out):** Evicts the oldest entry regardless of access pattern. Simplest to implement, good when all items have similar access probability.
+
+    **Also worth knowing:**
+    - **Random eviction:** Surprisingly competitive with LRU at scale and has zero bookkeeping overhead
+    - **TTL-based expiration:** Entries expire after a fixed time, regardless of access — used alongside other policies
+
+    **Interview tip:** LRU is the most commonly asked eviction policy. Know how to implement it with a **hash map + doubly linked list** for O(1) get and put operations.
