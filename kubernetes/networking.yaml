@@ -1,0 +1,75 @@
+- title: "Kubernetes Networking - Flat Network Model"
+  difficulty: "medium"
+  tags: ["kubernetes", "networking", "CNI", "pod networking"]
+  Front: |
+    How does **Kubernetes networking** work? What is the flat network model?
+  Back: |
+    Kubernetes imposes three fundamental networking rules that every cluster implementation must satisfy:
+
+    1. **Every Pod gets its own IP address** -- no NAT between Pods
+    2. **All Pods can communicate with all other Pods** without NAT, regardless of which node they are on
+    3. **Agents on a node (kubelet, kube-proxy) can communicate with all Pods on that node**
+
+    This creates a **flat network** -- from any Pod's perspective, every other Pod is directly reachable by IP address. There is no port mapping, no NAT translation, and no manual network configuration.
+
+    **How it is implemented:** Kubernetes does not implement networking itself. It delegates to **CNI (Container Network Interface) plugins** like Calico, Cilium, Flannel, or AWS VPC CNI. Each plugin uses different mechanisms (overlay networks, BGP routing, cloud-native VPC routing) to satisfy the three rules above.
+
+    **Why this design matters:** Applications do not need to know about the physical network topology. A Pod on Node A can connect to a Pod on Node B using the Pod's IP address, the same way it would connect to a Pod on the same node.
+
+    **Interview tip:** When asked "how do Pods communicate," describe the flat network model and the three rules. Then mention CNI plugins as the implementation layer. This shows you understand the abstraction, not just one specific CNI.
+
+- title: "Kubernetes Networking - Ingress vs Service"
+  difficulty: "medium"
+  tags: ["kubernetes", "Ingress", "Service", "L7 routing"]
+  Front: |
+    What is an **Ingress** and how does it differ from a Service?
+  Back: |
+    A Service provides L4 (transport layer) load balancing -- it routes TCP/UDP traffic to Pods based on IP and port. An Ingress provides L7 (application layer) routing -- it routes HTTP/HTTPS traffic based on hostnames, URL paths, and headers.
+
+    **What an Ingress does:**
+    - **Host-based routing:** `api.example.com` goes to the API Service, `app.example.com` goes to the frontend Service
+    - **Path-based routing:** `/api/*` goes to the backend, `/*` goes to the frontend
+    - **TLS termination:** Handles HTTPS certificates so backend services can communicate over plain HTTP
+    - **Single entry point:** One external load balancer instead of one per Service
+
+    **How it works:** An Ingress resource is just a routing configuration. It requires an **Ingress controller** (NGINX Ingress Controller, Traefik, AWS ALB Ingress Controller) to actually implement the routing rules. Without a controller, Ingress resources have no effect.
+
+    **When to use each:**
+    - **Service (LoadBalancer):** Single service exposed externally, or non-HTTP protocols (TCP/UDP, gRPC without HTTP mapping)
+    - **Ingress:** Multiple HTTP services behind a single entry point, host/path-based routing, centralized TLS management
+
+    **Note:** Kubernetes Gateway API is the successor to Ingress, offering more expressive routing and better multi-tenant support.
+
+    **Interview tip:** If designing a microservices architecture on Kubernetes, use an Ingress to consolidate external traffic through a single load balancer with path-based routing.
+
+- title: "Kubernetes Networking - NetworkPolicy"
+  difficulty: "medium"
+  tags: ["kubernetes", "NetworkPolicy", "security", "pod isolation"]
+  Front: |
+    What is a **NetworkPolicy** and why would you use one?
+  Back: |
+    A NetworkPolicy is a firewall rule for Pod-to-Pod traffic. By default, all Pods in a Kubernetes cluster can communicate with all other Pods freely. NetworkPolicies restrict this open communication.
+
+    **How they work:**
+    - NetworkPolicies use **label selectors** to match target Pods
+    - Rules define allowed ingress (incoming) and egress (outgoing) traffic
+    - Once any NetworkPolicy selects a Pod, all traffic not explicitly allowed by a policy is **denied** (default-deny for selected Pods)
+    - Pods with no NetworkPolicy applied remain open (default-allow)
+
+    **Example use cases:**
+    - Isolate a database Pod so only the backend Pod can reach it on port 5432
+    - Prevent Pods in the `staging` Namespace from talking to Pods in `production`
+    - Restrict egress so Pods can only reach specific external endpoints (preventing data exfiltration)
+
+    **Important limitation:** NetworkPolicies are enforced by the CNI plugin. Not all CNI plugins support them. Flannel (basic overlay) does not enforce NetworkPolicies. Calico and Cilium do.
+
+    **Common default-deny pattern:**
+    ```yaml
+    # Deny all ingress to all Pods in this Namespace
+    spec:
+      podSelector: {}
+      policyTypes: ["Ingress"]
+    ```
+    Then add specific allow rules for each legitimate communication path.
+
+    **Interview tip:** When discussing Kubernetes security, mention that the network is open by default and NetworkPolicies must be explicitly applied to restrict it. This shows you understand the default posture and how to harden it.

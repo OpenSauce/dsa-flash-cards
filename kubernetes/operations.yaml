@@ -1,0 +1,124 @@
+- title: "Kubernetes Ops - Liveness and Readiness Probes"
+  difficulty: "medium"
+  tags: ["kubernetes", "probes", "liveness", "readiness", "health checks"]
+  Front: |
+    What are **liveness** and **readiness probes**? What happens if a liveness probe fails?
+  Back: |
+    Probes are health checks that Kubernetes performs on containers to determine if they are functioning correctly.
+
+    **Liveness probe:** "Is this container alive?" If a liveness probe fails (after the configured failure threshold), Kubernetes **kills and restarts** the container. Use it to detect deadlocks, infinite loops, or crashed processes that are still technically running.
+
+    **Readiness probe:** "Is this container ready to receive traffic?" If a readiness probe fails, Kubernetes **removes the Pod from Service endpoints** -- it stops sending traffic to it, but does not restart it. Use it for slow-starting applications that need time to load data or warm caches.
+
+    **Startup probe:** "Has this container finished starting?" Disables liveness and readiness probes until the startup probe succeeds. Use it for legacy applications with very long initialization times, preventing premature liveness kills during startup.
+
+    **Probe types:**
+    - **HTTP GET:** Send an HTTP request, success if status 200-399
+    - **TCP socket:** Attempt a TCP connection, success if the port is open
+    - **Exec:** Run a command inside the container, success if exit code 0
+
+    **Common mistake:** Making the liveness probe too aggressive (short period, low threshold) or pointing it at a dependency. If the liveness probe checks a database connection and the database goes down temporarily, Kubernetes restarts all your application Pods -- making the outage worse.
+
+    **Interview tip:** Emphasize the consequence difference: liveness failure causes restarts, readiness failure causes traffic removal. This distinction is critical for designing resilient services.
+
+- title: "Kubernetes Ops - Horizontal Pod Autoscaler"
+  difficulty: "medium"
+  tags: ["kubernetes", "HPA", "autoscaling", "scaling"]
+  Front: |
+    What is a **Horizontal Pod Autoscaler (HPA)** and what metrics can it use?
+  Back: |
+    An HPA automatically adjusts the number of Pod replicas in a Deployment or StatefulSet based on observed metrics. More load means more Pods, less load means fewer Pods.
+
+    **How it works:**
+    1. The HPA controller queries metrics every 15 seconds (default)
+    2. It compares the current metric value against the target value
+    3. It calculates the desired replica count: `desired = current * (currentMetric / targetMetric)`
+    4. It scales the Deployment up or down to match
+
+    **Metrics it can use:**
+    - **CPU utilization:** The most common. "Maintain 60% average CPU across all Pods" -- scale out when above, scale in when below.
+    - **Memory utilization:** Useful but trickier, since many applications do not release memory after load decreases.
+    - **Custom metrics:** Application-specific metrics exposed via the Metrics API. Request rate, queue depth, active connections.
+    - **External metrics:** Metrics from outside the cluster, like an SQS queue length or a Pub/Sub subscription backlog.
+
+    **Scaling behavior controls:**
+    - **Stabilization window:** Prevents flapping by requiring the metric to stay above/below the threshold for a period before scaling
+    - **Scale-down rate limiting:** Prevents aggressive scale-in that could cause capacity problems during bursty traffic
+
+    **Key constraint:** The HPA requires the Metrics Server to be installed in the cluster. Without it, the HPA has no data to act on.
+
+    **Interview tip:** Mention custom metrics as a differentiator. Scaling on CPU alone is naive -- scaling on request latency or queue depth is more responsive to actual application load.
+
+- title: "Kubernetes Ops - Jobs and CronJobs"
+  difficulty: "easy"
+  tags: ["kubernetes", "Job", "CronJob", "batch"]
+  Front: |
+    What is the difference between a **Job** and a **CronJob**?
+  Back: |
+    Both manage Pods that run to completion (unlike Deployments, which run indefinitely), but they differ in scheduling.
+
+    **Job:** Runs one or more Pods to completion **once**. The Pod runs, does its work, exits with code 0, and the Job is marked as complete. If the Pod fails, the Job retries it (up to `backoffLimit` times, default 6).
+
+    **CronJob:** Creates Jobs on a **recurring schedule** using cron syntax. It is a Job factory -- at each scheduled time, it creates a new Job, which creates Pods that run to completion.
+
+    **Job configuration options:**
+    - `completions`: How many successful Pod completions are needed (default 1)
+    - `parallelism`: How many Pods can run simultaneously
+    - `backoffLimit`: Max retries before marking the Job as failed
+    - `activeDeadlineSeconds`: Timeout for the entire Job
+
+    **Common use cases:**
+    - **Job:** Database migrations, one-time data processing, batch imports
+    - **CronJob:** Nightly database backups (`0 2 * * *`), hourly report generation, periodic cache warming
+
+    **CronJob gotcha:** If a CronJob takes longer than the interval between runs, the `concurrencyPolicy` determines behavior: `Allow` (run in parallel), `Forbid` (skip the new run), or `Replace` (kill the old run and start a new one).
+
+    **Interview tip:** Jobs are Kubernetes' answer to batch processing. Use them instead of running scripts on VMs or in always-running containers that waste resources while idle.
+
+- title: "Kubernetes Ops - Taints and Tolerations"
+  difficulty: "medium"
+  tags: ["kubernetes", "taints", "tolerations", "scheduling", "node affinity"]
+  Front: |
+    What are **taints and tolerations** and how do they affect Pod scheduling?
+  Back: |
+    Taints and tolerations work together to control which Pods can be scheduled on which nodes. They are the inverse of node affinity -- instead of attracting Pods to nodes, taints repel them.
+
+    **Taint (on a node):** Marks a node as off-limits to most Pods. A taint has a key, value, and effect:
+    - `NoSchedule` -- new Pods will not be scheduled on this node unless they tolerate the taint
+    - `PreferNoSchedule` -- soft version; scheduler tries to avoid the node but will use it if necessary
+    - `NoExecute` -- existing Pods without the toleration are evicted, and new Pods are not scheduled
+
+    **Toleration (on a Pod):** Allows a Pod to be scheduled on a node with a matching taint. A toleration says "I can handle this condition."
+
+    **Common use cases:**
+    - **Dedicated nodes:** Taint GPU nodes with `gpu=true:NoSchedule` so only ML workloads with the matching toleration land there
+    - **Control plane isolation:** Control plane nodes are tainted by default so application Pods are not scheduled on them
+    - **Draining nodes:** `kubectl drain` applies a `NoExecute` taint, evicting all Pods for maintenance
+
+    **How taints differ from node affinity:** Node affinity says "schedule me here" (Pod chooses node). Taints say "keep away unless tolerated" (node rejects Pods). Use both together for precise placement.
+
+    **Interview tip:** When asked about isolating workloads (e.g., separating production from batch jobs on shared clusters), taints and tolerations are the standard answer.
+
+- title: "Kubernetes Ops - Node Failure and Rescheduling"
+  difficulty: "hard"
+  tags: ["kubernetes", "node failure", "pod eviction", "rescheduling", "high availability"]
+  Front: |
+    What happens when a **node goes down**? How does Kubernetes handle Pod rescheduling?
+  Back: |
+    When a node becomes unreachable, Kubernetes follows a deliberate sequence before rescheduling Pods -- it does not react instantly.
+
+    **The timeline:**
+    1. **Kubelet heartbeat stops:** The kubelet on the node sends heartbeats to the API server every 10 seconds (default). When heartbeats stop, the node controller notices.
+    2. **Node marked NotReady:** After `node-monitor-grace-period` (default 40 seconds) without a heartbeat, the node's status changes to `NotReady`.
+    3. **Pod eviction timeout:** The node controller waits an additional `pod-eviction-timeout` (default 5 minutes) before evicting Pods from the NotReady node.
+    4. **Pods rescheduled:** After eviction, Pods managed by a Deployment or StatefulSet are rescheduled onto healthy nodes. Bare Pods (not managed by a controller) are **not rescheduled** -- they are simply gone.
+
+    **Total time before rescheduling: ~5-6 minutes by default.** This delay is intentional -- it prevents thrashing during transient network partitions.
+
+    **How to minimize impact:**
+    - **Pod Disruption Budgets (PDBs):** Guarantee a minimum number of Pods remain available during voluntary disruptions
+    - **Anti-affinity rules:** Spread replicas across nodes so a single node failure does not take down all replicas
+    - **Topology spread constraints:** Distribute Pods across failure domains (zones, regions)
+    - **Shorter eviction timeout:** Reduce `pod-eviction-timeout` for faster failover (at the risk of more false positives)
+
+    **Interview tip:** Knowing the specific timeouts (40s grace, 5m eviction) and explaining why the delay exists (preventing thrashing) demonstrates deep operational understanding.

@@ -1,0 +1,88 @@
+- title: "Kubernetes Config - ConfigMaps vs Secrets"
+  difficulty: "easy"
+  tags: ["kubernetes", "ConfigMap", "Secret", "configuration"]
+  Front: |
+    What is the difference between a **ConfigMap** and a **Secret**?
+  Back: |
+    Both inject configuration into Pods without baking it into container images, but they are intended for different types of data.
+
+    **ConfigMap:** Stores non-sensitive configuration as key-value pairs. Environment variables, config file contents, command-line arguments. Stored as plaintext in etcd.
+
+    **Secret:** Stores sensitive data -- passwords, API keys, TLS certificates. Stored as base64-encoded values in etcd.
+
+    **How they are consumed:**
+    - **Environment variables:** Inject individual keys as env vars into a container
+    - **Volume mounts:** Mount the entire ConfigMap/Secret as files in a directory. The application reads them as regular files.
+
+    **Critical misconception:** Secrets are **not encrypted by default**. Base64 encoding is not encryption -- anyone with etcd access or the right RBAC permissions can read them. For real security, enable encryption at rest in etcd and use an external secret manager (Vault, AWS Secrets Manager, or the Sealed Secrets controller).
+
+    **Interview tip:** If asked about Kubernetes secrets management, mention that Secrets are base64-encoded (not encrypted) and describe what additional measures are needed for production security.
+
+- title: "Kubernetes Storage - PV and PVC"
+  difficulty: "medium"
+  tags: ["kubernetes", "PersistentVolume", "PersistentVolumeClaim", "storage"]
+  Front: |
+    What is a **PersistentVolume (PV)** and **PersistentVolumeClaim (PVC)**, and how do they work together?
+  Back: |
+    PV and PVC form a two-layer abstraction that separates storage provisioning from storage consumption.
+
+    **PersistentVolume (PV):** A piece of storage provisioned in the cluster -- an AWS EBS volume, a GCP Persistent Disk, or an NFS share. It has a specific capacity, access mode, and reclaim policy. Think of it as the physical disk.
+
+    **PersistentVolumeClaim (PVC):** A request for storage by a Pod. It specifies how much storage is needed and what access mode (ReadWriteOnce, ReadOnlyMany, ReadWriteMany). Think of it as a storage requisition form.
+
+    **How they work together:**
+    1. A PVC is created requesting 10Gi of ReadWriteOnce storage
+    2. Kubernetes finds a matching PV (or dynamically provisions one via a StorageClass)
+    3. The PVC is bound to the PV
+    4. The Pod mounts the PVC as a volume
+
+    **Dynamic provisioning:** In most cloud environments, you define a StorageClass (e.g., `gp3` for AWS EBS) and PVCs automatically provision PVs on demand. No manual PV creation needed.
+
+    **Reclaim policies:**
+    - **Retain:** PV data survives after PVC deletion (manual cleanup needed)
+    - **Delete:** PV and underlying storage are deleted when the PVC is deleted
+
+    **Interview tip:** Mention dynamic provisioning and StorageClasses. Static PV management does not scale -- production clusters use dynamic provisioning almost exclusively.
+
+- title: "Kubernetes Config - Resource Requests and Limits"
+  difficulty: "medium"
+  tags: ["kubernetes", "resources", "requests", "limits", "OOMKilled"]
+  Front: |
+    What are **resource requests** and **limits**? What happens when a container exceeds its memory limit?
+  Back: |
+    Requests and limits control how much CPU and memory a container can use, and they serve different purposes.
+
+    **Requests:** The guaranteed minimum. The scheduler uses requests to decide which node has enough capacity for the Pod. A Pod requesting 512Mi of memory will only be placed on a node with at least 512Mi available.
+
+    **Limits:** The hard ceiling. The container cannot exceed this amount.
+
+    **What happens when limits are exceeded:**
+    - **Memory limit exceeded:** The container is **OOMKilled** (Out of Memory Killed) by the kernel. Kubernetes restarts it according to the Pod's restart policy. This is abrupt -- the process has no chance to clean up.
+    - **CPU limit exceeded:** The container is **throttled** -- it does not get killed, but it runs slower because the kernel restricts its CPU time.
+
+    **Common mistakes:**
+    - **No requests set:** The scheduler cannot make informed placement decisions. Pods may land on overcommitted nodes.
+    - **Limits set too low:** Containers are OOMKilled under normal load spikes
+    - **Requests equal to limits:** Guarantees resources but wastes capacity. The cluster cannot overcommit, leading to low utilization.
+
+    **Interview tip:** Explain the asymmetry: memory violations are fatal (OOMKill), CPU violations are graceful (throttling). This is because unused memory cannot be reclaimed from a process, but CPU time-slices can be redistributed.
+
+- title: "Kubernetes Config - DaemonSets"
+  difficulty: "easy"
+  tags: ["kubernetes", "DaemonSet", "node", "monitoring", "logging"]
+  Front: |
+    What is a **DaemonSet** and what is it used for?
+  Back: |
+    A DaemonSet ensures that a copy of a specific Pod runs on every node in the cluster (or a subset of nodes filtered by node selectors). When a new node joins the cluster, the DaemonSet automatically schedules a Pod on it. When a node is removed, the Pod is garbage collected.
+
+    **Common use cases:**
+    - **Log collection:** Run Fluentd or Filebeat on every node to collect container logs and ship them to a centralized system (Elasticsearch, CloudWatch)
+    - **Monitoring agents:** Run Prometheus node-exporter or Datadog agent on every node to collect host-level metrics (CPU, memory, disk)
+    - **Network plugins:** CNI plugins (Calico, Cilium) and kube-proxy run as DaemonSets to configure networking on each node
+    - **Storage drivers:** CSI node plugins that mount volumes on each node
+
+    **How it differs from a Deployment:**
+    - A Deployment runs N replicas, and the scheduler decides which nodes they land on. Multiple replicas might land on the same node.
+    - A DaemonSet runs exactly one Pod per node (or per matching node). You do not set a replica count.
+
+    **Interview tip:** DaemonSets are the answer whenever you need a per-node agent. If an interviewer asks "how would you collect logs from every node," the answer is a DaemonSet running a log shipper.
