@@ -8,7 +8,10 @@
     - Builds the final array one item at a time
     - Shifts larger elements right to insert the current key
     - Runs in **O(n²)** worst-case but **O(n)** on nearly-sorted data?
-  Back: "Insertion Sort"
+  Back: |
+    **Insertion Sort**
+
+    A sorting algorithm that builds the sorted array one element at a time by shifting larger elements right, running in O(n^2) worst case but O(n) on nearly-sorted data. Use for small arrays or as a finishing pass inside hybrid sorts like Timsort and introsort. Trade-off: quadratic on reverse-sorted input, but its low overhead and stability make it the best choice for small n.
 
 - title: "Insertion Sort – Implementation"
   difficulty: "easy"

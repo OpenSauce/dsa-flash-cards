@@ -7,7 +7,10 @@
 
     - Uses **two indices** that move toward each other or at different speeds
     - Solves many problems in **O(n)** without extra space (e.g., pair sum, palindrome)?
-  Back: "Two-Pointer Technique"
+  Back: |
+    **Two-Pointer Technique**
+
+    A technique using two indices that move through sorted or structured data, solving problems like pair sum and palindrome checking in O(n) with O(1) space. Use on sorted arrays or linked lists where shrinking a search window converges on the answer. Trade-off: requires sorted input or a specific traversal order -- unsorted data typically needs a hash set approach instead.
 
 - title: "Two-Pointer – Pair Sum (Sorted)"
   difficulty: "easy"

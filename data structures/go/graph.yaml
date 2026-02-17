@@ -8,7 +8,10 @@
     - Represents vertices with **lists of neighbours**
     - Uses **O(V+E)** space
     - Allows **O(1)** expected add-edge?
-  Back: "Graph (Adjacency List)"
+  Back: |
+    **Graph (Adjacency List)**
+
+    A graph representation where each vertex stores a list of its neighbors, using O(V+E) space. Use when the graph is sparse (few edges relative to vertices), since iterating a vertex's neighbors is O(degree). Trade-off: checking whether a specific edge exists costs O(degree) vs. O(1) in an adjacency matrix.
 
 - title: "Graph – Add Edge (Undirected)"
   difficulty: "easy"

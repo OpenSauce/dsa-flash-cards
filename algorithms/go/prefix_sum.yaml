@@ -7,7 +7,10 @@
 
     - Builds an array of **cumulative totals**
     - Answers **range-sum queries** in **O(1)** after **O(n)** build?
-  Back: "Prefix Sum"
+  Back: |
+    **Prefix Sum**
+
+    A preprocessing technique that builds an array of cumulative totals in O(n), then answers any range-sum query in O(1). Use when you have many range-sum queries on static data. Trade-off: requires O(n) extra space and does not handle point updates efficiently -- use a Fenwick tree or segment tree when the underlying data changes.
 
 - title: "Prefix Sum – Build & Range Query"
   difficulty: "easy"

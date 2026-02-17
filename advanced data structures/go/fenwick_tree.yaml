@@ -7,7 +7,10 @@
 
     - Stores **prefix sums** in a clever bit-indexed array
     - Supports **point updates** and **prefix queries** in **O(log n)**?
-  Back: "Fenwick Tree (Binary Indexed Tree)"
+  Back: |
+    **Fenwick Tree (Binary Indexed Tree)**
+
+    A compact array-based structure that supports point updates and prefix sum queries in O(log n), using bit manipulation to navigate implicit tree ranges. Use when you need dynamic prefix sums -- frequency tables, cumulative counts, inversion counting. Trade-off: only supports prefix queries natively; arbitrary range queries require two prefix queries, and range updates need a segment tree with lazy propagation.
 
 # Point update
 - title: "Fenwick Tree – Update"

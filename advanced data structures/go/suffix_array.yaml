@@ -8,7 +8,10 @@
     - Lists **all suffixes of a string in lexicographic order**
     - Enables substring search via binary search in **O(m log n)**
     - Can be built in **O(n log n)** (or O(n) with SA-IS)?
-  Back: "Suffix Array"
+  Back: |
+    **Suffix Array**
+
+    A sorted array of all suffixes of a string, enabling substring search via binary search in O(m log n) time. Use for string matching, longest common prefix queries, and problems on large texts where a suffix tree's memory overhead is prohibitive. Trade-off: slower to build than a suffix tree (O(n log n) vs. O(n) for Ukkonen's), but uses significantly less memory and is simpler to implement.
 
 - title: "Suffix Array – Build (Naïve O(n log² n))"
   difficulty: "hard"
