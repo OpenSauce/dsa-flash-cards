@@ -8,4 +8,106 @@
     - Operates on a **first-in, first-out** principle
     - Uses **enqueue** at the rear and **dequeue** at the front
     - Is common in task scheduling, buffering, and BFS
-  Back: "Queue"
+  Back: |
+    **Queue**
+
+    A linear data structure where elements are added at the rear and removed from the front, enforcing first-in, first-out (FIFO) order. Use when processing order must match arrival order: BFS traversal, task scheduling, print queues, and message buffering. In Go, a slice works as a simple queue, but naive dequeue via `q = q[1:]` leaks memory over time. For production use, prefer a ring buffer or `container/list`. Trade-off: unlike a stack, you cannot efficiently access or remove elements from the back.
+
+# ── OPERATION CARDS ─────────────────────────────────────────────────────────
+- title: "Queue – Enqueue and Dequeue"
+  difficulty: "easy"
+  tags: ["queue", "enqueue", "dequeue"]
+  Front: |
+    What data structure operations does this implement? What are the time complexities, and what is the hidden cost of the dequeue approach?
+
+    ```go
+    // enqueue
+    q = append(q, 42)
+
+    // dequeue
+    front := q[0]
+    q = q[1:]
+    ```
+  Back: |
+    Queue enqueue and dequeue
+
+    - **Enqueue:** O(1) amortized — same as slice append.
+    - **Dequeue:** O(1) per operation, but `q[1:]` only advances the slice header without freeing the underlying array. Over many dequeues the backing array is never reclaimed, causing a **memory leak**.
+
+    **Fix:** Use a ring buffer (circular array) that reuses slots, or periodically copy the remaining elements to a fresh slice. Go's standard library `container/list` provides a doubly linked list that avoids this issue with O(1) dequeue and no memory leak.
+
+    - **Interview tip:** If asked to implement a queue with a slice, mention the memory leak — it shows you understand Go's slice internals beyond the happy path.
+
+- title: "Queue – Implement with Two Stacks"
+  difficulty: "medium"
+  tags: ["queue", "interview", "two stacks"]
+  Front: |
+    **Queue** — How do you implement a FIFO queue using only two LIFO stacks? What is the amortized time complexity per operation?
+
+    ```go
+    type MyQueue struct {
+        in, out []int
+    }
+
+    func (q *MyQueue) Push(x int) {
+        q.in = append(q.in, x)
+    }
+
+    func (q *MyQueue) Pop() int {
+        q.move()
+        top := q.out[len(q.out)-1]
+        q.out = q.out[:len(q.out)-1]
+        return top
+    }
+
+    func (q *MyQueue) move() {
+        if len(q.out) == 0 {
+            for len(q.in) > 0 {
+                q.out = append(q.out, q.in[len(q.in)-1])
+                q.in = q.in[:len(q.in)-1]
+            }
+        }
+    }
+    ```
+  Back: |
+    Queue using two stacks — amortized O(1) per operation
+
+    All pushes go to the `in` stack. When a pop is needed and `out` is empty, pour all elements from `in` to `out` (reversing their order). Since each element is moved at most once from `in` to `out`, the amortized cost per operation is O(1).
+
+    - **Key insight:** Reversing a stack reverses LIFO into FIFO — two reversals cancel out.
+    - **Worst-case single pop:** O(n) when `out` is empty and `in` has n elements, but this cost is spread across the n prior pushes.
+    - **Interview tip:** This is a classic design question. It also appears as a building block in problems that require queue semantics but only provide stack primitives.
+
+- title: "Queue – BFS Frontier Pattern"
+  difficulty: "medium"
+  tags: ["queue", "bfs", "interview"]
+  Front: |
+    **Queue** — Why is a queue the correct data structure for BFS? What would happen if you replaced it with a stack?
+
+    ```go
+    func bfs(root *Node) [][]int {
+        if root == nil { return nil }
+        var result [][]int
+        q := []*Node{root}
+        for len(q) > 0 {
+            level := []int{}
+            size := len(q)
+            for i := 0; i < size; i++ {
+                node := q[0]; q = q[1:]
+                level = append(level, node.Val)
+                if node.Left != nil  { q = append(q, node.Left) }
+                if node.Right != nil { q = append(q, node.Right) }
+            }
+            result = append(result, level)
+        }
+        return result
+    }
+    ```
+  Back: |
+    BFS level-order traversal using a queue — O(n) time, O(w) space
+
+    The queue's FIFO order guarantees nodes are processed level by level. Each iteration drains the current level (captured by `size := len(q)`) and enqueues the next level's children.
+
+    - **Why not a stack?** Replacing the queue with a stack turns BFS into DFS — you would explore one branch to its deepest node before visiting siblings. FIFO is what makes BFS explore breadth-first.
+    - **Space:** O(w) where w is the maximum width of the tree. For a complete binary tree, the last level has ~n/2 nodes, so space is O(n).
+    - **Common variant:** Shortest path in an unweighted graph uses the same pattern — the queue guarantees you visit nodes in order of distance from the source.

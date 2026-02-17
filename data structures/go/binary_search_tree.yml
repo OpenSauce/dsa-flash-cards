@@ -55,3 +55,74 @@
     BST insert (O(n) worst-case)
 
     Inserting sorted data creates a linked-list-shaped tree where every insert walks the full depth. Self-balancing trees (AVL, red-black) restructure after each insert to keep height at O(log n).
+
+- title: "BST – Delete"
+  difficulty: "hard"
+  tags: ["bst", "delete", "interview"]
+  Front: |
+    **BST** — What are the three cases for deleting a node from a BST? What is the time complexity?
+
+    ```go
+    func deleteNode(root *Node, key int) *Node {
+        if root == nil { return nil }
+        if key < root.Val {
+            root.Left = deleteNode(root.Left, key)
+        } else if key > root.Val {
+            root.Right = deleteNode(root.Right, key)
+        } else {
+            // Case 1 & 2: no child or one child
+            if root.Left == nil { return root.Right }
+            if root.Right == nil { return root.Left }
+            // Case 3: two children
+            succ := root.Right
+            for succ.Left != nil {
+                succ = succ.Left
+            }
+            root.Val = succ.Val
+            root.Right = deleteNode(root.Right, succ.Val)
+        }
+        return root
+    }
+    ```
+  Back: |
+    BST delete — O(h) time, where h is tree height
+
+    **Three cases:**
+    1. **Leaf node (no children):** Simply remove it.
+    2. **One child:** Replace the node with its single child.
+    3. **Two children:** Find the **in-order successor** (smallest node in the right subtree), copy its value to the current node, then recursively delete the successor.
+
+    - **Why the in-order successor?** It is the smallest value greater than the deleted node, so placing it at the deleted position preserves the BST invariant.
+    - **Alternative:** You can use the in-order predecessor (largest in left subtree) instead — both work.
+    - **Worst case:** O(n) on a skewed tree. O(log n) on a balanced tree.
+    - **Interview tip:** This is one of the most common BST questions. Interviewers want to see that you handle all three cases, especially the two-children case.
+
+- title: "BST – Validate"
+  difficulty: "medium"
+  tags: ["bst", "validate", "interview"]
+  Front: |
+    **BST** — How do you validate that a binary tree satisfies the BST property? Why does checking only `left.Val < node.Val < right.Val` at each node fail?
+
+    ```go
+    func isValidBST(root *Node) bool {
+        return validate(root, math.MinInt64, math.MaxInt64)
+    }
+
+    func validate(n *Node, min, max int) bool {
+        if n == nil { return true }
+        if n.Val <= min || n.Val >= max {
+            return false
+        }
+        return validate(n.Left, min, n.Val) &&
+               validate(n.Right, n.Val, max)
+    }
+    ```
+  Back: |
+    Validate BST using min/max bounds — O(n) time, O(h) space
+
+    Pass down the allowed range for each node. The left child must be less than the current node (upper bound tightens), and the right child must be greater (lower bound tightens).
+
+    - **Why the naive check fails:** Checking only `left < node < right` for immediate children misses violations deeper in the tree. For example, a node in the left subtree could be greater than the root — the local check passes but the global BST property is violated.
+    - **Alternative approach:** An in-order traversal of a valid BST produces strictly increasing values. Track the previously visited value and verify each node is greater.
+    - **Edge case:** Use `math.MinInt64` / `math.MaxInt64` as initial bounds, or pass pointers to handle trees containing those extreme values.
+    - **Interview tip:** Start by explaining why the naive approach fails — it demonstrates you understand the BST invariant is a global property, not just a local one.

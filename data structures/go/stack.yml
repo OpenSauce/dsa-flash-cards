@@ -8,4 +8,140 @@
     - Operates on a **last-in, first-out** principle
     - Supports **push** and **pop** in **O(1)**
     - Is used for recursion call stacks and undo features
-  Back: "Stack"
+  Back: |
+    **Stack**
+
+    A linear data structure where elements are added and removed from the same end (the "top"), enforcing last-in, first-out (LIFO) order. Use when you need to reverse order, track nested state (parentheses, recursion), or backtrack. In Go, a slice works as a stack with `append` for push and reslicing for pop. Trade-off: no efficient access to elements below the top — if you need random access, use an array instead.
+
+# ── OPERATION CARDS ─────────────────────────────────────────────────────────
+- title: "Stack – Push and Pop"
+  difficulty: "easy"
+  tags: ["stack", "push", "pop"]
+  Front: |
+    What data structure operations does this implement? What are the time complexities?
+
+    ```go
+    // push
+    stack = append(stack, 42)
+
+    // pop
+    top := stack[len(stack)-1]
+    stack = stack[:len(stack)-1]
+
+    // peek
+    top = stack[len(stack)-1]
+    ```
+  Back: |
+    Stack push, pop, and peek — all O(1)
+
+    Push appends to the end of the slice. Pop reads the last element and shrinks the slice by one. Both are O(1) amortized. Push occasionally triggers an O(n) copy when the backing array grows, but Go doubles capacity each time, so the amortized cost per push remains O(1). Always check `len(stack) > 0` before popping to avoid a panic on an empty stack.
+
+- title: "Stack – Balanced Parentheses"
+  difficulty: "medium"
+  tags: ["stack", "interview", "parentheses"]
+  Front: |
+    **Stack** — What interview pattern does this implement? What is the time and space complexity?
+
+    ```go
+    func isValid(s string) bool {
+        stack := []rune{}
+        match := map[rune]rune{')': '(', ']': '[', '}': '{'}
+        for _, c := range s {
+            if c == '(' || c == '[' || c == '{' {
+                stack = append(stack, c)
+            } else {
+                if len(stack) == 0 || stack[len(stack)-1] != match[c] {
+                    return false
+                }
+                stack = stack[:len(stack)-1]
+            }
+        }
+        return len(stack) == 0
+    }
+    ```
+  Back: |
+    Balanced parentheses check — O(n) time, O(n) space
+
+    Push every opening bracket onto the stack. When a closing bracket appears, check that the top of the stack is its matching opener. If not, the string is invalid. At the end, the stack must be empty (no unmatched openers).
+
+    This pattern generalises to any problem involving **nested or matched pairs**: HTML tags, nested function calls, or expression parsing. The key insight is that the most recently opened bracket must be closed first — exactly LIFO order.
+
+    - **Edge case:** A string with only closing brackets fails immediately (empty stack check).
+    - **Edge case:** `"(("` — all openers, no closers — fails the final `len(stack) == 0` check.
+
+- title: "Stack – Min Stack"
+  difficulty: "medium"
+  tags: ["stack", "interview", "min stack"]
+  Front: |
+    **Min Stack** — How do you design a stack that supports push, pop, top, and getMin all in O(1) time?
+
+    ```go
+    type MinStack struct {
+        data []int
+        mins []int
+    }
+
+    func (s *MinStack) Push(x int) {
+        s.data = append(s.data, x)
+        if len(s.mins) == 0 || x <= s.mins[len(s.mins)-1] {
+            s.mins = append(s.mins, x)
+        }
+    }
+
+    func (s *MinStack) Pop() {
+        top := s.data[len(s.data)-1]
+        s.data = s.data[:len(s.data)-1]
+        if top == s.mins[len(s.mins)-1] {
+            s.mins = s.mins[:len(s.mins)-1]
+        }
+    }
+
+    func (s *MinStack) GetMin() int {
+        return s.mins[len(s.mins)-1]
+    }
+    ```
+  Back: |
+    Min Stack — O(1) push, pop, and getMin
+
+    Maintain an auxiliary stack (`mins`) that tracks the current minimum. Push to `mins` only when the new value is less than or equal to the current minimum. Pop from `mins` only when the popped value equals the current minimum.
+
+    - **Why `<=` not `<`?** If you push the same minimum twice, you need two entries in `mins` so that popping one still leaves the correct minimum.
+    - **Space complexity:** O(n) worst case (all elements in decreasing order). Best case O(1) extra if the minimum never changes.
+    - **Interview tip:** This is a classic design question. The naive approach (scan the stack for min on each call) is O(n). The auxiliary stack trades O(n) space for O(1) time — always state this trade-off explicitly.
+
+- title: "Stack – Evaluate Reverse Polish Notation"
+  difficulty: "medium"
+  tags: ["stack", "interview", "rpn"]
+  Front: |
+    **Stack** — What algorithm does this implement? What is the time complexity?
+
+    ```go
+    func evalRPN(tokens []string) int {
+        stack := []int{}
+        for _, t := range tokens {
+            switch t {
+            case "+", "-", "*", "/":
+                b := stack[len(stack)-1]; stack = stack[:len(stack)-1]
+                a := stack[len(stack)-1]; stack = stack[:len(stack)-1]
+                switch t {
+                case "+": stack = append(stack, a+b)
+                case "-": stack = append(stack, a-b)
+                case "*": stack = append(stack, a*b)
+                case "/": stack = append(stack, a/b)
+                }
+            default:
+                n, _ := strconv.Atoi(t)
+                stack = append(stack, n)
+            }
+        }
+        return stack[0]
+    }
+    ```
+  Back: |
+    Evaluate Reverse Polish Notation — O(n) time, O(n) space
+
+    Numbers are pushed onto the stack. When an operator appears, pop two operands, apply the operator, and push the result. The final value on the stack is the answer.
+
+    - **Why stacks?** RPN eliminates the need for parentheses and operator precedence rules. The stack naturally handles evaluation order — operands accumulate until an operator consumes them.
+    - **Order matters:** Pop `b` first, then `a`, so subtraction and division compute `a op b` (not `b op a`).
+    - **Interview tip:** This pattern extends to any expression evaluation problem. Converting infix to postfix (Shunting Yard algorithm) and then evaluating with a stack is the standard two-pass approach.
