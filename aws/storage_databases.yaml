@@ -1,0 +1,113 @@
+- title: "AWS Storage - S3 Storage Classes"
+  difficulty: "medium"
+  tags: ["aws", "storage", "S3", "storage classes"]
+  Front: |
+    What is the difference between **S3 storage classes** (Standard, IA, Glacier)?
+  Back: |
+    S3 storage classes trade access speed and cost based on how frequently you retrieve data.
+
+    **S3 Standard:** Frequently accessed data. Low latency, high throughput. Highest storage cost per GB, no retrieval fee. Use for active application data, website assets, frequently read files.
+
+    **S3 Infrequent Access (IA):** Lower storage cost, but charges a per-GB retrieval fee. Use for backups, disaster recovery files, or data accessed less than once a month.
+
+    **S3 Glacier Instant Retrieval:** Archival storage with millisecond retrieval. Cheapest option for data that is rarely accessed but needs fast retrieval when it is.
+
+    **S3 Glacier Flexible Retrieval:** Archival with retrieval in minutes to hours. Very cheap storage.
+
+    **S3 Glacier Deep Archive:** Cheapest storage class. Retrieval takes 12-48 hours. Use for regulatory compliance data or long-term backups.
+
+    **Lifecycle policies** automate transitions between classes -- for example, move objects to IA after 30 days and Glacier after 90 days.
+
+    **Interview tip:** The decision axis is access frequency. Mention lifecycle policies to show you understand cost optimization at scale.
+
+- title: "AWS Databases - DynamoDB vs RDS"
+  difficulty: "medium"
+  tags: ["aws", "databases", "DynamoDB", "RDS", "NoSQL"]
+  Front: |
+    When would you choose **DynamoDB** over **RDS**?
+  Back: |
+    **DynamoDB:** Fully managed NoSQL key-value and document store. Single-digit millisecond latency at any scale, serverless pricing (pay per read/write), no schema enforcement.
+
+    **RDS:** Managed relational databases (PostgreSQL, MySQL, SQL Server, etc.). SQL queries, ACID transactions, complex joins, enforced schemas.
+
+    **Choose DynamoDB when:**
+    - Access patterns are known and simple (get by key, query by sort key)
+    - You need massive scale without operational overhead
+    - Key-value or document lookups dominate the workload
+    - You want serverless pricing that scales to zero
+
+    **Choose RDS when:**
+    - You need complex queries, joins across tables, or aggregations
+    - ACID transactions across multiple rows/tables are required
+    - The data model is inherently relational
+    - You want the flexibility of ad-hoc SQL queries
+
+    **Key trade-off:** DynamoDB requires you to design your data model around your access patterns upfront. Changing access patterns later often means redesigning the table. RDS is more flexible for evolving query needs but harder to scale horizontally.
+
+    **Interview tip:** Mention that DynamoDB is not "better" than RDS -- it trades query flexibility for scale and operational simplicity. Pick based on the workload.
+
+- title: "AWS Storage - S3 Consistency Model"
+  difficulty: "medium"
+  tags: ["aws", "storage", "S3", "consistency"]
+  Front: |
+    What is the **S3 consistency model** and when does it matter?
+  Back: |
+    As of December 2020, S3 provides **strong read-after-write consistency** for all operations -- PUTs, DELETEs, and list operations.
+
+    This means: after a successful write, any subsequent read will return the latest version. There is no window where you might read stale data.
+
+    **Why this matters:** Before this change, S3 had eventual consistency for overwrite PUTs and DELETEs. Applications that wrote an object and immediately read it could get stale data. Workarounds included adding delays, using DynamoDB as a consistency layer, or retrying reads.
+
+    **Workloads that depend on strong consistency:**
+    - Writing a config file to S3 and immediately reading it in a Lambda function
+    - Uploading a file and immediately listing the bucket to confirm it exists
+    - Overwriting a data file and reading it in a downstream pipeline
+
+    **Key insight:** AWS achieved this without sacrificing performance or increasing cost. It was a major infrastructure achievement that eliminated an entire class of bugs in S3-based architectures.
+
+    **Interview tip:** If an interviewer asks about S3 consistency, stating it is now strongly consistent (and knowing it was not always the case) demonstrates current knowledge.
+
+- title: "AWS Databases - RDS vs Aurora"
+  difficulty: "medium"
+  tags: ["aws", "databases", "RDS", "Aurora"]
+  Front: |
+    What is the difference between **RDS** and **Aurora**?
+  Back: |
+    Both are managed relational databases, but Aurora is AWS's cloud-native engine rebuilt from the ground up for the cloud. Aurora is compatible with MySQL and PostgreSQL.
+
+    **Key differences:**
+
+    **Storage architecture:** Aurora separates compute from storage. Storage auto-scales up to 128 TB with no manual provisioning. RDS uses EBS volumes with fixed capacity that you must manage.
+
+    **Replication:** Aurora replicates data 6 ways across 3 Availability Zones automatically. Replica lag is typically sub-10ms. RDS replication is slower (often seconds) and requires more configuration.
+
+    **Failover:** Aurora failover takes ~30 seconds. RDS Multi-AZ failover takes 1-2 minutes.
+
+    **Performance:** Aurora claims up to 5x throughput over standard MySQL and 3x over PostgreSQL, primarily due to its distributed storage layer reducing write amplification.
+
+    **Cost:** Aurora is 3-5x more expensive at baseline than RDS. But at scale, Aurora's efficiency can make it more cost-effective per transaction.
+
+    **Decision framework:** Use RDS for small/medium workloads where cost matters. Use Aurora when you need high availability, fast failover, or expect to scale beyond a single instance.
+
+- title: "AWS Databases - ElastiCache"
+  difficulty: "easy"
+  tags: ["aws", "databases", "ElastiCache", "caching", "Redis"]
+  Front: |
+    What is **ElastiCache** and when would you put it in front of a database?
+  Back: |
+    ElastiCache is a fully managed in-memory caching service supporting **Redis** and **Memcached**. It sits between your application and your database, serving frequently requested data from memory instead of disk.
+
+    **When to use it:**
+    - **Read-heavy workloads:** Cache the results of frequent database queries so the database handles fewer reads
+    - **Latency-sensitive paths:** Cache responses in microseconds vs milliseconds from a database query
+    - **Expensive computations:** Cache the result of aggregations, rankings, or complex joins that are costly to recompute
+    - **Session storage:** Store user sessions in-memory for fast access across stateless application servers
+
+    **Common pattern:** Application checks cache first. On a hit, return cached data immediately. On a miss, query the database, store the result in cache, and return it.
+
+    **Trade-offs:**
+    - **Cache invalidation:** Keeping cache and database in sync is the hardest part. Stale cache entries can serve outdated data.
+    - **Additional cost:** Another service to pay for and operate
+    - **Cold cache:** After a restart or deployment, all requests hit the database until the cache warms up
+
+    **Interview tip:** When designing a read-heavy system, always mention a caching layer. ElastiCache is the standard AWS answer.
