@@ -1,0 +1,93 @@
+- title: "Application Layer - Forward Proxy vs Reverse Proxy"
+  difficulty: "medium"
+  tags: ["networking", "proxy", "reverse proxy", "forward proxy"]
+  Front: |
+    What is the difference between a **forward proxy** and a **reverse proxy**?
+  Back: |
+    **Forward proxy:** Sits in front of **clients**. The client sends all requests through the proxy, which forwards them to the internet. The destination server sees the proxy's IP, not the client's.
+
+    Use cases: corporate internet gateways, content filtering, bypassing geo-restrictions, anonymizing client traffic.
+
+    **Reverse proxy:** Sits in front of **servers**. External clients send requests to the proxy, which routes them to the appropriate backend server. The client never knows the backend server's address.
+
+    Use cases: load balancing, SSL termination, caching, DDoS protection (Cloudflare, Nginx).
+
+    **The key distinction:** A forward proxy hides clients from servers. A reverse proxy hides servers from clients. The direction of "who is hidden" is what differentiates them.
+
+    In system design interviews, "reverse proxy" almost always refers to an edge server handling load balancing and TLS termination (Nginx, HAProxy, Envoy).
+
+- title: "Application Layer - WebSocket vs Long-Polling"
+  difficulty: "medium"
+  tags: ["networking", "WebSocket", "long-polling", "real-time"]
+  Front: |
+    What is a **WebSocket** and how does it differ from HTTP long-polling?
+  Back: |
+    **HTTP long-polling:** Client sends a request; server holds it open until new data is available (or a timeout). Client immediately re-sends after receiving a response. Simulates real-time over standard HTTP.
+    - Works everywhere (standard HTTP)
+    - High overhead -- full HTTP headers per exchange, frequent reconnections
+    - Unidirectional per request
+
+    **WebSocket:** After an HTTP upgrade handshake, both sides get a persistent, full-duplex TCP connection. Either side can send messages at any time with minimal framing overhead (2-14 bytes per frame).
+    - True bidirectional communication
+    - Low latency after connection is established
+    - Requires WebSocket-aware infrastructure (some proxies and load balancers need explicit configuration)
+
+    **Also worth knowing:** Server-Sent Events (SSE) provide server-to-client streaming over a single HTTP connection. Simpler than WebSocket when you only need one-way push. SSE auto-reconnects on failure; WebSocket does not.
+
+    **Decision framework:** SSE for server-push dashboards and feeds. WebSocket for chat, gaming, collaborative editing. Long-polling as a fallback for constrained environments.
+
+- title: "Application Layer - REST vs gRPC"
+  difficulty: "hard"
+  tags: ["networking", "REST", "gRPC", "API", "protocol buffers"]
+  Front: |
+    What is the difference between **REST** and **gRPC**? When would you choose each?
+  Back: |
+    **REST:**
+    - HTTP/1.1 (typically), JSON payloads, text-based
+    - Resource-oriented (nouns: `/users/123`, `/orders`)
+    - Human-readable, easy to debug with curl or a browser
+    - Broadly supported by every language and framework
+    - No built-in streaming (workarounds: SSE, chunked transfer)
+
+    **gRPC:**
+    - HTTP/2, Protocol Buffer payloads, binary
+    - Method-oriented (verbs: `GetUser`, `CreateOrder`) defined in `.proto` files
+    - Auto-generated client/server stubs in any language from the proto definition
+    - Four streaming modes: unary, server-streaming, client-streaming, bidirectional
+    - 2-10x faster serialization than JSON due to compact binary format
+
+    **Choose REST for:** Public APIs, browser clients, simple CRUD services, anything that benefits from human readability and broad tooling support.
+
+    **Choose gRPC for:** Internal microservice communication where latency and throughput matter, polyglot service meshes where generated stubs reduce integration bugs, and streaming workloads.
+
+    **Hybrid approach:** Many companies expose a REST API externally and use gRPC internally.
+
+- title: "Application Layer - HTTP Status Codes"
+  difficulty: "easy"
+  tags: ["networking", "HTTP", "status codes"]
+  Front: |
+    What do the **HTTP status code ranges** (1xx through 5xx) mean? Name one common code from each.
+  Back: |
+    - **1xx -- Informational:** Request received, processing continues. `100 Continue` -- server confirms it will accept the request body.
+    - **2xx -- Success:** Request succeeded. `200 OK`, `201 Created` (resource created after POST), `204 No Content` (success but no response body).
+    - **3xx -- Redirection:** Client must take additional action. `301 Moved Permanently` (update your bookmarks), `302 Found` (temporary redirect), `304 Not Modified` (use your cached copy).
+    - **4xx -- Client Error:** The request is invalid. `400 Bad Request` (malformed syntax), `401 Unauthorized` (not authenticated), `403 Forbidden` (authenticated but not allowed), `404 Not Found`.
+    - **5xx -- Server Error:** The server failed. `500 Internal Server Error` (generic), `502 Bad Gateway` (upstream server returned an invalid response), `503 Service Unavailable` (overloaded or in maintenance).
+
+    The range tells you *whose fault it is*. 4xx = the client sent something wrong. 5xx = the server broke.
+
+- title: "Application Layer - HTTP Methods"
+  difficulty: "easy"
+  tags: ["networking", "HTTP", "methods", "REST", "idempotency"]
+  Front: |
+    What are the main **HTTP methods** and which are idempotent?
+  Back: |
+    - **GET:** Retrieve a resource. Safe (no side effects) and idempotent.
+    - **POST:** Create a resource or trigger an action. **Not** idempotent -- sending the same POST twice may create two resources.
+    - **PUT:** Replace a resource entirely. Idempotent -- sending the same PUT twice produces the same result.
+    - **PATCH:** Partially update a resource. Not guaranteed to be idempotent (depends on implementation).
+    - **DELETE:** Remove a resource. Idempotent -- deleting the same resource twice still results in it being gone.
+
+    **Idempotent** means that making the same request multiple times has the same effect as making it once. This matters for retry logic: it is safe to retry a failed GET, PUT, or DELETE, but retrying a POST may create duplicates.
+
+    **HEAD** and **OPTIONS** are also idempotent. HEAD is identical to GET but returns only headers (useful for checking if a resource exists without downloading it). OPTIONS is used by CORS preflight checks.
