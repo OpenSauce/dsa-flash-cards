@@ -65,9 +65,7 @@
     - Auto-extracts local `.tar` archives into the destination
     - Can download files from remote URLs (though this is discouraged)
 
-    **Best practice:** Always use `COPY` unless you specifically need tar extraction. `ADD` introduces implicit behavior -- a reader has to check whether the source is a tar file to understand what happens. `COPY` is explicit and predictable.
-
-    `COPY` also supports `--from=<stage>` for copying files from a previous build stage in multi-stage builds. `ADD` does not.
+    **Best practice:** Always use `COPY` unless you specifically need tar extraction. `ADD` introduces implicit behavior -- a reader has to check whether the source is a tar file to understand what happens. `COPY` is explicit and predictable. Both support `--from=<stage>` for multi-stage builds, but `COPY` is preferred for its clarity.
 
 - title: "Docker - Multi-Stage Builds"
   difficulty: "medium"

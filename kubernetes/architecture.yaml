@@ -1,14 +1,6 @@
 - title: "Kubernetes Architecture - Control Plane"
   difficulty: "hard"
-  tags:
-    [
-      "kubernetes",
-      "control plane",
-      "API server",
-      "etcd",
-      "scheduler",
-      "controller manager",
-    ]
+  tags: ["kubernetes", "control plane", "API server", "etcd", "scheduler", "controller manager"]
   Front: |
     What are the components of the **Kubernetes control plane** and what does each do?
   Back: |

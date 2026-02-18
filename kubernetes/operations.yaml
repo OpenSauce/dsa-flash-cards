@@ -101,14 +101,7 @@
 
 - title: "Kubernetes Ops - Node Failure and Rescheduling"
   difficulty: "hard"
-  tags:
-    [
-      "kubernetes",
-      "node failure",
-      "pod eviction",
-      "rescheduling",
-      "high availability",
-    ]
+  tags: ["kubernetes", "node failure", "pod eviction", "rescheduling", "high availability"]
   Front: |
     What happens when a **node goes down**? How does Kubernetes handle Pod rescheduling?
   Back: |
