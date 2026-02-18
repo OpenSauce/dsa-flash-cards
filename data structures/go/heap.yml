@@ -8,7 +8,10 @@
     - Is a **complete binary tree** stored most often in an array
     - Satisfies the **min-heap / max-heap** property
     - Provides **O(log n)** insertion and deletion, **O(1)** peek
-  Back: "Binary Heap"
+  Back: |
+    **Binary Heap**
+
+    A complete binary tree stored as an array, where every parent satisfies the heap property: smaller than its children (min-heap) or larger (max-heap). The primary use case is implementing priority queues — O(1) peek at the extremum and O(log n) insert/extract. The array layout (children of index i at 2i+1 and 2i+2) avoids pointer overhead and benefits from cache-friendly sequential access.
 
 # ── OPERATION CARDS ─────────────────────────────────────────────────────────
 - title: "Binary Heap – Insert"

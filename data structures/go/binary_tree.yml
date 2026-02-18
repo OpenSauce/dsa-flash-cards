@@ -8,7 +8,10 @@
     - Is a hierarchical collection where each node has **up to two children**
     - Has **no ordering constraint** between child nodes
     - Forms the foundation for heaps, BSTs, etc.
-  Back: "Binary Tree"
+  Back: |
+    **Binary Tree**
+
+    A hierarchical structure where each node has at most two children (left and right), with no inherent ordering constraint. Variants include full (every node has 0 or 2 children), complete (all levels filled except possibly the last, filled left to right), and balanced (subtree heights differ by at most 1). Binary trees are the foundation for BSTs, heaps, tries, and expression trees.
 
 # ── TRAVERSAL CARDS ────────────────────────────────────────────────────────
 - title: "Binary Tree – In-order Traversal"

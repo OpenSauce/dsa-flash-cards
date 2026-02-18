@@ -8,7 +8,10 @@
     - Maps **keys to values** via a **hash function**
     - Aims for **O(1)** average-case insert, delete, and lookup
     - Suffers collisions that can degrade to **O(n)**
-  Back: "Hash Map"
+  Back: |
+    **Hash Map**
+
+    A key-value store backed by an array of buckets, where a hash function maps each key to a bucket index for O(1) average-case lookup, insert, and delete. Worst case degrades to O(n) when many keys collide into the same bucket. Collisions are typically resolved via chaining (linked list per bucket) or open addressing (probing for the next empty slot).
 
 # ── OPERATION CARDS ─────────────────────────────────────────────────────────
 - title: "Hash Map – Lookup by Key"
