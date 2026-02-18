@@ -1,0 +1,48 @@
+- title: "DNS - Resolution Path"
+  difficulty: "medium"
+  tags: ["networking", "DNS", "resolution", "recursive"]
+  Front: |
+    What happens when you type a URL into a browser? Describe the **full DNS resolution path**.
+  Back: |
+    1. **Browser cache:** Check if the domain was resolved recently.
+    2. **OS cache:** Check the local DNS resolver cache and `/etc/hosts`.
+    3. **Recursive resolver:** Your ISP (or configured resolver like 8.8.8.8) receives the query. If it has a cached answer, it returns it immediately.
+    4. **Root nameserver:** The resolver asks a root server (one of 13 root server clusters). The root does not know the IP but returns the address of the correct TLD server (e.g., the `.com` server).
+    5. **TLD nameserver:** The `.com` server returns the address of the domain's authoritative nameserver.
+    6. **Authoritative nameserver:** Returns the actual IP address for the domain.
+    7. **Response cached:** The resolver caches the answer for the duration of the TTL and returns it to the browser.
+
+    The full chain only happens on a cache miss. In practice, most lookups are served from the recursive resolver's cache in under 10ms.
+
+- title: "DNS - Record Types"
+  difficulty: "easy"
+  tags: ["networking", "DNS", "A record", "CNAME", "MX"]
+  Front: |
+    What is the difference between **A**, **AAAA**, **CNAME**, **MX**, and **TXT** DNS records?
+  Back: |
+    - **A:** Maps a domain to an **IPv4** address (`93.184.216.34`). The most common record type.
+    - **AAAA:** Maps a domain to an **IPv6** address (`2606:2800:220:1:...`). Same purpose as A, different IP version.
+    - **CNAME:** Alias that points one domain to another domain (`blog.example.com` -> `example.github.io`). Cannot coexist with other record types on the same name.
+    - **MX:** Specifies the mail server for a domain. Has a priority value -- lower number means higher priority. Required for receiving email.
+    - **TXT:** Stores arbitrary text. Used for domain verification (Google, AWS), email authentication (SPF, DKIM, DMARC), and security policies.
+
+    A and AAAA resolve names to IP addresses. CNAME resolves a name to another name. MX and TXT serve specialized roles beyond address resolution.
+
+- title: "DNS - TTL and Deployments"
+  difficulty: "medium"
+  tags: ["networking", "DNS", "TTL", "caching", "deployment"]
+  Front: |
+    What is **DNS TTL** and how does it affect deployments?
+  Back: |
+    TTL (Time to Live) is a value on each DNS record that tells resolvers how many seconds to cache the answer before re-querying the authoritative server.
+
+    **High TTL (e.g., 86400 = 24 hours):** Fewer DNS lookups, faster resolution for repeat visitors. But if you change the record, users may see the old IP for up to 24 hours.
+
+    **Low TTL (e.g., 60 seconds):** Changes propagate quickly, but every minute resolvers re-query, slightly increasing lookup latency and DNS server load.
+
+    **Deployment strategy:**
+    - Before a migration, lower TTL to 60-300 seconds **days in advance** so the old high TTL expires from caches worldwide
+    - Switch the DNS record to the new IP
+    - After confirming the new server is healthy, raise TTL back up
+
+    **Caveat:** Some resolvers and clients ignore low TTLs or enforce a minimum floor. DNS-based failover is never truly instant -- always have a rollback plan that does not depend solely on DNS propagation.
