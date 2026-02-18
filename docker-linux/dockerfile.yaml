@@ -1,0 +1,255 @@
+- title: "Docker - Image Layers"
+  difficulty: "medium"
+  tags: ["docker", "images", "layers", "Dockerfile"]
+  Front: |
+    What is a **Docker image layer** and why does layer ordering in a Dockerfile matter?
+  Back: |
+    Each instruction in a Dockerfile (`RUN`, `COPY`, `ADD`) creates a new read-only layer. Layers are stacked and cached independently. When you rebuild, Docker reuses cached layers until it hits one that changed -- then it rebuilds that layer and everything after it.
+
+    **Why ordering matters:**
+    - Put instructions that change rarely (install OS packages) near the top
+    - Put instructions that change often (copy application code) near the bottom
+    - If you `COPY . .` before `RUN pip install`, every code change re-installs all dependencies
+
+    **Optimized pattern:**
+    ```
+    COPY requirements.txt .
+    RUN pip install -r requirements.txt
+    COPY . .
+    ```
+    Dependencies are only reinstalled when `requirements.txt` changes.
+
+    **Common mistake:** A single `RUN` with `&&`-chained commands creates one layer. Splitting it into separate `RUN` instructions creates multiple layers, which increases image size but improves cacheability. The trade-off depends on how often each command's inputs change.
+
+- title: "Docker - CMD vs ENTRYPOINT"
+  difficulty: "medium"
+  tags: ["docker", "Dockerfile", "CMD", "ENTRYPOINT"]
+  Front: |
+    What is the difference between **CMD** and **ENTRYPOINT** in a Dockerfile?
+  Back: |
+    Both define what runs when a container starts, but they differ in overridability.
+
+    **CMD** sets the default command and arguments. It is fully replaced if you pass arguments to `docker run`:
+    ```dockerfile
+    CMD ["python", "app.py"]
+    # docker run myimage          -> runs python app.py
+    # docker run myimage bash     -> runs bash (CMD is replaced)
+    ```
+
+    **ENTRYPOINT** sets the executable that always runs. Arguments passed to `docker run` are appended to it:
+    ```dockerfile
+    ENTRYPOINT ["python", "app.py"]
+    # docker run myimage          -> runs python app.py
+    # docker run myimage --debug  -> runs python app.py --debug
+    ```
+
+    **Using both together:** ENTRYPOINT defines the executable, CMD provides default arguments:
+    ```dockerfile
+    ENTRYPOINT ["python"]
+    CMD ["app.py"]
+    # docker run myimage          -> python app.py
+    # docker run myimage test.py  -> python test.py
+    ```
+
+    **Rule of thumb:** Use `CMD` when users might want to run a completely different command. Use `ENTRYPOINT` when the container should always run a specific executable. Always use exec form (`["..."]`) over shell form for both.
+
+- title: "Docker - COPY vs ADD"
+  difficulty: "easy"
+  tags: ["docker", "Dockerfile", "COPY", "ADD"]
+  Front: |
+    What is the difference between **COPY** and **ADD** in a Dockerfile?
+  Back: |
+    `COPY` copies files from the build context into the image. That is all it does.
+
+    `ADD` does the same, plus two extras:
+    - Auto-extracts local `.tar` archives into the destination
+    - Can download files from remote URLs (though this is discouraged)
+
+    **Best practice:** Always use `COPY` unless you specifically need tar extraction. `ADD` introduces implicit behavior -- a reader has to check whether the source is a tar file to understand what happens. `COPY` is explicit and predictable.
+
+    `COPY` also supports `--from=<stage>` for copying files from a previous build stage in multi-stage builds. `ADD` does not.
+
+- title: "Docker - Multi-Stage Builds"
+  difficulty: "medium"
+  tags: ["docker", "multi-stage", "image size", "Dockerfile"]
+  Front: |
+    What is a **multi-stage build** and why would you use one?
+  Back: |
+    A multi-stage build uses multiple `FROM` statements in a single Dockerfile. Each `FROM` starts a new stage with its own base image. You compile or build in an early stage, then copy only the output into a minimal final stage.
+
+    ```dockerfile
+    # Build stage -- has compiler, build tools
+    FROM golang:1.21 AS builder
+    COPY . .
+    RUN go build -o /app
+
+    # Runtime stage -- minimal image
+    FROM alpine:3.18
+    COPY --from=builder /app /app
+    CMD ["/app"]
+    ```
+
+    **Why it matters:**
+    - The final image contains only the runtime binary, not the compiler, source code, or build dependencies
+    - A Go binary in `alpine` can be 20MB vs 800MB+ with the full Go SDK image
+    - Build tools and source code never ship to production, reducing attack surface
+
+    **Cache benefit:** Each stage is cached independently. If only your application code changes, the dependency-installation stage can be reused.
+
+- title: "Docker - Build Cache"
+  difficulty: "medium"
+  tags: ["docker", "build cache", "optimization", "Dockerfile"]
+  Front: |
+    What is the **Docker build cache** and how do you optimize for it?
+  Back: |
+    Docker caches each layer of a build. On rebuild, it checks each instruction top-to-bottom: if the instruction and its inputs have not changed, the cached layer is reused. The moment one layer's cache is invalidated, all subsequent layers are rebuilt.
+
+    **Cache invalidation triggers:**
+    - `COPY`/`ADD`: file checksums changed (content, not just timestamps)
+    - `RUN`: the command string changed, or a previous layer was invalidated
+    - Any change to a parent layer invalidates all children
+
+    **Optimization techniques:**
+    - Copy dependency manifests (`package.json`, `requirements.txt`) before source code, so dependency installation is cached across code changes
+    - Use `.dockerignore` to exclude files that would unnecessarily bust the cache (`.git`, `node_modules`, `__pycache__`)
+    - Combine related `RUN` commands with `&&` to avoid creating unnecessary intermediate layers
+    - Put slow, rarely-changing steps (OS package installs) early in the Dockerfile
+
+- title: "Docker - .dockerignore"
+  difficulty: "easy"
+  tags: ["docker", "dockerignore", "build context"]
+  Front: |
+    What is a `.dockerignore` file and why does it matter for build performance?
+  Back: |
+    `.dockerignore` tells Docker which files to exclude from the build context -- the set of files sent to the Docker daemon before the build starts.
+
+    Without it, `docker build` sends everything in the directory to the daemon, including files the build never uses: `.git/` (often hundreds of MB), `node_modules/`, test data, local configs.
+
+    **Impact:**
+    - **Build speed:** A smaller build context means faster transfers to the daemon
+    - **Cache stability:** Files excluded by `.dockerignore` cannot trigger cache invalidation via `COPY . .`
+    - **Image size:** Prevents accidentally copying junk into the image
+    - **Security:** Keeps `.env` files, credentials, and secrets out of the image
+
+    ```
+    .git
+    node_modules
+    __pycache__
+    .env
+    *.md
+    ```
+
+    A missing `.dockerignore` is one of the most common causes of slow Docker builds.
+
+- title: "Docker - Containers vs VMs"
+  difficulty: "easy"
+  tags: ["docker", "containers", "virtual machines", "isolation"]
+  Front: |
+    What is the difference between a **container** and a **virtual machine**?
+  Back: |
+    A VM runs a full guest operating system on a hypervisor, with its own kernel, device drivers, and system libraries. A container shares the host's kernel and isolates processes using Linux namespaces and cgroups.
+
+    **Practical differences:**
+    - **Startup time:** Containers start in milliseconds (just a process). VMs take seconds to minutes (booting an OS).
+    - **Resource overhead:** A container uses tens of MB. A VM reserves GB for the guest OS.
+    - **Isolation:** VMs provide hardware-level isolation (separate kernels). Containers share the host kernel -- a kernel exploit can escape the container.
+    - **Density:** You can run hundreds of containers on a host vs dozens of VMs.
+
+    **When containers are better:** Microservices, CI/CD, rapid scaling, dev/prod parity.
+    **When VMs are better:** Running different OS kernels, strong security isolation between tenants, legacy applications that need a full OS.
+
+    The key trade-off is isolation strength vs resource efficiency.
+
+- title: "Docker - Volumes vs Bind Mounts"
+  difficulty: "medium"
+  tags: ["docker", "volumes", "bind mounts", "storage"]
+  Front: |
+    What is a **Docker volume** and how does it differ from a **bind mount**?
+  Back: |
+    Both provide persistent storage for containers, but they differ in who manages the storage.
+
+    **Volume (Docker-managed):**
+    - Created and managed by Docker (`docker volume create`)
+    - Stored in Docker's storage directory (`/var/lib/docker/volumes/`)
+    - Portable across hosts, easy to back up
+    - Preferred for production data (databases, application state)
+
+    **Bind mount (host-managed):**
+    - Maps a specific host directory into the container (`-v /host/path:/container/path`)
+    - The host controls the file contents -- both the host and container see the same files
+    - Not portable: depends on host filesystem structure
+    - Preferred for development (live code reloading, sharing configs)
+
+    **What happens to data without either?** Container filesystems are ephemeral. When a container is removed, everything inside it is gone. Volumes and bind mounts solve this by storing data outside the container's writable layer.
+
+    **Rule of thumb:** Volumes for persistent application data, bind mounts for development workflows.
+
+- title: "Docker - Networking Modes"
+  difficulty: "medium"
+  tags: ["docker", "networking", "bridge", "host"]
+  Front: |
+    What are the Docker networking modes (**bridge**, **host**, **none**) and when would you use each?
+  Back: |
+    **Bridge (default):** Creates a private network on the host. Containers get their own IP addresses and communicate via this internal network. Port mapping (`-p 8080:80`) exposes container ports to the host. User-defined bridge networks add DNS resolution between containers by name.
+
+    **Host:** Removes network isolation entirely. The container shares the host's network stack and IP address. No port mapping needed -- the container's ports are the host's ports. Use when you need maximum network performance or the container must bind to the host's interface directly.
+
+    **None:** Disables all networking. The container has only a loopback interface. Use for security-sensitive workloads that should have zero network access (batch processing on local data, cryptographic operations).
+
+    **Decision framework:**
+    - Most workloads -> **bridge** (isolation with controlled exposure)
+    - Performance-critical networking -> **host** (no NAT overhead)
+    - Complete network isolation -> **none**
+
+    There is also **overlay** for multi-host networking in Docker Swarm, but for single-host Docker this is rarely relevant.
+
+- title: "Docker - stop vs kill"
+  difficulty: "easy"
+  tags: ["docker", "stop", "kill", "signals", "SIGTERM", "SIGKILL"]
+  Front: |
+    What is the difference between `docker stop` and `docker kill`?
+  Back: |
+    `docker stop` sends **SIGTERM** and gives the process a grace period (default 10 seconds) to shut down cleanly -- flush logs, close connections, finish in-flight requests. If the process does not exit within the timeout, Docker sends **SIGKILL** to force termination.
+
+    `docker kill` sends **SIGKILL** immediately. No grace period, no cleanup. The process is terminated by the kernel without any chance to handle the signal.
+
+    **Always default to `docker stop`.** Use `docker kill` only when a container is unresponsive and `docker stop` has already failed or timed out.
+
+    You can customize the grace period: `docker stop -t 30 mycontainer` waits 30 seconds before escalating to SIGKILL.
+
+- title: "Docker - Container Data Persistence"
+  difficulty: "easy"
+  tags: ["docker", "containers", "data", "ephemeral"]
+  Front: |
+    What happens to data inside a container when the container is **removed**?
+  Back: |
+    It is gone. A container's writable layer exists only for the lifetime of that container. `docker rm` deletes the container and its writable layer permanently.
+
+    **Clarification:** `docker stop` preserves data -- the container is still on disk, just not running. `docker rm` destroys it.
+
+    **How to persist data:**
+    - **Volumes:** Docker-managed storage that survives container removal
+    - **Bind mounts:** Host directories mapped into the container
+    - **External storage:** Write to a database, object store, or external API
+
+    This is by design. Containers are meant to be disposable -- you should be able to destroy and recreate one without losing state. Anything that needs to survive must live outside the container's filesystem.
+
+- title: "Docker - Docker Compose"
+  difficulty: "easy"
+  tags: ["docker", "docker compose", "orchestration"]
+  Front: |
+    What is **Docker Compose** and when would you use it vs Kubernetes?
+  Back: |
+    Docker Compose defines and runs multi-container applications using a YAML file (`docker-compose.yml`). You declare your services, networks, and volumes in one file and start everything with `docker compose up`.
+
+    **Compose is for:**
+    - Local development environments (app + database + cache in one command)
+    - Small self-hosted deployments (single server, no orchestration needed)
+    - CI test environments
+
+    **Kubernetes is for:**
+    - Production workloads that need auto-scaling, self-healing, and rolling updates
+    - Multi-node clusters
+    - Teams that need service discovery, load balancing, and declarative infrastructure at scale
+
+    **The practical dividing line:** If your application runs on a single machine and you do not need automatic recovery from node failure, Compose is simpler. Once you need multi-node orchestration or production-grade resilience, Kubernetes is the tool.
