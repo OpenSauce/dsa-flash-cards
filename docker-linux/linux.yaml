@@ -1,0 +1,197 @@
+- title: "Linux - Processes vs Threads"
+  difficulty: "medium"
+  tags: ["linux", "processes", "threads", "kernel"]
+  Front: |
+    What is the difference between a **process** and a **thread** in Linux?
+  Back: |
+    A process is an independent execution unit with its own virtual address space, file descriptors, and signal handlers. A thread is a lightweight execution unit that shares its parent process's address space and resources with other threads in the same process.
+
+    **Key differences:**
+    - **Memory:** Processes have isolated memory. One process cannot read another's memory without explicit IPC. Threads share heap and global data -- fast communication, but concurrency bugs (races, deadlocks) become possible.
+    - **Creation cost:** Forking a process copies page tables and file descriptors (though copy-on-write makes this cheaper than a full copy). Creating a thread is faster because it shares the existing address space.
+    - **Failure isolation:** A crashing process does not take down other processes. A crashing thread can corrupt shared memory and take down the entire process.
+
+    **Linux implementation detail:** The kernel does not distinguish between processes and threads at the scheduler level. Both are `task_struct` entries in the runqueue. The `clone()` syscall creates both -- the flags determine how much is shared (e.g., `CLONE_VM` shares memory, making it a thread).
+
+- title: "Linux - File Permissions"
+  difficulty: "easy"
+  tags: ["linux", "permissions", "chmod", "filesystem"]
+  Front: |
+    What do the Linux file permissions **755** and **644** mean?
+  Back: |
+    Linux permissions are three octal digits representing **owner**, **group**, and **others**. Each digit is the sum of: **4** (read) + **2** (write) + **1** (execute).
+
+    **755 = rwxr-xr-x:**
+    - Owner: read + write + execute (7)
+    - Group: read + execute (5)
+    - Others: read + execute (5)
+    - Standard for directories and executable scripts
+
+    **644 = rw-r--r--:**
+    - Owner: read + write (6)
+    - Group: read only (4)
+    - Others: read only (4)
+    - Standard for regular files (configs, source code, documents)
+
+    **Why directories need execute:** The execute bit on a directory means "permission to traverse." Without it, you cannot `cd` into the directory or access files inside it, even if you can list its contents.
+
+- title: "Linux - Kill Signals"
+  difficulty: "medium"
+  tags: ["linux", "signals", "kill", "SIGTERM", "SIGKILL"]
+  Front: |
+    What is the difference between `kill`, `kill -9`, and `kill -15`?
+  Back: |
+    `kill <pid>` sends **SIGTERM** (signal 15) by default. The process can catch this signal, clean up resources, and exit gracefully. This is the polite way to terminate a process.
+
+    `kill -15 <pid>` is identical to `kill <pid>` -- SIGTERM is the default.
+
+    `kill -9 <pid>` sends **SIGKILL** (signal 9). The kernel terminates the process immediately. The process cannot catch, block, or ignore SIGKILL. No cleanup happens -- open files are not flushed, network connections are not closed, temporary files are not removed.
+
+    **Always try SIGTERM first.** Only escalate to SIGKILL when the process is unresponsive. A well-written daemon uses a SIGTERM handler to flush buffers, release locks, and deregister from service discovery before exiting.
+
+    **Other useful signals:**
+    - `kill -1` (SIGHUP): Conventionally tells a daemon to reload its configuration
+    - `kill -2` (SIGINT): Same as pressing Ctrl+C
+
+- title: "Linux - chmod, chown, chgrp"
+  difficulty: "easy"
+  tags: ["linux", "permissions", "chmod", "chown", "chgrp"]
+  Front: |
+    What do `chmod`, `chown`, and `chgrp` do?
+  Back: |
+    **`chmod`** changes file permissions (the read/write/execute bits):
+    ```bash
+    chmod 755 script.sh     # numeric: rwxr-xr-x
+    chmod u+x script.sh     # symbolic: add execute for owner
+    ```
+
+    **`chown`** changes the file owner (and optionally the group):
+    ```bash
+    chown alice file.txt          # change owner to alice
+    chown alice:developers file.txt  # change owner and group
+    ```
+
+    **`chgrp`** changes only the group:
+    ```bash
+    chgrp developers file.txt
+    ```
+
+    In practice, `chown user:group` is used more often than `chgrp` since it handles both in one command. All three require appropriate privileges -- typically root or the current file owner.
+
+- title: "Linux - Filesystem Hierarchy"
+  difficulty: "easy"
+  tags: ["linux", "filesystem", "directories"]
+  Front: |
+    What is the difference between `/tmp`, `/var`, `/etc`, and `/home`?
+  Back: |
+    **`/etc`** -- System configuration files. Network settings (`/etc/hosts`), user accounts (`/etc/passwd`), service configs (`/etc/nginx/`). Edited by admins, read by services.
+
+    **`/home`** -- User home directories. Each user gets `/home/username/` for personal files, dotfiles, and application settings.
+
+    **`/tmp`** -- Temporary files. Any user can write here. Contents may be cleared on reboot (many distros mount it as `tmpfs`, which lives in RAM). Do not store anything important here.
+
+    **`/var`** -- Variable data that changes at runtime. Log files (`/var/log/`), mail spools, package caches (`/var/cache/`), database files. Unlike `/etc` (which is config), `/var` holds data that grows and changes during normal operation.
+
+    **Other common directories:**
+    - `/usr` -- Installed programs and libraries (read-only in normal operation)
+    - `/bin`, `/sbin` -- Essential system binaries
+    - `/proc`, `/sys` -- Virtual filesystems exposing kernel and process information
+
+- title: "Linux - Symlinks vs Hardlinks"
+  difficulty: "medium"
+  tags: ["linux", "symlinks", "hardlinks", "filesystem", "inodes"]
+  Front: |
+    What is a **symlink** vs a **hardlink**?
+  Back: |
+    Both create additional filesystem entries that point to existing data, but they work differently at the inode level.
+
+    **Hardlink:** A direct reference to the same inode (the same data on disk). The original file and the hardlink are indistinguishable -- they share the same inode number, same data blocks, same permissions. Deleting the original does not affect the hardlink because the data persists until all references are removed.
+
+    **Symlink (symbolic link):** A separate file (its own inode) that contains a path to the target. It is a pointer to a name, not to data. If the target is deleted or moved, the symlink becomes a dangling reference (broken link).
+
+    **Constraints:**
+    - Hardlinks cannot cross filesystem boundaries (inodes are per-filesystem)
+    - Hardlinks cannot point to directories (to prevent cycles in the filesystem tree)
+    - Symlinks can point anywhere -- other filesystems, directories, even non-existent paths
+
+    **Common use:** Symlinks are far more common. They are used to create aliases (`/usr/bin/python -> /usr/bin/python3`), switch between versions, and reference shared libraries.
+
+- title: "Linux - stdin, stdout, stderr"
+  difficulty: "medium"
+  tags: ["linux", "stdin", "stdout", "stderr", "redirection"]
+  Front: |
+    What is `stdin`, `stdout`, and `stderr`? What does `2>&1` do?
+  Back: |
+    Every Linux process has three standard file descriptors opened at birth:
+    - **fd 0 (stdin):** Standard input. Where the process reads input (keyboard by default, or piped data).
+    - **fd 1 (stdout):** Standard output. Normal program output.
+    - **fd 2 (stderr):** Standard error. Error messages and diagnostics.
+
+    **`2>&1` redirects stderr to wherever stdout is currently going.** The `2` is stderr's file descriptor, `>` means redirect, and `&1` means "to the same destination as fd 1."
+
+    ```bash
+    # Send both stdout and stderr to a file:
+    command > output.log 2>&1
+
+    # Discard all output:
+    command > /dev/null 2>&1
+
+    # Pipe both stdout and stderr to another command:
+    command 2>&1 | grep "error"
+    ```
+
+    **Why stderr exists separately:** It lets you redirect normal output to a file while still seeing errors on the terminal, or pipe output to another program without error messages contaminating the data stream.
+
+- title: "Linux - Cron Jobs"
+  difficulty: "easy"
+  tags: ["linux", "cron", "scheduling"]
+  Front: |
+    What is a **cron job** and what does `0 5 * * *` mean?
+  Back: |
+    Cron is a time-based job scheduler in Unix systems. You define scheduled commands in a crontab file, and the cron daemon executes them at the specified times.
+
+    **Crontab format:** five fields, left to right:
+    ```
+    minute  hour  day-of-month  month  day-of-week
+    (0-59)  (0-23)   (1-31)    (1-12)    (0-7)
+    ```
+
+    **`0 5 * * *`** = "At minute 0 of hour 5, every day of every month, every day of the week" = **daily at 5:00 AM**.
+
+    **Common patterns:**
+    - `*/15 * * * *` -- every 15 minutes
+    - `0 0 * * 0` -- midnight every Sunday
+    - `0 9 1 * *` -- 9 AM on the first of each month
+
+    **Gotchas:**
+    - Cron jobs run with a minimal environment. `PATH`, environment variables, and shell rc files may not be loaded. Use absolute paths for commands.
+    - stdout/stderr go to the system mail by default. Redirect output explicitly or it silently vanishes.
+
+- title: "Linux - grep, awk, sed"
+  difficulty: "medium"
+  tags: ["linux", "grep", "awk", "sed", "text processing"]
+  Front: |
+    What do `grep`, `awk`, and `sed` do? When would you use each?
+  Back: |
+    **`grep`** -- Search. Filters lines matching a pattern.
+    ```bash
+    grep "ERROR" /var/log/app.log       # lines containing ERROR
+    grep -r "TODO" src/                  # recursive search in files
+    ```
+    Use for: finding lines, counting matches, checking if a pattern exists.
+
+    **`sed`** -- Find and replace. A stream editor that transforms text line-by-line.
+    ```bash
+    sed 's/old/new/g' file.txt          # replace all occurrences
+    sed -i '5d' file.txt                # delete line 5 in-place
+    ```
+    Use for: substitutions, deletions, in-place file editing.
+
+    **`awk`** -- Column-based processing. Splits each line into fields and operates on them.
+    ```bash
+    awk '{print $1, $3}' data.txt       # print columns 1 and 3
+    awk -F: '{print $1}' /etc/passwd    # print usernames (: delimiter)
+    ```
+    Use for: extracting specific columns, computing sums/averages, reformatting structured text.
+
+    **Mental model:** `grep` filters rows. `awk` selects columns. `sed` transforms content. They compose naturally with pipes: `grep "200" access.log | awk '{print $7}' | sort | uniq -c | sort -rn` gives you the most-requested URLs with 200 status.

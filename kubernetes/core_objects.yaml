@@ -58,7 +58,15 @@
 
 - title: "Kubernetes Core - Services"
   difficulty: "medium"
-  tags: ["kubernetes", "services", "networking", "ClusterIP", "NodePort", "LoadBalancer"]
+  tags:
+    [
+      "kubernetes",
+      "services",
+      "networking",
+      "ClusterIP",
+      "NodePort",
+      "LoadBalancer",
+    ]
   Front: |
     What is a **Service** and what are the three main types (ClusterIP, NodePort, LoadBalancer)?
   Back: |
