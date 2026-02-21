@@ -45,7 +45,7 @@ Docker caches each layer. On rebuild, it walks the Dockerfile top to bottom:
 
 If both answers are "no," Docker reuses the cached layer instantly. The moment one layer's cache is **invalidated**, every subsequent layer must be rebuilt -- even if those later instructions have not changed.
 
-This is the single most important concept for build performance: **cache invalidation cascades downward.**
+This is the single most important concept for build performance: **cache invalidation cascades to subsequent layers.**
 
 ### Why Instruction Order Matters
 
@@ -125,7 +125,7 @@ USER appuser
 ## Key Takeaways
 
 - Each `RUN`, `COPY`, and `ADD` instruction creates an immutable layer identified by its content hash.
-- Cache invalidation cascades: once a layer changes, every layer below it rebuilds. Order your Dockerfile from least-changing to most-changing.
+- Cache invalidation cascades: once a layer changes, every subsequent layer rebuilds. Order your Dockerfile from least-changing to most-changing.
 - Copy dependency manifests before source code so dependency installation is cached across code changes.
 - Use `.dockerignore` to exclude files that would unnecessarily bust the cache.
 - Multi-stage builds separate build tooling from the runtime image, reducing size and attack surface.
