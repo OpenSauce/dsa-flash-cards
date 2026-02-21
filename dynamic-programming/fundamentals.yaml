@@ -16,7 +16,14 @@
 
 - title: "DP - Memoization vs Tabulation"
   difficulty: "medium"
-  tags: ["dynamic programming", "memoization", "tabulation", "top-down", "bottom-up"]
+  tags:
+    [
+      "dynamic programming",
+      "memoization",
+      "tabulation",
+      "top-down",
+      "bottom-up",
+    ]
   Front: |
     What is the difference between **memoization** (top-down) and **tabulation** (bottom-up) in dynamic programming?
   Back: |
