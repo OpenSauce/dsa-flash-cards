@@ -1,0 +1,189 @@
+- title: "DP - Climbing Stairs"
+  difficulty: "easy"
+  tags: ["dynamic programming", "fibonacci", "1D"]
+  Front: |
+    How do you solve the **Climbing Stairs** problem: given n stairs, you can climb 1 or 2 steps at a time -- how many distinct ways to reach the top?
+  Back: |
+    **Recurrence:** `dp[i] = dp[i-1] + dp[i-2]`
+
+    The number of ways to reach step i equals the ways to reach step i-1 (take one step) plus the ways to reach step i-2 (take two steps). This is the Fibonacci sequence.
+
+    **Base cases:** `dp[0] = 1, dp[1] = 1`
+    **Time:** O(n) | **Space:** O(1) with two rolling variables
+
+    **Variations:** k steps at a time, variable step costs (min cost climbing stairs).
+
+    **Interview tip:** This is the canonical first DP problem. If you explain it clearly, the interviewer trusts you understand DP fundamentals.
+
+- title: "DP - Coin Change"
+  difficulty: "medium"
+  tags: ["dynamic programming", "knapsack", "unbounded"]
+  Front: |
+    How do you solve the **Coin Change** problem: given coins of different denominations and a target amount, find the **minimum number of coins** needed?
+  Back: |
+    **Recurrence:** `dp[a] = min(dp[a - coin] + 1)` for each coin denomination
+
+    For each amount, try subtracting every coin and take the minimum result plus one.
+
+    **Base case:** `dp[0] = 0` (zero coins for amount zero)
+    **Initialization:** `dp[1..amount] = infinity` (unreachable until proven otherwise)
+    **Time:** O(amount * coins) | **Space:** O(amount)
+
+    This is an **unbounded knapsack** -- each coin can be used unlimited times.
+
+    **Variations:** Count number of *combinations* (different recurrence), coin change with limited supply per denomination.
+
+    **Interview tip:** Be precise about whether the problem asks for minimum coins (this problem) or number of ways -- the recurrences differ.
+
+- title: "DP - 0/1 Knapsack"
+  difficulty: "medium"
+  tags: ["dynamic programming", "knapsack", "optimization"]
+  Front: |
+    How do you solve the **0/1 Knapsack** problem: given items with weights and values, maximize total value without exceeding capacity W?
+  Back: |
+    **Recurrence:** `dp[i][w] = max(dp[i-1][w], dp[i-1][w - weight[i]] + value[i])`
+
+    For each item: skip it (keep previous best) or take it (add its value, reduce remaining capacity).
+
+    **Base case:** `dp[0][w] = 0` for all w
+    **Time:** O(n * W) | **Space:** O(n * W), optimizable to O(W) with a single row
+
+    The "0/1" means each item is either taken or left -- no fractions. The space optimization works by iterating capacity **right to left** so each item is only counted once.
+
+    **Variations:** Subset sum (values equal weights, target is exact), equal partition (split array into two equal-sum subsets).
+
+    **Interview tip:** The right-to-left iteration trick for O(W) space is a common follow-up question.
+
+- title: "DP - Longest Common Subsequence"
+  difficulty: "medium"
+  tags: ["dynamic programming", "string", "2D"]
+  Front: |
+    How do you solve the **Longest Common Subsequence (LCS)** problem: find the length of the longest subsequence common to two strings?
+  Back: |
+    **Recurrence:**
+    - If `s1[i] == s2[j]`: `dp[i][j] = dp[i-1][j-1] + 1`
+    - Else: `dp[i][j] = max(dp[i-1][j], dp[i][j-1])`
+
+    When characters match, both strings advance together. When they don't, try advancing each string independently and keep the better result.
+
+    **Base case:** `dp[0][j] = dp[i][0] = 0`
+    **Time:** O(m * n) | **Space:** O(m * n), optimizable to O(min(m, n))
+
+    **Variations:** Longest common *substring* (consecutive -- reset to 0 on mismatch), shortest common supersequence, diff algorithms.
+
+    **Interview tip:** To reconstruct the actual subsequence (not just the length), backtrack through the DP table from `dp[m][n]`.
+
+- title: "DP - Longest Increasing Subsequence"
+  difficulty: "medium"
+  tags: ["dynamic programming", "subsequence", "binary search"]
+  Front: |
+    How do you solve the **Longest Increasing Subsequence (LIS)** problem, and what are the two standard approaches?
+  Back: |
+    **O(n^2) DP:** `dp[i] = max(dp[j] + 1)` for all j < i where `arr[j] < arr[i]`. Base case: `dp[i] = 1`. Answer: `max(dp[0..n-1])`.
+
+    **O(n log n) patience sorting:** Maintain a "tails" array where `tails[k]` is the smallest tail element of all increasing subsequences of length k+1. For each element, binary search for its insertion point in tails. The length of tails is the LIS length.
+
+    The greedy insight: keeping the smallest possible tail for each length maximizes the chance of extending the subsequence later.
+
+    **Space:** O(n) for both approaches.
+
+    **Variations:** Longest non-decreasing, longest *decreasing* (reverse the array), count the number of distinct LIS.
+
+    **Interview tip:** Interviewers often want O(n log n). Explain the O(n^2) DP first, then optimize with tails + binary search.
+
+- title: "DP - Maximum Subarray (Kadane's Algorithm)"
+  difficulty: "medium"
+  tags: ["dynamic programming", "kadane", "subarray", "1D"]
+  Front: |
+    How does **Kadane's Algorithm** solve the **Maximum Subarray** problem: find the contiguous subarray with the largest sum?
+  Back: |
+    **Recurrence:** `dp[i] = max(arr[i], dp[i-1] + arr[i])`
+
+    At each position, either extend the previous subarray or start a new one here. If the running sum goes negative, restarting is always better.
+
+    **Answer:** `max(dp[0], dp[1], ..., dp[n-1])`
+    **Time:** O(n) | **Space:** O(1) -- only the previous value and the running max are needed
+
+    **Variations:** Maximum *product* subarray (track both max and min because negative times negative is positive), maximum circular subarray (total sum minus minimum subarray), maximum subarray with at most k deletions.
+
+    **Interview tip:** Kadane's is one of the few DP problems solvable in O(1) space. Expect the circular or product variant as a follow-up.
+
+- title: "DP - House Robber"
+  difficulty: "medium"
+  tags: ["dynamic programming", "1D", "adjacency constraint"]
+  Front: |
+    How do you solve the **House Robber** problem: maximize total money from houses in a row, where you **cannot rob two adjacent houses**?
+  Back: |
+    **Recurrence:** `dp[i] = max(dp[i-1], dp[i-2] + nums[i])`
+
+    Either skip house i (take previous best) or rob house i (add its value to the best from two houses back).
+
+    **Base cases:** `dp[0] = nums[0]`, `dp[1] = max(nums[0], nums[1])`
+    **Time:** O(n) | **Space:** O(1) with two variables
+
+    Same structure as climbing stairs, but maximizing value instead of counting ways. The "no adjacent" constraint forces a binary decision at each step.
+
+    **Variations:** House Robber II (circular street -- solve twice, excluding first or last house), House Robber III (binary tree -- rob or skip each node with DFS).
+
+    **Interview tip:** The circular variant (II) tests whether you can reduce a new problem to one you've already solved.
+
+- title: "DP - Edit Distance"
+  difficulty: "hard"
+  tags: ["dynamic programming", "string", "2D", "levenshtein"]
+  Front: |
+    How do you solve the **Edit Distance** (Levenshtein Distance) problem: find the minimum operations (insert, delete, replace) to convert one string to another?
+  Back: |
+    **Recurrence:**
+    - If `s1[i] == s2[j]`: `dp[i][j] = dp[i-1][j-1]` (no edit needed)
+    - Else: `dp[i][j] = 1 + min(dp[i-1][j], dp[i][j-1], dp[i-1][j-1])`
+      - `dp[i-1][j]` = delete from s1
+      - `dp[i][j-1]` = insert into s1
+      - `dp[i-1][j-1]` = replace in s1
+
+    **Base cases:** `dp[i][0] = i` (delete all of s1), `dp[0][j] = j` (insert all of s2)
+    **Time:** O(m * n) | **Space:** O(m * n), optimizable to O(min(m, n))
+
+    Each cell represents the cost of converting the first i characters of s1 to the first j characters of s2. The three operations map to three directions in the table.
+
+    **Real-world uses:** Spell checkers, DNA sequence alignment, diff tools.
+
+    **Interview tip:** Walk through a small 2D grid step by step -- interviewers value seeing the table filled in.
+
+- title: "DP - Minimum Path Sum"
+  difficulty: "medium"
+  tags: ["dynamic programming", "grid", "2D"]
+  Front: |
+    How do you solve the **Minimum Path Sum** problem: find the path from top-left to bottom-right of a grid that minimizes the sum, moving only right or down?
+  Back: |
+    **Recurrence:** `dp[i][j] = grid[i][j] + min(dp[i-1][j], dp[i][j-1])`
+
+    Each cell can only be reached from the left or above. Take the cheaper predecessor and add the current cell's value.
+
+    **Base cases:** `dp[0][0] = grid[0][0]`; first row and first column are prefix sums (only one direction to arrive from).
+    **Time:** O(m * n) | **Space:** O(m * n), optimizable to O(n) with a single row, or O(1) if you modify the grid in-place.
+
+    The restricted movement (only right/down) ensures no cycles, which is why DP works here -- a greedy approach would fail.
+
+    **Variations:** Unique paths (count paths instead of sum), obstacles blocking cells, maximum path sum, triangle path sum.
+
+    **Interview tip:** Grid DP problems are popular because the 2D table maps directly to the grid. Mention the in-place O(1) space trick if asked to optimize.
+
+- title: "DP - Partition Equal Subset Sum"
+  difficulty: "hard"
+  tags: ["dynamic programming", "knapsack", "subset sum"]
+  Front: |
+    How do you solve the **Partition Equal Subset Sum** problem: determine if an array can be split into two subsets with equal sum?
+  Back: |
+    **Reduction:** If total sum is odd, return false. Otherwise, find a subset that sums to `total / 2` -- a 0/1 knapsack feasibility check.
+
+    **Recurrence:** `dp[j] = dp[j] || dp[j - nums[i]]` (can we make sum j using elements up to index i?)
+    **Base case:** `dp[0] = true` (the empty subset sums to 0)
+    **Iteration:** j from target **down to** `nums[i]` (reverse to avoid reusing the same element)
+
+    **Time:** O(n * sum/2) | **Space:** O(sum/2)
+
+    The boolean DP array is a simplification of the full knapsack table -- we only care about reachability, not optimal value.
+
+    **Variations:** Partition into k equal subsets, target sum with +/- signs, last stone weight.
+
+    **Interview tip:** The real insight is the *reduction* from "partition" to "subset sum" to "0/1 knapsack." Articulate that chain clearly before writing code.

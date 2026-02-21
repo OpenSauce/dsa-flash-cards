@@ -1,0 +1,70 @@
+- title: "DP - What is Dynamic Programming"
+  difficulty: "easy"
+  tags: ["dynamic programming", "optimization", "recursion"]
+  Front: |
+    What is **dynamic programming** and when should you use it?
+  Back: |
+    An optimization technique that solves problems by breaking them into **overlapping subproblems** and storing their results to avoid redundant computation.
+
+    **Two required properties:**
+    1. **Optimal substructure** -- the optimal solution is built from optimal solutions to subproblems
+    2. **Overlapping subproblems** -- the same subproblems are solved repeatedly in the naive recursive approach
+
+    Contrast with **divide and conquer** (merge sort, quicksort), which also decomposes problems but has *non-overlapping* subproblems -- no caching needed.
+
+    **When to reach for DP:** the problem asks for a minimum, maximum, count of ways, or feasibility, and the brute-force recursion recomputes the same states.
+
+- title: "DP - Memoization vs Tabulation"
+  difficulty: "medium"
+  tags: ["dynamic programming", "memoization", "tabulation", "top-down", "bottom-up"]
+  Front: |
+    What is the difference between **memoization** (top-down) and **tabulation** (bottom-up) in dynamic programming?
+  Back: |
+    **Memoization (top-down):** Start with the original problem, recurse into subproblems, cache results in a hash map or array. Only solves subproblems that are actually reached.
+
+    **Tabulation (bottom-up):** Fill a table iteratively from the smallest subproblems up to the answer. No recursion, no stack overflow risk.
+
+    **Trade-offs:**
+    - Memoization is easier to write (natural recursion) but risks stack overflow on deep inputs
+    - Tabulation has predictable memory access and is usually faster in practice due to no function-call overhead
+    - Tabulation solves *all* subproblems, even unreachable ones -- memoization only solves what's needed
+
+    **Interview tip:** Start with memoization for correctness, then convert to tabulation if the interviewer asks to optimize.
+
+- title: "DP - Identifying DP Problems"
+  difficulty: "medium"
+  tags: ["dynamic programming", "problem identification", "patterns"]
+  Front: |
+    How do you identify whether a problem can be solved with **dynamic programming**?
+  Back: |
+    **Signal phrases in the problem statement:** "find the minimum/maximum," "count the number of ways," "is it possible to..."
+
+    **Check the two properties:**
+    1. **Optimal substructure** -- can you express the answer in terms of answers to smaller instances?
+    2. **Overlapping subproblems** -- does the naive recursion solve the same subproblem more than once?
+
+    **Decision framework once you suspect DP:**
+    1. Define the **state** (what variables uniquely describe a subproblem)
+    2. Write the **recurrence** (how states relate to each other)
+    3. Identify the **base case(s)**
+    4. Determine **iteration order** (if using tabulation)
+
+    **Quick test:** Draw the recursion tree for a small input. If you see repeated nodes, DP applies.
+
+- title: "DP - Common Patterns"
+  difficulty: "medium"
+  tags: ["dynamic programming", "patterns", "knapsack", "interval", "grid"]
+  Front: |
+    What are the **common DP patterns** and what type of problem does each solve?
+  Back: |
+    **1D DP (linear):** State depends on previous elements in a single sequence. *Examples:* climbing stairs, house robber, maximum subarray.
+
+    **2D DP (grid / two-sequence):** State has two dimensions -- grid coordinates or indices into two strings. *Examples:* LCS, edit distance, minimum path sum.
+
+    **Knapsack:** Choose items subject to a capacity constraint. Variants: 0/1 (each item once), unbounded (unlimited copies), bounded. *Examples:* coin change, subset sum, partition equal subset sum.
+
+    **Interval DP:** Solve over contiguous subranges, try all split points. *Examples:* matrix chain multiplication, burst balloons.
+
+    **State machine DP:** Model explicit states and transitions. *Examples:* best time to buy/sell stock with cooldown.
+
+    Recognizing the pattern is half the problem -- once you identify it as a knapsack variant, the recurrence almost writes itself.
