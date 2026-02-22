@@ -1,0 +1,56 @@
+title: "Security and IAM"
+lesson_slug: "aws-security-and-iam"
+questions:
+  - question: "What is the key difference between an IAM role and an IAM user?"
+    options:
+      - "IAM users can access all AWS services; roles are restricted to specific services"
+      - "IAM users have long-term credentials; roles provide short-lived temporary credentials assumed by services or users"
+      - "IAM roles are for human operators; users are for automated services"
+      - "IAM users and roles are functionally identical -- they are just named differently"
+    correct: 1
+    explanation: "IAM users have long-term credentials (password + access keys) that persist until manually rotated. IAM roles provide temporary credentials issued by STS that expire automatically (typically within 1 hour). Roles are assumed by AWS services (Lambda, EC2, ECS tasks), not held as permanent identities."
+
+  - question: "What does the principle of least privilege require?"
+    options:
+      - "Grant read-only access to all resources by default, add write permissions only when needed"
+      - "Rotate IAM access keys every 90 days"
+      - "Grant only the minimum permissions required to perform a task, scoped to specific resources"
+      - "Never allow cross-account IAM access"
+    correct: 2
+    explanation: "Least privilege means granting exactly what is needed for the task -- no more. A Lambda function reading from one S3 bucket should have s3:GetObject on that specific bucket ARN, not s3:* on *. The most common violation is using broad permissions during development and never tightening them before production."
+
+  - question: "An IAM policy statement has Effect: Allow for s3:* on all resources. A separate SCP (Service Control Policy) has Effect: Deny for s3:DeleteObject on all resources. What happens when the user tries to delete an S3 object?"
+    options:
+      - "The Allow policy wins because it is more specific"
+      - "The Deny policy wins -- an explicit Deny always overrides any Allow"
+      - "Both policies cancel each other out and the request is allowed by default"
+      - "It depends on which policy was created first"
+    correct: 1
+    explanation: "In IAM policy evaluation, an explicit Deny always wins over any Allow. Regardless of how many Allow policies apply, a single Deny in any evaluated policy (including SCPs, permission boundaries, or resource-based policies) blocks the request. There is no way to override an explicit Deny with an Allow."
+
+  - question: "What does an IAM group do?"
+    options:
+      - "Groups enforce network-level isolation between IAM users"
+      - "Groups allow IAM users to assume roles in other AWS accounts"
+      - "Groups are a way to apply the same permissions to multiple IAM users by attaching policies to the group"
+      - "Groups replace IAM roles for service-to-service authentication"
+    correct: 2
+    explanation: "An IAM group is a collection of users. Policies attached to the group apply to all users in it. Groups cannot assume roles and have no credentials of their own -- they are purely an organizational tool to avoid attaching the same policies to multiple users individually."
+
+  - question: "Why are IAM roles preferred over IAM access keys for services running in AWS?"
+    options:
+      - "IAM roles have higher permission limits than access keys"
+      - "Access keys cannot be used with EC2 or Lambda"
+      - "Roles issue temporary credentials that expire automatically, eliminating the risk of long-lived static credentials being leaked or forgotten"
+      - "IAM roles are required by AWS for all production workloads"
+    correct: 2
+    explanation: "Static access keys are a persistent security liability: they don't expire, must be manually rotated, and if leaked (via a public S3 bucket, a compromised CI system, or a committed env file), provide ongoing access until manually deactivated. Role-issued STS credentials expire automatically -- a leaked token is useless in an hour."
+
+  - question: "What are the three required fields in an IAM policy statement?"
+    options:
+      - "Principal, Action, Resource"
+      - "Effect, Action, Resource"
+      - "Version, Statement, Condition"
+      - "Allow, Deny, Resource"
+    correct: 1
+    explanation: "Every IAM policy statement requires: Effect (Allow or Deny), Action (one or more AWS API actions like s3:GetObject or ec2:*), and Resource (the ARN of the resource(s) the statement applies to, or * for all). Principal is required in resource-based policies (like S3 bucket policies) but not in identity-based policies."

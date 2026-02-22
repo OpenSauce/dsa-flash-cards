@@ -1,0 +1,56 @@
+title: "Networking and VPC"
+lesson_slug: "aws-networking-and-vpc"
+questions:
+  - question: "What is the single factor that makes a subnet public vs private?"
+    options:
+      - "Whether resources in the subnet have Elastic IP addresses assigned"
+      - "Whether the subnet's route table has a route to an internet gateway"
+      - "Whether the subnet is tagged 'public' in the AWS Console"
+      - "Whether the subnet is in a different Availability Zone from the VPC's main route table"
+    correct: 1
+    explanation: "A subnet is public if its route table contains a route to an internet gateway (e.g., '0.0.0.0/0 → igw-xxx'). Without that route, the subnet is private. Whether resources have public IPs is a secondary concern -- public IPs only work if the subnet can reach the internet gateway."
+
+  - question: "Are security groups stateful or stateless?"
+    options:
+      - "Stateless -- you must create separate inbound and outbound rules for each traffic flow"
+      - "Stateful -- if inbound traffic is allowed, the return traffic is automatically allowed"
+      - "It depends on whether the security group is attached to an EC2 instance or an RDS database"
+      - "Security groups have no concept of state -- they only filter by port and protocol"
+    correct: 1
+    explanation: "Security groups are stateful. If you allow inbound traffic from a source (e.g., TCP port 443), the response traffic is automatically allowed outbound without a separate rule. You only need to write rules in one direction for request-response flows."
+
+  - question: "Are Network ACLs (NACLs) stateful or stateless?"
+    options:
+      - "Stateful -- like security groups, return traffic is automatically permitted"
+      - "Stateless -- you must explicitly allow both inbound and outbound traffic for every connection"
+      - "Stateful for TCP, stateless for UDP"
+      - "NACLs do not filter traffic -- they only log network flows"
+    correct: 1
+    explanation: "NACLs are stateless. They evaluate inbound and outbound rules independently. If you allow inbound HTTP on port 80, you must also explicitly allow the return traffic (ephemeral ports 1024-65535 outbound) or responses never reach clients. This is the critical stateful vs stateless difference between security groups and NACLs."
+
+  - question: "What is the purpose of a NAT gateway?"
+    options:
+      - "It allows internet users to initiate connections to private subnet resources"
+      - "It translates private IPv4 addresses to IPv6 addresses within a VPC"
+      - "It allows resources in private subnets to initiate outbound internet connections without being directly reachable from the internet"
+      - "It distributes traffic across multiple EC2 instances in different subnets"
+    correct: 2
+    explanation: "A NAT gateway provides outbound-only internet access for private subnet resources. Private instances can reach external APIs, download software updates, etc. The internet cannot initiate connections to private instances through a NAT gateway. NAT gateways live in public subnets and are managed by AWS."
+
+  - question: "In the standard 3-tier AWS architecture, where does each tier belong?"
+    options:
+      - "Load balancer in private subnet, application servers in public subnet, databases in private subnet"
+      - "All three tiers in public subnets for internet reachability"
+      - "Load balancer in public subnet, application servers in private subnet, databases in private subnet"
+      - "Load balancer and application servers in public subnets, databases in a separate VPC"
+    correct: 2
+    explanation: "The standard pattern: load balancer in the public subnet (internet-facing), application servers in private subnets (reachable only from the load balancer), databases in private subnets (reachable only from application servers). Each security group restricts access to only the adjacent tier."
+
+  - question: "Why should databases always be placed in private subnets?"
+    options:
+      - "Databases in public subnets cannot use Elastic IPs"
+      - "Private subnets provide higher network throughput than public subnets"
+      - "Databases in private subnets are not directly reachable from the internet, reducing the attack surface"
+      - "AWS requires databases to be in private subnets for compliance reasons"
+    correct: 2
+    explanation: "A database in a public subnet with a public IP is directly reachable from the internet. Even with strong passwords, this exposes the database to brute-force attacks, vulnerability exploits, and accidental public exposure. In a private subnet, the database is only reachable from within the VPC, and only from resources explicitly allowed by its security group."
