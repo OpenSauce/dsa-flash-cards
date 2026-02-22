@@ -1,0 +1,47 @@
+title: "Docker Image Layers and Build Cache"
+lesson_slug: "docker-layers-build-cache"
+questions:
+  - question: "Which Dockerfile instructions create new filesystem layers?"
+    options:
+      - "FROM, ENV, and CMD"
+      - "RUN, COPY, and ADD"
+      - "All instructions create layers"
+      - "Only RUN creates layers; COPY and ADD modify existing layers"
+    correct: 1
+    explanation: "RUN, COPY, and ADD create filesystem layers. Other instructions (ENV, WORKDIR, EXPOSE, CMD) only add metadata to the image configuration."
+
+  - question: "You change one line of application code and rebuild. Your Dockerfile has `COPY . .` before `RUN pip install -r requirements.txt`. What happens?"
+    options:
+      - "Only the changed source file is rebuilt"
+      - "The COPY layer is invalidated, which forces pip install to re-run even though requirements.txt has not changed"
+      - "Docker detects that requirements.txt is unchanged and skips pip install"
+      - "The build fails because the cache is corrupted"
+    correct: 1
+    explanation: "Cache invalidation cascades. When COPY . . is invalidated by the code change, every subsequent layer rebuilds -- including pip install. The fix: copy requirements.txt separately before pip install, then COPY . . after."
+
+  - question: "What is the purpose of a `.dockerignore` file?"
+    options:
+      - "It prevents Docker from running certain containers"
+      - "It lists Dockerfile instructions to skip during builds"
+      - "It tells Docker which files to exclude from the build context, improving build speed and cache stability"
+      - "It configures which ports to block in container networking"
+    correct: 2
+    explanation: ".dockerignore excludes files from the build context. Fewer files means faster context transfer, fewer unnecessary cache invalidations from COPY . ., and no accidental inclusion of .git/, .env, or node_modules/ in the image."
+
+  - question: "A multi-stage build uses multiple FROM statements. What is the main benefit?"
+    options:
+      - "It runs multiple containers in parallel for faster builds"
+      - "The final image contains only the runtime artifact, not build tools, source code, or SDKs -- dramatically reducing image size and attack surface"
+      - "It automatically scales the application across multiple hosts"
+      - "It allows mixing Linux and Windows base images"
+    correct: 1
+    explanation: "Multi-stage builds compile in an early stage and copy only the output to a minimal final stage. A Go binary in alpine can be 20MB vs 800MB+ with the full Go SDK."
+
+  - question: "What is the rule for Dockerfile instruction ordering to maximize cache hits?"
+    options:
+      - "Put the most important instructions first"
+      - "Alphabetize instructions by command name"
+      - "Instructions that change rarely go near the top; instructions that change often go near the bottom"
+      - "Put all COPY instructions together, then all RUN instructions"
+    correct: 2
+    explanation: "Cache invalidation cascades downward. Rarely-changing instructions (base image, OS packages) go first so they stay cached. Frequently-changing instructions (source code) go last so only the final layers rebuild."

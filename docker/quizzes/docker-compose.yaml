@@ -1,0 +1,56 @@
+title: "Docker Compose"
+lesson_slug: "docker-compose"
+questions:
+  - question: "What does `docker compose up -d` do?"
+    options:
+      - "Downloads all images and deletes old containers"
+      - "Creates and starts all services defined in the Compose file in detached (background) mode"
+      - "Deploys the application to a Kubernetes cluster"
+      - "Runs the services in debug mode with verbose logging"
+    correct: 1
+    explanation: "docker compose up creates containers for all services in the Compose file and starts them. The -d flag runs them in the background (detached), just like docker run -d."
+
+  - question: "How do services in a Docker Compose project discover each other by name?"
+    options:
+      - "You must configure /etc/hosts in each container"
+      - "Compose creates a user-defined bridge network with DNS resolution -- services resolve each other by service name"
+      - "Compose assigns static IP addresses to each service"
+      - "Services must be on the host network to communicate"
+    correct: 1
+    explanation: "Compose automatically creates a user-defined bridge network. Docker's embedded DNS server resolves service names to container IPs. The app service can reach the db service at hostname 'db'."
+
+  - question: "What does `depends_on: [db]` guarantee about the db service?"
+    options:
+      - "That db is fully ready and accepting connections before app starts"
+      - "That db's container is started before app's container, but NOT that db is ready to accept connections"
+      - "That db and app share the same network namespace"
+      - "That db's data volume is mounted into the app container"
+    correct: 1
+    explanation: "depends_on controls startup order only. The db container starts first, but the app container does not wait for db to be ready. For readiness, use depends_on with condition: service_healthy and define a healthcheck on db."
+
+  - question: "What does `docker compose down` do to named volumes?"
+    options:
+      - "Deletes all volumes along with the containers"
+      - "Preserves named volumes -- add -v to delete them"
+      - "Moves volumes to a backup directory"
+      - "Converts volumes to bind mounts"
+    correct: 1
+    explanation: "docker compose down removes containers and the Compose network but preserves named volumes. Use docker compose down -v to also delete volumes. This is important for database data that should survive restarts."
+
+  - question: "When should you choose Kubernetes over Docker Compose?"
+    options:
+      - "For any production deployment regardless of scale"
+      - "When your application has more than 3 services"
+      - "When you need multi-node orchestration, auto-scaling, and automatic recovery from node failure"
+      - "When you want to use YAML configuration files"
+    correct: 2
+    explanation: "Compose is for single-host orchestration. Kubernetes adds multi-node scheduling, auto-scaling, rolling updates, and self-healing. If your app runs on one server without needing automatic failover, Compose is simpler."
+
+  - question: "What is the Compose v2 command syntax?"
+    options:
+      - "docker-compose up (hyphenated, standalone binary)"
+      - "docker compose up (space-separated, Docker CLI plugin)"
+      - "compose up (standalone command)"
+      - "docker orchestrate up"
+    correct: 1
+    explanation: "Compose v2 is a Docker CLI plugin invoked with 'docker compose' (space, not hyphen). The old v1 syntax 'docker-compose' (hyphenated) is deprecated as of July 2023."

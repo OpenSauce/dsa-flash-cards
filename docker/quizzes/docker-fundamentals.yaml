@@ -1,0 +1,56 @@
+title: "Docker Fundamentals"
+lesson_slug: "docker-fundamentals"
+questions:
+  - question: "What Linux kernel feature controls what a container can SEE (its own process IDs, network interfaces, mount points)?"
+    options:
+      - "Cgroups"
+      - "Namespaces"
+      - "SELinux"
+      - "Hypervisor"
+    correct: 1
+    explanation: "Namespaces isolate visibility -- each container gets its own view of process IDs, network interfaces, mount points, and hostnames. Cgroups control resource limits (CPU, memory), not visibility."
+
+  - question: "A container shares the host's kernel. A VM runs its own kernel. What is the main consequence of this difference?"
+    options:
+      - "Containers cannot run Linux applications"
+      - "VMs start faster because they skip kernel loading"
+      - "Containers start in milliseconds and use far less memory than VMs"
+      - "VMs can run more containers per host than bare metal"
+    correct: 2
+    explanation: "Sharing the host kernel means containers do not boot an OS. They start as a process in milliseconds and consume tens of MB, whereas VMs take seconds to minutes and reserve GB for the guest OS."
+
+  - question: "What is the relationship between a Docker image and a container?"
+    options:
+      - "An image is a running container that has been paused"
+      - "A container is a running instance of an image, with its own writable layer on top"
+      - "An image and a container are the same thing, just different names"
+      - "A container is a compressed version of an image for transfer over networks"
+    correct: 1
+    explanation: "An image is a read-only template. A container is a running instance of that image with a writable layer added on top. You can run many containers from the same image."
+
+  - question: "What does a Dockerfile do?"
+    options:
+      - "It runs containers in production"
+      - "It stores container logs and metrics"
+      - "It defines instructions for building a Docker image, layer by layer"
+      - "It manages networking between containers"
+    correct: 2
+    explanation: "A Dockerfile is a text file with instructions (FROM, RUN, COPY, etc.) that Docker executes sequentially to build an image. Each instruction adds a layer."
+
+  - question: "What is a Docker registry?"
+    options:
+      - "A log of all containers that have run on a host"
+      - "A tool for monitoring container resource usage"
+      - "A configuration file for Docker networking"
+      - "A server that stores and distributes Docker images"
+    correct: 3
+    explanation: "A registry stores Docker images. Docker Hub is the default public registry. Organizations use private registries (AWS ECR, GitHub Container Registry) for their own images. You push images to a registry and pull them on target machines."
+
+  - question: "Which of these is a scenario where a VM is a better choice than a container?"
+    options:
+      - "Running a microservice that needs to scale to 100 instances"
+      - "Running a CI/CD build step that needs a clean environment"
+      - "Running a Windows application on a Linux host"
+      - "Running a web server that needs sub-second startup"
+    correct: 2
+    explanation: "Containers share the host kernel and cannot run a different OS kernel. Running Windows on a Linux host requires a VM with its own Windows kernel. Containers excel at the other scenarios due to fast startup, low overhead, and easy scaling."

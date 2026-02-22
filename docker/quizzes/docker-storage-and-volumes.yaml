@@ -1,0 +1,47 @@
+title: "Docker Storage and Volumes"
+lesson_slug: "docker-storage-and-volumes"
+questions:
+  - question: "What happens to files written inside a container when you run `docker rm`?"
+    options:
+      - "They are moved to a backup directory on the host"
+      - "They persist in the container's writable layer until garbage collected"
+      - "They are permanently deleted along with the container's writable layer"
+      - "They are preserved if the container was stopped gracefully with docker stop"
+    correct: 2
+    explanation: "docker rm deletes the container and its writable layer. All files written inside the container are gone permanently. This is true regardless of how the container was stopped."
+
+  - question: "What is the key difference between a Docker volume and a bind mount?"
+    options:
+      - "Volumes are faster; bind mounts are slower"
+      - "Volumes are managed by Docker and stored in Docker's storage directory; bind mounts map a specific host path chosen by the user"
+      - "Volumes only work on Linux; bind mounts work on all platforms"
+      - "Volumes are read-only; bind mounts are read-write"
+    correct: 1
+    explanation: "Volumes are created and managed by Docker in /var/lib/docker/volumes/. Bind mounts map a user-specified host directory into the container. Both are read-write by default, and both work cross-platform."
+
+  - question: "You are running a PostgreSQL database in Docker for production. Which storage option should you use for the database files?"
+    options:
+      - "The container's writable layer -- it is the simplest option"
+      - "A bind mount to your home directory"
+      - "A tmpfs mount for maximum performance"
+      - "A Docker volume"
+    correct: 3
+    explanation: "Volumes are the right choice for production data. They are managed by Docker, survive container removal, and are portable. Bind mounts depend on host paths and are less portable. tmpfs data vanishes when the container stops. The writable layer is deleted on docker rm."
+
+  - question: "When does data in a tmpfs mount disappear?"
+    options:
+      - "When the container is removed with docker rm"
+      - "When the Docker daemon restarts"
+      - "When the container stops (not just when removed)"
+      - "After a configurable TTL expires"
+    correct: 2
+    explanation: "tmpfs stores data in RAM only. When the container stops, the data is gone -- you do not even need to run docker rm. This makes tmpfs suitable for sensitive ephemeral data like session tokens."
+
+  - question: "Why would you use a bind mount during development instead of a volume?"
+    options:
+      - "Bind mounts are more secure than volumes"
+      - "Bind mounts sync files between host and container in real time, enabling live code reloading"
+      - "Volumes do not support file editing"
+      - "Bind mounts are faster because they bypass the filesystem"
+    correct: 1
+    explanation: "With a bind mount, the host directory and the container see the same files instantly. Edit source code on the host and the container picks up changes immediately, enabling hot-reload workflows."
