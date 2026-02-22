@@ -10,7 +10,7 @@ questions:
     correct: 2
     explanation: "The -d flag runs the container in the background (detached). Without it, the container's stdout/stderr is attached to your terminal and blocks it."
 
-  - question: "You run `docker run myimage bash`. The Dockerfile has `CMD [\"python\", \"app.py\"]`. What happens?"
+  - question: 'You run `docker run myimage bash`. The Dockerfile has `CMD ["python", "app.py"]`. What happens?'
     options:
       - "The container runs python app.py, then runs bash"
       - "The container runs bash, ignoring the CMD entirely"
@@ -19,7 +19,7 @@ questions:
     correct: 1
     explanation: "CMD sets the default command. Arguments passed to docker run replace CMD entirely. The container runs bash instead of python app.py."
 
-  - question: "What happens if you use ENTRYPOINT with shell form (`ENTRYPOINT python app.py`) instead of exec form (`ENTRYPOINT [\"python\", \"app.py\"]`)?"
+  - question: 'What happens if you use ENTRYPOINT with shell form (`ENTRYPOINT python app.py`) instead of exec form (`ENTRYPOINT ["python", "app.py"]`)?'
     options:
       - "Nothing different -- they behave identically"
       - "Shell form runs the command as a child of /bin/sh -c, so it is not PID 1 and does not receive SIGTERM"
