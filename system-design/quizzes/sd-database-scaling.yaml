@@ -1,0 +1,56 @@
+title: "Database Scaling"
+lesson_slug: "sd-database-scaling"
+questions:
+  - question: "When should you prefer vertical scaling over horizontal scaling for a database?"
+    options:
+      - "When you need more than 1,000 queries per second"
+      - "When you need to run in multiple geographic regions"
+      - "As the default starting point -- it is simpler and cheaper until you hit hardware limits"
+      - "Only when using relational databases"
+    correct: 2
+    explanation: "Vertical scaling (bigger machine) requires no application changes, no distributed query logic, and no sharding complexity. Start there. Move to horizontal scaling when you hit hardware limits or need fault tolerance that a single machine cannot provide. Most systems never need horizontal scaling."
+
+  - question: "What problem does leader-follower replication primarily solve?"
+    options:
+      - "Write throughput -- distributing writes across multiple machines"
+      - "Read scalability -- distributing reads across replicas while the leader handles all writes"
+      - "Geographic latency -- placing databases near users"
+      - "Schema migrations -- followers can be updated independently"
+    correct: 1
+    explanation: "Leader-follower replication directs all writes to one leader and distributes reads across followers. Since most web applications are 90%+ reads, this dramatically reduces load on the leader. Writes remain a bottleneck on the single leader -- if write throughput is the problem, you need sharding."
+
+  - question: "What is replication lag, and when does it cause problems?"
+    options:
+      - "The time it takes to promote a follower to leader during failover"
+      - "The delay between a write on the leader and its appearance on followers, causing stale reads"
+      - "Latency added by the network between the application and the database"
+      - "The time it takes to create a new replica from scratch"
+    correct: 1
+    explanation: "Replication is asynchronous -- followers apply the leader's changes after a short delay (typically milliseconds). A read from a follower during this window returns data that does not reflect the latest write. This matters when a user reads their own write immediately (e.g., checking balance after a transfer). Route those queries to the leader."
+
+  - question: "Why does naive modulo hashing (`hash(key) % N`) fail when you add a server?"
+    options:
+      - "Hash functions do not work with large numbers of servers"
+      - "Adding a server changes N, remapping almost all keys to different servers and invalidating the cache"
+      - "Modulo creates uneven distribution across servers"
+      - "The hash function produces collisions more frequently as N increases"
+    correct: 1
+    explanation: "When N changes from 10 to 11, `hash(key) % 10` and `hash(key) % 11` return different results for ~91% of keys. Nearly every cached key becomes invalid simultaneously, causing a cache stampede where all requests hit the backing store at once. Consistent hashing avoids this by ensuring only K/N keys move when a server changes."
+
+  - question: "How does consistent hashing minimize key redistribution when a server is added or removed?"
+    options:
+      - "By storing all keys on a designated coordinator node during server changes"
+      - "By mapping servers and keys onto a ring, so only keys near the changed server move"
+      - "By using a directory table that is updated when servers change"
+      - "By pausing all writes during server changes to ensure consistency"
+    correct: 1
+    explanation: "Consistent hashing places both servers and keys on a circular ring. Each key is assigned to the nearest server clockwise. When a server is added, only keys between it and its predecessor on the ring are remapped. When removed, only its keys move to the next server. All other keys stay put. On average, only K/N keys move (K = total keys, N = servers)."
+
+  - question: "Why are virtual nodes needed in consistent hashing?"
+    options:
+      - "To handle hash collisions between servers"
+      - "To enable servers to store keys from multiple shards"
+      - "To compensate for uneven distribution when few physical servers occupy the ring"
+      - "To replicate keys across multiple servers for fault tolerance"
+    correct: 2
+    explanation: "With few physical servers on the ring, arc segments are large and unevenly sized -- some servers handle far more keys than others. Virtual nodes give each physical server many positions on the ring (typically 150+), spreading the load evenly. They also make rebalancing smoother: adding a server redistributes load from many neighbors, not just one."

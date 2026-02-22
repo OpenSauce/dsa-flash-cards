@@ -1,0 +1,1134 @@
+# =============================================================================
+# Lesson 1: System Design Fundamentals (8 cards)
+# =============================================================================
+
+- title: "SD Fundamentals - First Step"
+  difficulty: "easy"
+  tags: ["system design", "interview", "fundamentals"]
+  lesson: sd-fundamentals
+  Front: |
+    What is the first step in a system design interview, before drawing any diagrams?
+  Back: |
+    Clarify requirements. Ask the interviewer to define functional requirements (what the system does) and non-functional requirements (scale, latency, availability, consistency). Non-functional requirements drive every architectural trade-off that follows.
+
+- title: "SD Fundamentals - Functional vs Non-Functional"
+  difficulty: "easy"
+  tags: ["system design", "requirements", "fundamentals"]
+  lesson: sd-fundamentals
+  Front: |
+    What is the difference between functional and non-functional requirements in system design?
+  Back: |
+    **Functional:** What the system does -- user actions, data stored, outputs returned. ("Users can post tweets, follow other users, see a feed.")
+
+    **Non-functional:** How the system must behave -- scale, latency, availability, consistency, durability. ("10M DAU, < 200ms p99, 99.99% uptime.")
+
+    Non-functional requirements determine which trade-offs to make.
+
+- title: "SD Fundamentals - QPS Estimation"
+  difficulty: "medium"
+  tags: ["system design", "estimation", "QPS"]
+  lesson: sd-fundamentals
+  Front: |
+    How do you estimate average QPS from daily active users and actions per day?
+  Back: |
+    `QPS = DAU × actions_per_day / 86,400`
+
+    100M DAU × 10 reads/day = 1B requests/day ÷ 86,400 ≈ **12,000 QPS** average. Peak is typically 3× average, so ~36,000 QPS at peak.
+
+    Order of magnitude matters more than precision: thousands vs millions vs billions determines whether you need sharding, caching, or CDN.
+
+- title: "SD Fundamentals - Latency Numbers"
+  difficulty: "medium"
+  tags: ["system design", "estimation", "latency"]
+  lesson: sd-fundamentals
+  Front: |
+    What approximate latency should you assume for common operations in system design estimation?
+  Back: |
+    - **L1 cache:** ~1 ns
+    - **Main memory (RAM):** ~100 ns
+    - **SSD read:** ~100 µs
+    - **Network same data center:** ~1 ms
+    - **Network cross-region:** ~100 ms
+    - **HDD seek:** ~10 ms
+
+    These inform whether a design can meet a latency SLA. RAM cache vs disk access is a 1,000× difference.
+
+- title: "SD Fundamentals - Core Building Blocks"
+  difficulty: "easy"
+  tags: ["system design", "architecture", "fundamentals"]
+  lesson: sd-fundamentals
+  Front: |
+    Name 6 standard building blocks used in high-level system design diagrams.
+  Back: |
+    1. **Load balancer** -- distributes traffic across backend servers
+    2. **Application servers** -- process requests, apply business logic
+    3. **Cache** -- fast in-memory store (Redis) reducing database load
+    4. **Database** -- persistent storage (relational or NoSQL)
+    5. **CDN** -- distributes static content geographically
+    6. **Message queue** -- decouples producers from consumers for async processing
+
+    Add each component only when scale requirements justify it.
+
+- title: "SD Fundamentals - When to Add a Cache"
+  difficulty: "medium"
+  tags: ["system design", "cache", "fundamentals"]
+  lesson: sd-fundamentals
+  Front: |
+    When should you add a cache to a system design, and when should you add a message queue instead?
+  Back: |
+    **Add a cache when:** Reads are expensive (slow DB query, external API call) and the data can tolerate some staleness. Cache reduces repeated computation and database load.
+
+    **Add a message queue when:** A task does not need to complete synchronously -- email sending, image resizing, notifications. Decouples the caller from the worker and absorbs traffic spikes.
+
+    Cache = faster reads. Queue = async processing.
+
+- title: "SD Fundamentals - Monolith vs Microservices"
+  difficulty: "medium"
+  tags: ["system design", "architecture", "microservices"]
+  lesson: sd-fundamentals
+  Front: |
+    When does a monolith architecture become the wrong choice, and microservices become justified?
+  Back: |
+    **Start with a monolith.** It is simpler to develop, test, deploy, and debug.
+
+    **Switch to microservices when:**
+    - Independent teams need to deploy at different rates
+    - One feature's load threatens others (need independent scaling)
+    - Polyglot needs: different services need different languages or runtimes
+
+    In interviews, start simple and justify adding microservices only when scale demands it.
+
+- title: "SD Fundamentals - Non-Functional Requirements Drive Architecture"
+  difficulty: "medium"
+  tags: ["system design", "requirements", "trade-offs"]
+  lesson: sd-fundamentals
+  Front: |
+    How do non-functional requirements determine architectural decisions?
+  Back: |
+    Each non-functional requirement maps to a design choice:
+
+    - **High availability (99.99%)** → redundancy, no single points of failure
+    - **Low latency (< 100ms p99)** → caches, CDN, read replicas near users
+    - **High write throughput** → sharding, async writes, eventual consistency
+    - **Strong consistency** → single-leader writes, synchronous replication
+
+    These requirements conflict. High availability + strong consistency during partitions violates CAP. Always state trade-offs explicitly.
+
+# =============================================================================
+# Lesson 2: Load Balancing (12 cards)
+# =============================================================================
+
+- title: "LB - Round Robin"
+  difficulty: "easy"
+  tags: ["load balancing", "round robin", "algorithms"]
+  lesson: sd-load-balancing
+  Front: |
+    What is round-robin load balancing, and when does it break down?
+  Back: |
+    Requests go to servers in rotation: A, B, C, A, B, C. No state tracking required.
+
+    **Breaks when:** Servers have unequal capacity (a 2-core machine gets the same share as a 16-core one) or requests have wildly different costs (a long report query vs a health check).
+
+- title: "LB - Weighted Round Robin"
+  difficulty: "easy"
+  tags: ["load balancing", "weighted round robin", "algorithms"]
+  lesson: sd-load-balancing
+  Front: |
+    What problem does weighted round-robin solve, and when do you use it?
+  Back: |
+    Assigns proportional request shares based on server capacity. If server A has weight 3 and server B has weight 1, A handles 3 out of every 4 requests.
+
+    **Use when:** Servers are heterogeneous -- different instance sizes or hardware generations.
+
+- title: "LB - Least Connections"
+  difficulty: "medium"
+  tags: ["load balancing", "least connections", "algorithms"]
+  lesson: sd-load-balancing
+  Front: |
+    How does least-connections load balancing work, and why is it better than round-robin for variable request durations?
+  Back: |
+    Each new request goes to the server with the fewest active connections. Fast servers finish requests sooner, freeing slots, and naturally receive more traffic.
+
+    **Better than round-robin** because it adapts to real-time load: a server handling a slow query accumulates connections and receives fewer new ones until it catches up.
+
+- title: "LB - IP Hash"
+  difficulty: "easy"
+  tags: ["load balancing", "IP hash", "session affinity"]
+  lesson: sd-load-balancing
+  Front: |
+    How does IP hash load balancing provide session affinity, and what is its downside?
+  Back: |
+    The client's IP is hashed to deterministically select a server. Same client IP always hits the same backend -- no cookie required.
+
+    **Downside:** Adding or removing a server remaps most clients, disrupting sessions. Also breaks when clients share an IP (corporate NATs) or change networks (mobile users).
+
+- title: "LB - Least Response Time"
+  difficulty: "medium"
+  tags: ["load balancing", "least response time", "latency"]
+  lesson: sd-load-balancing
+  Front: |
+    What does least-response-time load balancing optimize for, and when is it the right algorithm?
+  Back: |
+    Routes each request to the server currently responding fastest, combining active connection count with measured latency.
+
+    **Use when:** Latency is the primary concern and you want to avoid the slowest node, not just the busiest one. Useful for latency-sensitive APIs where tail latency matters.
+
+- title: "LB - L4 vs L7"
+  difficulty: "medium"
+  tags: ["load balancing", "L4", "L7", "networking"]
+  lesson: sd-load-balancing
+  Front: |
+    What can an L7 load balancer do that an L4 load balancer cannot?
+  Back: |
+    **L4** sees only IP address and port. Cannot inspect the request body, URL, headers, or cookies.
+
+    **L7** parses the full HTTP request. Can route by URL path, headers, cookies -- enabling content-aware routing, SSL termination, request rewriting, and per-route rate limiting.
+
+    L7 is higher overhead because it reads and parses the full request. Use L4 for non-HTTP protocols or when raw throughput matters.
+
+- title: "LB - SSL Termination"
+  difficulty: "medium"
+  tags: ["load balancing", "SSL", "TLS", "security"]
+  lesson: sd-load-balancing
+  Front: |
+    What is SSL termination at the load balancer, and why is it beneficial?
+  Back: |
+    The load balancer handles the TLS handshake and decryption. Backends receive plain HTTP.
+
+    **Benefits:**
+    - Centralizes certificate management (one cert, not N backends)
+    - Reduces CPU load on backend servers
+    - Enables L7 inspection (routing, WAF, auth) -- the load balancer must decrypt before it can inspect
+
+- title: "LB - Active Health Checks"
+  difficulty: "easy"
+  tags: ["load balancing", "health checks", "availability"]
+  lesson: sd-load-balancing
+  Front: |
+    How do active health checks work in a load balancer?
+  Back: |
+    The load balancer periodically sends a probe to each backend -- an HTTP GET to `/health`, a TCP connect, or a custom check. If a server fails a configurable number of consecutive probes, it is marked unhealthy and removed from the pool.
+
+    Once it passes checks again, it is gradually reintroduced to avoid overwhelming it with a sudden traffic spike.
+
+- title: "LB - Passive Health Checks"
+  difficulty: "easy"
+  tags: ["load balancing", "health checks", "availability"]
+  lesson: sd-load-balancing
+  Front: |
+    How do passive health checks differ from active health checks?
+  Back: |
+    **Passive:** The load balancer monitors error rates from real traffic. If a backend returns too many 5xx errors or timeouts within a window, it is pulled from the pool. No probe traffic required.
+
+    **Slower detection** than active checks because it depends on real errors occurring. Most production setups use both: active for fast outage detection, passive for degraded performance.
+
+- title: "LB - Sticky Sessions Problem"
+  difficulty: "medium"
+  tags: ["load balancing", "sticky sessions", "stateless"]
+  lesson: sd-load-balancing
+  Front: |
+    Why are sticky sessions (session affinity) a problem in load-balanced systems?
+  Back: |
+    Sticky sessions bind a user to one server. This creates **uneven load** (popular sessions concentrate on one server) and **no failover** -- if that server dies, the session state it holds is lost.
+
+    **The fix:** Externalize session state to Redis or a database. All servers become stateless and interchangeable. The load balancer can distribute traffic freely.
+
+- title: "LB - Cookie-Based Session Affinity"
+  difficulty: "easy"
+  tags: ["load balancing", "sticky sessions", "cookies"]
+  lesson: sd-load-balancing
+  Front: |
+    How does cookie-based session affinity work in a load balancer?
+  Back: |
+    The load balancer injects a cookie identifying the target backend server. Subsequent requests from the same client include this cookie, and the load balancer routes them to the same server.
+
+    More reliable than IP hash for session affinity because it works correctly when clients change networks or share IPs.
+
+- title: "LB - Choosing L4 vs L7"
+  difficulty: "medium"
+  tags: ["load balancing", "L4", "L7", "trade-offs"]
+  lesson: sd-load-balancing
+  Front: |
+    When should you choose L4 load balancing over L7?
+  Back: |
+    Choose **L4** when:
+    - The protocol is not HTTP (database connections, game servers, real-time streaming)
+    - Raw throughput is the priority and request-parsing overhead is unacceptable
+    - SSL termination is not needed
+
+    Most web applications use **L7** for content-aware routing and SSL termination. L4 is the right choice for non-HTTP or ultra-high-throughput scenarios.
+
+# =============================================================================
+# Lesson 3: Caching Strategies (13 cards)
+# =============================================================================
+
+- title: "Cache - Write-Through"
+  difficulty: "easy"
+  tags: ["caching", "write-through", "consistency"]
+  lesson: sd-caching-strategies
+  Front: |
+    What is write-through caching, and what does it guarantee?
+  Back: |
+    Every write goes to both the cache and the backing store simultaneously. The write is not acknowledged until both complete.
+
+    **Guarantees:** No stale data after writes. No data loss if the cache crashes -- the store already has the data. **Trade-off:** Higher write latency -- every write waits for the slower backing store.
+
+- title: "Cache - Write-Back"
+  difficulty: "medium"
+  tags: ["caching", "write-back", "durability"]
+  lesson: sd-caching-strategies
+  Front: |
+    What is write-back (write-behind) caching, and what is the risk?
+  Back: |
+    Writes go to the cache only. The cache asynchronously flushes dirty entries to the backing store.
+
+    **Benefit:** Low write latency -- only the fast cache write is synchronous. Write coalescing: 10 updates to the same key result in one store write.
+
+    **Risk:** If the cache crashes before flushing, unwritten data is **permanently lost**.
+
+- title: "Cache - Write-Around"
+  difficulty: "easy"
+  tags: ["caching", "write-around"]
+  lesson: sd-caching-strategies
+  Front: |
+    What is write-around caching, and when is it appropriate?
+  Back: |
+    Writes go directly to the backing store, bypassing the cache. The cache is only populated on subsequent reads.
+
+    **Avoids** cache pollution from data that will never be re-read.
+
+    **Use when:** Write-heavy workloads where most written data is not queried soon after writing (log ingestion, bulk imports, archival writes).
+
+- title: "Cache - Cache-Aside (Lazy Loading)"
+  difficulty: "easy"
+  tags: ["caching", "cache-aside", "read strategy"]
+  lesson: sd-caching-strategies
+  Front: |
+    How does cache-aside (lazy loading) work, and who owns the caching logic?
+  Back: |
+    On a read miss, the **application** reads from the backing store, writes the result into the cache, and returns it. The cache is a passive store; the application controls what gets cached.
+
+    **Downside:** The first request for any key is always a miss. Cold starts cause load spikes on the backing store.
+
+- title: "Cache - Read-Through"
+  difficulty: "easy"
+  tags: ["caching", "read-through", "read strategy"]
+  lesson: sd-caching-strategies
+  Front: |
+    How does read-through caching differ from cache-aside?
+  Back: |
+    In read-through, on a miss, the **cache** fetches from the backing store transparently. The application always reads from the cache and never calls the store directly.
+
+    **Advantage:** Simpler application code -- no cache-miss handling logic. **Disadvantage:** Less application control over what gets cached and for how long.
+
+- title: "Cache - LRU Eviction"
+  difficulty: "medium"
+  tags: ["caching", "LRU", "eviction"]
+  lesson: sd-caching-strategies
+  Front: |
+    What data structures implement LRU eviction with O(1) get and put?
+  Back: |
+    A **hash map** (for O(1) key lookup) plus a **doubly linked list** (to track access order).
+
+    - On access: move the entry to the head of the list
+    - On eviction: remove from the tail (least recently used)
+    - On insert: add to the head; if over capacity, remove the tail
+
+    Both get and put are O(1).
+
+- title: "Cache - LFU vs LRU"
+  difficulty: "medium"
+  tags: ["caching", "LFU", "LRU", "eviction"]
+  lesson: sd-caching-strategies
+  Front: |
+    When is LFU (Least Frequently Used) eviction better than LRU?
+  Back: |
+    **LFU wins** when access patterns have clear hot and cold data. A viral video with 10,000 hits/hour should not be evicted because a batch job briefly accessed 1,000 other entries.
+
+    **LRU wins** when popularity shifts over time -- LFU suffers from "frequency pollution" where old popular entries resist eviction even after going cold.
+
+- title: "Cache - FIFO Eviction"
+  difficulty: "easy"
+  tags: ["caching", "FIFO", "eviction"]
+  lesson: sd-caching-strategies
+  Front: |
+    When is FIFO eviction the right eviction policy?
+  Back: |
+    Evicts the oldest entry regardless of access pattern. Zero bookkeeping beyond insertion order -- the cheapest policy to implement.
+
+    **Use when:** All entries have roughly equal access probability, or when implementation simplicity and low overhead matter more than maximizing hit rate.
+
+- title: "Cache - Thundering Herd"
+  difficulty: "medium"
+  tags: ["caching", "thundering herd", "cache invalidation"]
+  lesson: sd-caching-strategies
+  Front: |
+    What is the thundering herd problem in caching, and how is it mitigated?
+  Back: |
+    A popular cache entry expires. Many concurrent requests simultaneously miss and hit the backing store, overwhelming it.
+
+    **Mitigations:**
+    - **Lock on miss:** First request fetches from store while others wait; all read from cache once populated
+    - **Stale-while-revalidate:** Serve stale data immediately while a background refresh runs
+
+- title: "Cache - TTL vs Event-Driven Invalidation"
+  difficulty: "medium"
+  tags: ["caching", "invalidation", "TTL"]
+  lesson: sd-caching-strategies
+  Front: |
+    Compare TTL-based and event-driven cache invalidation.
+  Back: |
+    **TTL:** Entries expire after a fixed time. Self-healing, no coordination required. **Downside:** Data is stale within the TTL window.
+
+    **Event-driven:** Writer explicitly deletes/updates the cache after modifying the store. More precise. **Downside:** Requires coordination and is vulnerable to race conditions (write path and cache update can interleave).
+
+    TTL is the safe default; event-driven is more precise but harder to implement correctly.
+
+- title: "Cache - Redis vs Memcached"
+  difficulty: "medium"
+  tags: ["caching", "Redis", "Memcached"]
+  lesson: sd-caching-strategies
+  Front: |
+    When would you choose Redis over Memcached?
+  Back: |
+    **Choose Redis when you need** more than simple key-value caching: data structures (lists, sets, sorted sets), persistence (RDB/AOF), pub/sub, Lua scripting, or replication and clustering.
+
+    **Choose Memcached when:** Pure cache-only workload at massive scale requiring multi-threaded performance and minimal operational overhead.
+
+    **Default to Redis** in interviews. It covers all Memcached use cases plus more.
+
+- title: "Cache - CDN Pull vs Push"
+  difficulty: "medium"
+  tags: ["caching", "CDN", "static assets"]
+  lesson: sd-caching-strategies
+  Front: |
+    How do CDN pull and push models differ?
+  Back: |
+    **Pull (lazy):** Edge caches content on first request from a region. Simple to configure. First request from each region is slow (origin fetch). Works well for content with unpredictable regional demand.
+
+    **Push:** Content is pre-populated to edge locations before any request. Faster first request. Requires explicit publishing when content changes. Best for large files with predictable high demand (video, software downloads).
+
+- title: "Cache - Why Invalidation Is Hard"
+  difficulty: "hard"
+  tags: ["caching", "cache invalidation", "distributed systems"]
+  lesson: sd-caching-strategies
+  Front: |
+    Why is cache invalidation considered one of the hardest problems in distributed systems?
+  Back: |
+    Three failure modes:
+    - **Race conditions:** A stale read and a write can interleave, causing the cache to store an old value after the store has the new one
+    - **Distributed delays:** An invalidation message takes time to propagate -- other nodes serve stale data during the propagation window
+    - **Thundering herd:** A popular entry expires; many requests simultaneously miss and overwhelm the backing store
+
+    Phil Karlton: *"There are only two hard things in computer science: cache invalidation and naming things."*
+
+# =============================================================================
+# Lesson 4: Database Scaling (15 cards)
+# =============================================================================
+
+- title: "DB Scaling - Vertical vs Horizontal"
+  difficulty: "easy"
+  tags: ["database", "scaling", "vertical", "horizontal"]
+  lesson: sd-database-scaling
+  Front: |
+    What is the difference between vertical and horizontal database scaling?
+  Back: |
+    **Vertical (scale up):** Bigger machine -- more CPU, RAM, faster disks. No application changes. Limited by hardware ceiling.
+
+    **Horizontal (scale out):** More machines -- replication, sharding. Near-infinite scale. Requires application changes (routing, distributed queries).
+
+    Start vertical. Move horizontal when you hit hardware limits or need fault tolerance.
+
+- title: "DB Scaling - When to Scale Vertically"
+  difficulty: "easy"
+  tags: ["database", "scaling", "vertical"]
+  lesson: sd-database-scaling
+  Front: |
+    Why should you default to vertical scaling before horizontal scaling?
+  Back: |
+    Vertical scaling: no application changes, no distributed query complexity, no sharding logic. A single machine is simpler to operate, query, and debug.
+
+    The largest cloud DB instance (96 vCPUs, 384GB RAM) handles enormous workloads. Most services never outgrow it. Move horizontal only when you hit hardware limits or need fault tolerance that a single node cannot provide.
+
+- title: "DB Scaling - Leader-Follower Replication"
+  difficulty: "medium"
+  tags: ["database", "replication", "leader-follower"]
+  lesson: sd-database-scaling
+  Front: |
+    How does leader-follower replication work, and what problem does it solve?
+  Back: |
+    One **leader** accepts all writes. **Followers** replicate the leader's changes asynchronously and serve read queries.
+
+    **Solves:** Read scalability. Most web apps are 90%+ reads -- distributing reads across followers dramatically reduces leader load.
+
+    **Limitation:** Writes are still a single-leader bottleneck. If write throughput is the problem, you need sharding.
+
+- title: "DB Scaling - Replication Lag"
+  difficulty: "medium"
+  tags: ["database", "replication", "consistency"]
+  lesson: sd-database-scaling
+  Front: |
+    What is replication lag and when does it cause visible problems?
+  Back: |
+    Async replication means followers apply the leader's changes after a short delay (typically milliseconds). A read from a follower during this window returns stale data.
+
+    **Visible problem:** A user updates their profile and immediately refreshes -- they see the old value because their read hit a lagging follower.
+
+    **Fix:** Route reads that require strong consistency (read-your-own-writes) to the leader.
+
+- title: "DB Scaling - Range Sharding"
+  difficulty: "medium"
+  tags: ["database", "sharding", "range-based"]
+  lesson: sd-database-scaling
+  Front: |
+    What is range-based sharding, and what is its main risk?
+  Back: |
+    Data is divided by a natural range: user IDs 1-1M on shard 1, 1M-2M on shard 2. Range queries (all users in a region) hit a single shard.
+
+    **Risk: hotspots.** If most users have IDs in the lower range (sequential inserts), one shard receives disproportionate load. Range sharding assumes uniform distribution -- data is often not uniform.
+
+- title: "DB Scaling - Hash Sharding"
+  difficulty: "medium"
+  tags: ["database", "sharding", "hash-based"]
+  lesson: sd-database-scaling
+  Front: |
+    What does hash-based sharding guarantee, and what is its failure mode?
+  Back: |
+    `shard = hash(key) % N` distributes data evenly regardless of key distribution. Eliminates hotspots.
+
+    **Failure mode:** When N changes (adding a shard), nearly every key maps to a different shard -- triggering a massive data migration. Consistent hashing solves this.
+
+- title: "DB Scaling - Directory Sharding"
+  difficulty: "medium"
+  tags: ["database", "sharding", "directory-based"]
+  lesson: sd-database-scaling
+  Front: |
+    What are the advantages and risks of directory-based sharding?
+  Back: |
+    A lookup table maps each key (or key range) to a shard. Maximum flexibility -- move individual keys between shards at will.
+
+    **Risk:** The directory is a **single point of failure** and a **bottleneck**. All reads must consult it. Caching mitigates latency but adds complexity. If the directory is unavailable, the entire system cannot route requests.
+
+- title: "DB Scaling - Consistent Hashing Ring"
+  difficulty: "medium"
+  tags: ["database", "consistent hashing", "sharding"]
+  lesson: sd-database-scaling
+  Front: |
+    How does consistent hashing work on a hash ring?
+  Back: |
+    Both servers and keys are mapped onto a circular hash space (0 to 2³²). Each key is assigned to the **nearest server clockwise** on the ring.
+
+    **Adding a server:** Only keys between the new server and its predecessor move. All other keys stay.
+
+    **Removing a server:** Only its keys move to the next server clockwise.
+
+    On average, only **K/N keys move** (K = total keys, N = servers). Naive modulo moves (N-1)/N keys.
+
+- title: "DB Scaling - Consistent Hashing Advantage"
+  difficulty: "medium"
+  tags: ["database", "consistent hashing", "cache stampede"]
+  lesson: sd-database-scaling
+  Front: |
+    Why does consistent hashing prevent cache stampedes when adding a server?
+  Back: |
+    With naive modulo hashing, adding a server changes N, remapping ~91% of keys (for 10→11 servers). All those cache entries become invalid simultaneously -- a cache stampede hits the backing store.
+
+    With consistent hashing, only K/N keys move (about 1/N of total keys). The cache remains mostly valid. No stampede.
+
+- title: "DB Scaling - Virtual Nodes"
+  difficulty: "hard"
+  tags: ["database", "consistent hashing", "virtual nodes"]
+  lesson: sd-database-scaling
+  Front: |
+    What are virtual nodes in consistent hashing and what problem do they solve?
+  Back: |
+    With few physical servers on the ring, arc segments are unevenly sized -- some servers handle far more keys than others.
+
+    Virtual nodes give each physical server **many positions** on the ring (typically 150+), spread across the hash space. This averages out to an even load distribution and smoother rebalancing when servers are added or removed.
+
+    More powerful servers can be assigned more virtual nodes.
+
+- title: "DB Scaling - Cross-Shard Queries"
+  difficulty: "hard"
+  tags: ["database", "sharding", "distributed queries"]
+  lesson: sd-database-scaling
+  Front: |
+    Why are cross-shard queries a challenge in a sharded database?
+  Back: |
+    A query that spans shard boundaries must be executed on multiple shards and the results merged. This is expensive:
+    - Multiple network round trips
+    - No native SQL JOIN across databases
+    - Sorting and aggregation must happen in the application layer
+
+    **Mitigation:** Design the shard key so common queries hit a single shard. Avoid cross-shard joins in the hot path.
+
+- title: "DB Scaling - Read Replicas"
+  difficulty: "easy"
+  tags: ["database", "read replica", "scaling"]
+  lesson: sd-database-scaling
+  Front: |
+    What is a read replica and when should you add one?
+  Back: |
+    A copy of the primary database that serves read-only queries. The primary handles all writes; replicas replicate changes and handle reads.
+
+    **Add when:** Reads vastly outnumber writes, reporting queries are slowing production, or you need to reduce load on the primary.
+
+    **Not useful when:** The bottleneck is write throughput -- replicas do not help with write-heavy workloads.
+
+- title: "DB Scaling - Connection Pooling"
+  difficulty: "medium"
+  tags: ["database", "connection pooling", "performance"]
+  lesson: sd-database-scaling
+  Front: |
+    What is database connection pooling and why is it essential at scale?
+  Back: |
+    A pool maintains a fixed set of open connections shared across requests. Requests borrow a connection, use it, and return it.
+
+    **Without pooling:** Each request opens and closes a connection -- expensive (TCP handshake, auth, SSL). At 1,000 req/s, that is 1,000 connection setups per second. Most databases cap connections at 100-500.
+
+    Tools: PgBouncer (PostgreSQL), HikariCP (Java), SQLAlchemy pool (Python).
+
+- title: "DB Scaling - Sharding Key Selection"
+  difficulty: "hard"
+  tags: ["database", "sharding", "hot partition"]
+  lesson: sd-database-scaling
+  Front: |
+    What makes a good sharding key, and what is a hot partition?
+  Back: |
+    A good shard key distributes both **data volume** and **query load** evenly across shards.
+
+    **Hot partition:** A shard key that concentrates traffic on one shard. Example: sharding tweets by `created_at` date causes recent-date shards to receive all new writes while older shards sit idle.
+
+    Prefer shard keys with high cardinality (user ID, entity ID) over temporal or sequential keys.
+
+- title: "DB Scaling - Failover in Leader-Follower"
+  difficulty: "hard"
+  tags: ["database", "replication", "failover", "consistency"]
+  lesson: sd-database-scaling
+  Front: |
+    What happens to data consistency when a leader database fails and a follower is promoted?
+  Back: |
+    Async replication means the promoted follower may not have the leader's most recent writes. Those writes are **lost** after failover -- this is the durability trade-off of async replication.
+
+    **Split-brain risk:** If the old leader recovers and reconnects without knowing it was demoted, two nodes may accept writes simultaneously.
+
+    Consensus protocols (Raft, Paxos) handle leader election safely. Patroni for PostgreSQL automates this.
+
+# =============================================================================
+# Lesson 5: CAP Theorem and Consistency (11 cards)
+# =============================================================================
+
+- title: "CAP - The Three Properties"
+  difficulty: "easy"
+  tags: ["CAP theorem", "distributed systems"]
+  lesson: sd-cap-and-consistency
+  Front: |
+    What are the three properties in the CAP theorem, and what does each mean?
+  Back: |
+    **Consistency (C):** Every read returns the most recent write. All nodes see the same data.
+
+    **Availability (A):** Every request receives a response -- not necessarily the latest data, but always a response.
+
+    **Partition Tolerance (P):** The system continues operating despite network failures between nodes.
+
+    A distributed system can guarantee at most two simultaneously.
+
+- title: "CAP - Why P Is Non-Negotiable"
+  difficulty: "medium"
+  tags: ["CAP theorem", "partition tolerance"]
+  lesson: sd-cap-and-consistency
+  Front: |
+    Why is partition tolerance non-negotiable for distributed systems?
+  Back: |
+    Network failures happen in production -- cables cut, switches fail, AZs lose connectivity. A system that cannot tolerate partitions stops working on any network hiccup.
+
+    Since P is non-negotiable, the real trade-off is **C vs A during a partition**: either refuse requests to stay consistent (CP), or keep serving potentially stale data (AP).
+
+- title: "CAP - CP System Behavior"
+  difficulty: "medium"
+  tags: ["CAP theorem", "CP systems", "consistency"]
+  lesson: sd-cap-and-consistency
+  Front: |
+    What does a CP system do during a network partition, and when is this the right choice?
+  Back: |
+    During a partition, a CP system refuses to serve requests rather than risk returning stale data. It trades availability for consistency.
+
+    **Use when:** Correctness matters more than uptime. Financial transactions, distributed locking, leader election -- scenarios where a wrong answer is worse than no answer.
+
+    **Examples:** ZooKeeper, HBase, etcd.
+
+- title: "CAP - AP System Behavior"
+  difficulty: "medium"
+  tags: ["CAP theorem", "AP systems", "availability"]
+  lesson: sd-cap-and-consistency
+  Front: |
+    What does an AP system do during a network partition, and when is this the right choice?
+  Back: |
+    During a partition, an AP system keeps serving requests, accepting that some reads may return stale data. It trades consistency for availability.
+
+    **Use when:** Availability matters more than perfect consistency. Social media feeds, shopping carts, DNS -- slightly stale data is acceptable.
+
+    **Examples:** Cassandra, DynamoDB (default), CouchDB.
+
+- title: "CAP - Why Not All Three"
+  difficulty: "hard"
+  tags: ["CAP theorem", "proof"]
+  lesson: sd-cap-and-consistency
+  Front: |
+    Why is it impossible to have all three of Consistency, Availability, and Partition Tolerance simultaneously?
+  Back: |
+    During a partition, an isolated node cannot communicate with others to verify the latest state. It must choose:
+
+    - **Respond with possibly stale data** → preserves A, sacrifices C
+    - **Refuse to respond until it can confirm state** → preserves C, sacrifices A
+
+    You cannot simultaneously guarantee a **fresh response** (C) and **any response** (A) when nodes **cannot communicate** (P). There is no third option.
+
+- title: "CAP - PACELC Extension"
+  difficulty: "hard"
+  tags: ["PACELC", "CAP theorem", "latency", "consistency"]
+  lesson: sd-cap-and-consistency
+  Front: |
+    What does PACELC add to CAP, and why does the "Else" clause matter more day-to-day?
+  Back: |
+    **PACELC:** If Partition → choose Availability or Consistency. Else (normal operation) → choose Latency or Consistency.
+
+    CAP only covers partition scenarios. PACELC covers **normal operation**: strong consistency requires node coordination (adds latency); eventual consistency allows immediate responses (low latency). This trade-off applies on every request, not just during failures.
+
+- title: "CAP - Tunable Consistency"
+  difficulty: "medium"
+  tags: ["CAP theorem", "consistency", "Cassandra", "DynamoDB"]
+  lesson: sd-cap-and-consistency
+  Front: |
+    How do systems like Cassandra and DynamoDB blur the CP/AP boundary?
+  Back: |
+    They offer **tunable consistency**: the application chooses a consistency level per operation.
+
+    **Cassandra:** `QUORUM` reads and writes give strong consistency; `ONE` gives high availability with potential staleness.
+
+    **DynamoDB:** Offers eventually consistent reads (low latency) and strongly consistent reads (higher latency) on the same table.
+
+    The CAP trade-off becomes a per-query choice rather than a system-wide property.
+
+- title: "CAP - Strong Consistency"
+  difficulty: "easy"
+  tags: ["consistency models", "strong consistency"]
+  lesson: sd-cap-and-consistency
+  Front: |
+    What does strong consistency guarantee, and what does it cost?
+  Back: |
+    Every read returns the most recent write. Reads may block until all replicas confirm.
+
+    **Cost:** Higher latency (coordination required across nodes) and lower availability during partitions.
+
+    **Use when:** Correctness is non-negotiable -- bank balances, inventory counts, read-your-own-writes requirements.
+
+- title: "CAP - Eventual Consistency"
+  difficulty: "easy"
+  tags: ["consistency models", "eventual consistency"]
+  lesson: sd-cap-and-consistency
+  Front: |
+    What does eventual consistency guarantee, and when is it acceptable?
+  Back: |
+    Given no new updates, all nodes will eventually converge to the same value. Reads may return stale data in the interim.
+
+    **Acceptable when:** Staleness causes no real harm -- like counts, recommendation feeds, DNS propagation.
+
+    **Not acceptable when:** Incorrect answers have financial or safety consequences -- bank debits, inventory decrements.
+
+- title: "CAP - Causal Consistency"
+  difficulty: "hard"
+  tags: ["consistency models", "causal consistency"]
+  lesson: sd-cap-and-consistency
+  Front: |
+    What is causal consistency, and how does it differ from strong and eventual consistency?
+  Back: |
+    If event A causally precedes event B (A happened before B and B depends on A), all nodes see A before B. Unrelated events may appear in any order.
+
+    **Weaker than strong consistency** -- does not require all nodes to agree on a global order.
+
+    **Stronger than eventual consistency** -- preserves cause-and-effect ordering, preventing anomalies like seeing a reply before the original post.
+
+- title: "CAP - PACELC System Examples"
+  difficulty: "hard"
+  tags: ["PACELC", "CAP theorem", "examples"]
+  lesson: sd-cap-and-consistency
+  Front: |
+    Classify DynamoDB and HBase under PACELC and explain why.
+  Back: |
+    **DynamoDB: PA/EL** -- Available during partitions (continues serving); Low latency during normal operation (eventual consistency by default).
+
+    **HBase: PC/EC** -- Consistent during partitions (refuses requests to stay correct); accepts higher latency for strong consistency during normal operation.
+
+    **Cassandra: PA/EL** -- Similar to DynamoDB but tunable per operation.
+
+# =============================================================================
+# Lesson 6: Message Queues (10 cards)
+# =============================================================================
+
+- title: "MQ - Sync vs Async"
+  difficulty: "easy"
+  tags: ["message queues", "async", "synchronous"]
+  lesson: sd-message-queues
+  Front: |
+    When should you use asynchronous communication instead of synchronous request-response?
+  Back: |
+    **Use async when:** The caller does not need the result immediately, or processing takes too long to block the user (email, image resizing, report generation).
+
+    **Use sync when:** The user needs the answer before the next step (username availability check, payment authorization).
+
+    Adding a queue when sync works adds complexity and failure modes without benefit.
+
+- title: "MQ - Queue Anatomy"
+  difficulty: "easy"
+  tags: ["message queues", "broker", "producer", "consumer"]
+  lesson: sd-message-queues
+  Front: |
+    Name the three roles in a message queue system and describe each.
+  Back: |
+    **Producer:** Sends messages to the queue. Does not know who will process them.
+
+    **Broker:** The queue itself. Stores messages, manages delivery guarantees, handles persistence. Examples: Kafka, RabbitMQ, SQS.
+
+    **Consumer:** Reads and processes messages. May be one instance or a pool of workers competing to process messages.
+
+- title: "MQ - Point-to-Point vs Pub/Sub"
+  difficulty: "medium"
+  tags: ["message queues", "pub/sub", "point-to-point"]
+  lesson: sd-message-queues
+  Front: |
+    How does point-to-point messaging differ from pub/sub?
+  Back: |
+    **Point-to-point:** Each message goes to exactly one consumer. Multiple consumers compete to process messages. Each message is handled once.
+
+    **Pub/sub:** Each message is broadcast to all subscribers. Each subscriber gets its own copy. One event triggers N reactions.
+
+    Use point-to-point for work distribution (one task, one worker). Use pub/sub for event fanout (user signup triggers email, analytics, and fraud detection simultaneously).
+
+- title: "MQ - At-Most-Once Delivery"
+  difficulty: "easy"
+  tags: ["message queues", "delivery guarantees"]
+  lesson: sd-message-queues
+  Front: |
+    What does at-most-once delivery mean, and when is it appropriate?
+  Back: |
+    The broker sends the message once. If the consumer fails before acknowledging, the message is **lost** -- no retry.
+
+    **Appropriate when:** Losing some messages is acceptable -- metrics, log aggregation, analytics events. Lowest overhead: no state tracking, no retry logic.
+
+- title: "MQ - At-Least-Once Delivery"
+  difficulty: "medium"
+  tags: ["message queues", "delivery guarantees", "idempotency"]
+  lesson: sd-message-queues
+  Front: |
+    What does at-least-once delivery guarantee, and what must the consumer implement?
+  Back: |
+    The broker retries until the consumer acknowledges. No message is lost, but the consumer may process the same message multiple times.
+
+    **Consumer must be idempotent:** Include a unique message ID. Record processed IDs and skip duplicates -- or design operations so repeating them has no additional effect.
+
+- title: "MQ - Exactly-Once Delivery"
+  difficulty: "hard"
+  tags: ["message queues", "delivery guarantees", "exactly-once"]
+  lesson: sd-message-queues
+  Front: |
+    How is exactly-once delivery achieved, and when is it worth the cost?
+  Back: |
+    Requires coordination between broker and consumer -- distributed transactions or idempotent producers with deduplication at the broker. Kafka's exactly-once semantics use producer transactions scoped to a session.
+
+    **Worth the cost when:** Duplicates cannot be tolerated -- financial debits, inventory decrements. Otherwise, at-least-once with idempotent consumers is simpler and more scalable.
+
+- title: "MQ - Dead Letter Queue"
+  difficulty: "medium"
+  tags: ["message queues", "DLQ", "poison messages"]
+  lesson: sd-message-queues
+  Front: |
+    What is a dead letter queue (DLQ) and what problem does it solve?
+  Back: |
+    A separate queue that receives messages that fail processing after a maximum number of retry attempts.
+
+    **Without DLQ:** A poison message (malformed data, consumer bug) causes infinite retries and blocks the queue. Healthy messages stall.
+
+    **With DLQ:** Poison messages are isolated after N failures. The main queue continues. Engineers inspect the DLQ to diagnose failures.
+
+- title: "MQ - Backpressure"
+  difficulty: "medium"
+  tags: ["message queues", "backpressure", "flow control"]
+  lesson: sd-message-queues
+  Front: |
+    What is backpressure in a message queue system?
+  Back: |
+    When consumers are slower than producers, messages accumulate. Backpressure is the mechanism that signals producers to slow down before the queue overflows.
+
+    **Explicit:** Producers check queue depth and throttle when it exceeds a threshold.
+    **Implicit:** The producer's send call blocks when the queue is full.
+
+    Without backpressure, the system degrades unpredictably -- new messages are dropped or the queue exhausts memory.
+
+- title: "MQ - Kafka Use Case"
+  difficulty: "medium"
+  tags: ["message queues", "Kafka", "event streaming"]
+  lesson: sd-message-queues
+  Front: |
+    What makes Kafka the right choice over RabbitMQ?
+  Back: |
+    Kafka retains messages on disk for a configurable period. Consumers track their position (offset) independently. A new consumer can replay from the beginning of the log.
+
+    **Choose Kafka for:** Event streaming, audit logs, data pipelines, replaying historical events for new services. Any scenario requiring a durable, replayable event log.
+
+- title: "MQ - RabbitMQ Use Case"
+  difficulty: "medium"
+  tags: ["message queues", "RabbitMQ", "task queues"]
+  lesson: sd-message-queues
+  Front: |
+    What makes RabbitMQ the right choice over Kafka?
+  Back: |
+    RabbitMQ deletes messages after acknowledgment. Supports complex routing (messages to different queues based on content type, priority queues, fanout exchanges).
+
+    **Choose RabbitMQ for:** Traditional task queues (background jobs, work distribution), complex routing requirements, and scenarios where you do not need replay.
+
+# =============================================================================
+# Lesson 7: API Design (10 cards)
+# =============================================================================
+
+- title: "API - REST Principles"
+  difficulty: "easy"
+  tags: ["API design", "REST", "HTTP"]
+  lesson: sd-api-design
+  Front: |
+    What are the core constraints of a REST API?
+  Back: |
+    - **HTTP method semantics:** GET reads, POST creates, PUT replaces, DELETE removes
+    - **Resource-based URLs:** `/users/123`, not `/getUser?id=123`
+    - **Stateless:** Each request contains all information needed; server holds no client session state between requests
+    - **Representations:** Server returns a representation of the resource (usually JSON)
+
+    These constraints give REST predictability. Any developer who knows HTTP can use a REST API without reading every endpoint's docs.
+
+- title: "API - HTTP Methods"
+  difficulty: "easy"
+  tags: ["API design", "HTTP", "idempotency"]
+  lesson: sd-api-design
+  Front: |
+    Which HTTP methods are idempotent and which are safe?
+  Back: |
+    **Safe (no side effects):** GET only.
+
+    **Idempotent (N calls = 1 call):** GET, PUT, DELETE.
+
+    **Neither safe nor idempotent:** POST, PATCH.
+
+    **Why it matters:** Idempotent operations can be safely retried. A failed POST may create duplicate resources if retried without an idempotency key.
+
+- title: "API - HTTP Status Codes"
+  difficulty: "medium"
+  tags: ["API design", "HTTP", "status codes"]
+  lesson: sd-api-design
+  Front: |
+    What HTTP status code should a REST API return for: resource created, not authenticated, no permission, rate limited?
+  Back: |
+    - **Resource created:** 201 Created (with `Location` header pointing to the new resource)
+    - **Not authenticated:** 401 Unauthorized (no token or invalid token)
+    - **No permission:** 403 Forbidden (authenticated but not authorized)
+    - **Rate limited:** 429 Too Many Requests (with `Retry-After` header)
+
+    401 vs 403 is a common interview trap: 401 means "identify yourself first"; 403 means "I know who you are and you cannot do this."
+
+- title: "API - Idempotency Keys"
+  difficulty: "medium"
+  tags: ["API design", "idempotency", "reliability"]
+  lesson: sd-api-design
+  Front: |
+    What is an idempotency key, and why is it critical for payment APIs?
+  Back: |
+    A unique ID the client generates per logical operation and includes in the request header. The server stores the key and its response. On a duplicate request (same key), the server returns the stored response without re-executing.
+
+    **Critical for payments:** A network failure after the server charges the card but before the response arrives causes the client to retry. Without idempotency, the card is charged twice. With idempotency key, the server detects the duplicate and returns the original response.
+
+- title: "API - Cursor-Based Pagination"
+  difficulty: "medium"
+  tags: ["API design", "pagination"]
+  lesson: sd-api-design
+  Front: |
+    Why is cursor-based pagination preferred over offset-based for large or real-time datasets?
+  Back: |
+    **Cursor-based:** `WHERE id > cursor LIMIT N` -- efficient regardless of depth. No scanning of skipped rows. Consistent when items are inserted or deleted.
+
+    **Offset-based:** `OFFSET 10000 LIMIT 20` -- forces the database to scan and discard 10,000 rows. Items shift when data changes, causing duplicates or skipped items across pages.
+
+    Use cursor-based for feeds and large datasets; offset-based is acceptable for small, stable admin UIs.
+
+- title: "API - GraphQL Trade-offs"
+  difficulty: "medium"
+  tags: ["API design", "GraphQL", "REST"]
+  lesson: sd-api-design
+  Front: |
+    What problem does GraphQL solve that REST does not, and what complexity does it add?
+  Back: |
+    **Solves:** Over-fetching (REST endpoint returns 30 fields, client needs 5) and under-fetching (need 3 separate REST calls to get all required data). Clients specify exactly the fields they need.
+
+    **Adds:** No URL-based caching (queries are POST bodies), N+1 query problem (requires DataLoader pattern), complex schema to maintain, overkill for simple APIs.
+
+    **Choose GraphQL** when clients have varied data needs. **Choose REST** for simple CRUD APIs.
+
+- title: "API - gRPC vs REST"
+  difficulty: "medium"
+  tags: ["API design", "gRPC", "protobuf"]
+  lesson: sd-api-design
+  Front: |
+    What are the main advantages of gRPC over REST for internal service communication?
+  Back: |
+    - **Smaller payloads:** Protocol Buffers serialize 3-10× smaller than JSON
+    - **Faster transport:** HTTP/2 multiplexes multiple calls over one connection
+    - **Strong typing:** Protobuf schema enforces contracts, generates client/server stubs in multiple languages
+    - **Streaming:** Native server-side and bidirectional streaming
+
+    **Trade-off:** Browser support requires a proxy (gRPC-Web). Not ideal for public APIs. Use gRPC internally, REST externally.
+
+- title: "API - Webhooks"
+  difficulty: "easy"
+  tags: ["API design", "webhooks", "event-driven"]
+  lesson: sd-api-design
+  Front: |
+    How do webhooks work, and what are the main challenges in implementing them?
+  Back: |
+    The client registers a URL with the server. When an event occurs, the server sends an HTTP POST to that URL with event data. Push model -- no polling required.
+
+    **Challenges:**
+    - Client server must be publicly reachable
+    - Delivery is not guaranteed -- server must retry with exponential backoff on failure
+    - Client must verify requests came from the expected sender (HMAC signature)
+
+- title: "API - API Versioning"
+  difficulty: "easy"
+  tags: ["API design", "versioning"]
+  lesson: sd-api-design
+  Front: |
+    What is the most common API versioning strategy, and what changes are breaking vs non-breaking?
+  Back: |
+    **URL versioning** (`/v1/users`, `/v2/users`) is most common: explicit, easy to route and cache, clients can pin to a version.
+
+    **Non-breaking (additive):** New optional response fields, new optional query parameters. Existing clients ignore them.
+
+    **Breaking:** Removing or renaming fields, changing data types, making optional fields required.
+
+    Deprecate before removing. Never change a field's meaning in the same version.
+
+- title: "API - REST Status Code Semantics"
+  difficulty: "easy"
+  tags: ["API design", "HTTP", "REST"]
+  lesson: sd-api-design
+  Front: |
+    When should a REST API return 204 No Content vs 200 OK?
+  Back: |
+    **204 No Content:** The operation succeeded but there is nothing to return. Standard for DELETE and sometimes PUT when the response body would be empty. Signals success without a body to parse.
+
+    **200 OK:** The operation succeeded and a body follows. Standard for GET, and for PUT/PATCH when you return the updated resource.
+
+    Returning 200 with an empty body for a DELETE is technically correct but 204 is the cleaner signal.
+
+# =============================================================================
+# Lesson 8: Rate Limiting (8 cards)
+# =============================================================================
+
+- title: "RL - Why Rate Limit"
+  difficulty: "easy"
+  tags: ["rate limiting", "abuse prevention"]
+  lesson: sd-rate-limiting
+  Front: |
+    Name three reasons to implement rate limiting in a production system.
+  Back: |
+    1. **Abuse prevention:** Stop scrapers, brute-force login attempts, and DDoS attacks before they damage the system
+    2. **Cost control:** Prevent runaway clients from generating unexpected costs on metered downstream services (LLM APIs, SMS providers)
+    3. **Fairness:** In multi-tenant systems, prevent one heavy user from exhausting resources at the expense of others
+
+- title: "RL - Token Bucket"
+  difficulty: "medium"
+  tags: ["rate limiting", "token bucket", "algorithms"]
+  lesson: sd-rate-limiting
+  Front: |
+    How does the token bucket algorithm work, and what does it allow that a fixed rate does not?
+  Back: |
+    Each user has a bucket with capacity N tokens that refill at a constant rate (e.g., 10/second). Each request consumes one token. If empty, the request is rejected.
+
+    **Allows bursting:** A user who has not made requests accumulates tokens (up to N). They can send a burst of N requests immediately, then are throttled to the refill rate.
+
+    Implementation: store `(token_count, last_refill_time)` per user. On each request, calculate tokens earned since last refill.
+
+- title: "RL - Leaky Bucket"
+  difficulty: "medium"
+  tags: ["rate limiting", "leaky bucket", "algorithms"]
+  lesson: sd-rate-limiting
+  Front: |
+    What does the leaky bucket algorithm guarantee, and how does it differ from token bucket?
+  Back: |
+    Requests enter a queue and are processed at a fixed, constant output rate. No matter how large the input burst, output is exactly N requests/second -- smooth and predictable.
+
+    **Token bucket:** Bursts pass through (if bucket is full).
+    **Leaky bucket:** Bursts are absorbed and smoothed out.
+
+    Use leaky bucket when downstream services need constant input rate (payment processors, external APIs).
+
+- title: "RL - Fixed Window Counter"
+  difficulty: "easy"
+  tags: ["rate limiting", "fixed window", "algorithms"]
+  lesson: sd-rate-limiting
+  Front: |
+    What is the boundary artifact in fixed window rate limiting?
+  Back: |
+    A user limited to 100 requests/minute can send 100 at the end of one window and 100 at the start of the next -- 200 requests in ~2 seconds.
+
+    The window boundary allows a double-rate burst. This is a known weakness of fixed window counters. Sliding window algorithms eliminate the artifact at the cost of more state.
+
+- title: "RL - Sliding Window Counter"
+  difficulty: "medium"
+  tags: ["rate limiting", "sliding window", "algorithms"]
+  lesson: sd-rate-limiting
+  Front: |
+    How does the sliding window counter improve on fixed window without the memory cost of sliding window log?
+  Back: |
+    Combine the previous window's count (weighted by how much of that window overlaps the current window) with the current window's count.
+
+    **Example:** Window is 60s. 40s into the current window, the previous window contributes 20/60 = 33% of its count.
+
+    **Better than fixed window:** No boundary artifact.
+    **Cheaper than sliding window log:** One counter per window, not one timestamp per request.
+
+- title: "RL - HTTP 429 and Retry-After"
+  difficulty: "easy"
+  tags: ["rate limiting", "HTTP", "429"]
+  lesson: sd-rate-limiting
+  Front: |
+    What HTTP response should a rate-limited request receive, and why is the Retry-After header important?
+  Back: |
+    Return **HTTP 429 Too Many Requests**.
+
+    Include `Retry-After: N` (seconds to wait) and optionally `X-RateLimit-Remaining` and `X-RateLimit-Reset`.
+
+    **Without Retry-After:** Clients immediately retry, generating more rejected requests -- wasting both sides' resources and worsening the problem.
+
+    Well-behaved clients read Retry-After and back off. Well-designed SDKs do this automatically.
+
+- title: "RL - Distributed Rate Limiting with Redis"
+  difficulty: "medium"
+  tags: ["rate limiting", "Redis", "distributed systems"]
+  lesson: sd-rate-limiting
+  Front: |
+    Why does distributed rate limiting require a shared store like Redis?
+  Back: |
+    With 10 app servers and a limit of 100 req/min, each server's in-memory counter sees only ~10% of traffic. A user can hit each server 100 times and exceed the global limit 10×.
+
+    **With Redis:** All servers call `INCR user:123:window` -- Redis's atomic increment prevents races. All rate-limit checks share the same counter. The global limit is enforced correctly.
+
+- title: "RL - Per-User vs Per-IP"
+  difficulty: "medium"
+  tags: ["rate limiting", "per-user", "per-IP"]
+  lesson: sd-rate-limiting
+  Front: |
+    When should you use per-user rate limiting vs per-IP rate limiting?
+  Back: |
+    **Per-IP:** Works for unauthenticated endpoints (login, signup). Simple -- no auth required. **Breaks** when thousands of users share one IP (corporate NAT) -- one abuser blocks everyone.
+
+    **Per-user:** Requires authentication. Precise and fair per identity. **Cannot** protect unauthenticated endpoints.
+
+    **Best practice:** Both -- per-IP for unauthenticated endpoints, per-user for authenticated APIs.
