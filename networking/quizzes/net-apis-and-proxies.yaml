@@ -1,0 +1,56 @@
+title: "APIs, Proxies, and Real-Time Communication"
+lesson_slug: net-apis-and-proxies
+questions:
+  - question: "What is the key difference between a forward proxy and a reverse proxy?"
+    options:
+      - "A forward proxy uses HTTP/1.1; a reverse proxy uses HTTP/2"
+      - "A forward proxy hides the client from servers; a reverse proxy hides the servers from the client"
+      - "A forward proxy is used for caching; a reverse proxy is used for authentication"
+      - "A forward proxy sits between servers; a reverse proxy sits between clients"
+    correct: 1
+    explanation: "A forward proxy sits in front of clients and forwards their requests to the internet -- the server sees the proxy's IP, not the client's. It hides the client. A reverse proxy sits in front of servers and receives requests from clients -- the client never knows the backend servers' addresses. It hides the servers. Examples: Nginx as a reverse proxy for load balancing and TLS termination."
+
+  - question: "When should you choose gRPC over REST for an API?"
+    options:
+      - "When building a public API that browser clients will consume directly"
+      - "When you need human-readable requests and responses for easy debugging"
+      - "When building internal microservice communication where latency, throughput, or bidirectional streaming matter"
+      - "When you want to avoid code generation and keep integration manual"
+    correct: 2
+    explanation: "gRPC is well-suited for internal microservice communication: its binary Protocol Buffer format is 2-10x more compact than JSON, HTTP/2 multiplexing reduces connection overhead, and it natively supports streaming. REST is better for public APIs, browser clients, and scenarios where debuggability (curl, browser dev tools) matters more than performance."
+
+  - question: "What is a CORS preflight request, and when does a browser send one?"
+    options:
+      - "A DNS query the browser sends to verify the server's IP before connecting"
+      - "An OPTIONS request the browser sends to ask permission before making a complex cross-origin request"
+      - "A GET request the browser sends to check if the server is alive before POSTing data"
+      - "A TLS probe the browser sends to negotiate cipher suites before HTTPS connections"
+    correct: 1
+    explanation: "A preflight is an OPTIONS request the browser automatically sends before 'complex' cross-origin requests (PUT, DELETE, custom headers, Content-Type: application/json). The server responds with CORS headers declaring which origins, methods, and headers are allowed. Only if the preflight succeeds does the browser send the actual request. Simple requests (GET, POST with basic content types) do not trigger a preflight."
+
+  - question: "What is the main trade-off between WebSocket and HTTP long-polling for real-time communication?"
+    options:
+      - "WebSocket works over UDP for lower latency; long-polling uses TCP for reliability"
+      - "WebSocket requires server-side sessions; long-polling is stateless and scales better"
+      - "WebSocket gives low-overhead bidirectional communication but requires WebSocket-aware infrastructure; long-polling works over standard HTTP everywhere but has high per-message overhead"
+      - "WebSocket is only supported in modern browsers; long-polling works in all environments including server-to-server"
+    correct: 2
+    explanation: "WebSocket provides true bidirectional communication with minimal framing overhead (2-14 bytes vs HTTP's kilobytes of headers), but requires WebSocket-aware proxies and load balancers, and does not auto-reconnect. Long-polling works with any HTTP infrastructure and is a reliable fallback, but each message exchange incurs full HTTP overhead and frequent reconnections add latency."
+
+  - question: "What does the same-origin policy prevent?"
+    options:
+      - "Two different browser tabs from sharing the same network connection"
+      - "JavaScript on one origin from reading HTTP responses from a different origin"
+      - "Servers from accepting requests from IP addresses outside their subnet"
+      - "Web pages from loading external resources like images or fonts"
+    correct: 1
+    explanation: "The same-origin policy prevents JavaScript on one origin (scheme + host + port) from reading responses from a different origin. An origin is defined as the combination of protocol, hostname, and port -- https://app.example.com:443 is different from https://api.example.com:443. Without this policy, malicious pages could silently read your data from other sites using your stored credentials."
+
+  - question: "When is Server-Sent Events (SSE) a better choice than WebSocket?"
+    options:
+      - "When you need the client to send messages to the server at high frequency"
+      - "When you need bidirectional communication for a chat or gaming application"
+      - "When you only need server-to-client push and want simpler infrastructure with auto-reconnect"
+      - "When you need to transmit binary data efficiently without base64 encoding"
+    correct: 2
+    explanation: "SSE is ideal for server-to-client push scenarios (live dashboards, news feeds, notifications) where the client does not need to send messages back in real time. SSE uses a standard HTTP connection, auto-reconnects on failure (built into the browser EventSource API), and works seamlessly over HTTP/2 multiplexing. WebSocket is better when true bidirectional communication is needed."

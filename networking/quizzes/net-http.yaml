@@ -1,0 +1,56 @@
+title: "HTTP: The Web's Protocol"
+lesson_slug: net-http
+questions:
+  - question: "Which of the following HTTP methods is NOT idempotent?"
+    options:
+      - "GET"
+      - "DELETE"
+      - "POST"
+      - "PUT"
+    correct: 2
+    explanation: "POST is not idempotent. Calling POST /users twice may create two user records. GET, PUT, and DELETE are idempotent: calling them multiple times with the same input produces the same result. Idempotency matters for retry logic -- it is safe to retry GET/PUT/DELETE on network failure, but retrying POST can cause duplicate side effects."
+
+  - question: "What does a 4xx HTTP status code indicate?"
+    options:
+      - "The server encountered an internal error processing the request"
+      - "The request was redirected to a different URL"
+      - "The client sent an invalid or unauthorized request"
+      - "The server is temporarily unavailable due to overload"
+    correct: 2
+    explanation: "4xx codes indicate client errors -- the problem is with the request, not the server. 400 Bad Request (malformed syntax), 401 Unauthorized (missing/invalid authentication), 403 Forbidden (authenticated but not permitted), 404 Not Found, 429 Too Many Requests. By contrast, 5xx codes indicate server errors. The distinction matters for retry logic."
+
+  - question: "What was the key improvement HTTP/2 introduced over HTTP/1.1?"
+    options:
+      - "Built-in TLS encryption, making HTTPS mandatory"
+      - "Binary multiplexing, allowing multiple requests and responses over one TCP connection simultaneously"
+      - "Elimination of head-of-line blocking by switching from TCP to UDP"
+      - "Compressed request bodies to reduce bandwidth usage"
+    correct: 1
+    explanation: "HTTP/2 introduced binary multiplexing: multiple requests and responses share a single TCP connection, interleaved as frames. HTTP/1.1 only allowed one outstanding request per TCP connection, forcing browsers to open 6-8 parallel connections. HTTP/2 also added HPACK header compression. It did not eliminate head-of-line blocking -- that required HTTP/3 (QUIC)."
+
+  - question: "What specific problem does HTTP/3 (QUIC) solve that HTTP/2 cannot?"
+    options:
+      - "HTTP/2 does not support TLS; HTTP/3 adds mandatory encryption"
+      - "HTTP/2 requires domain sharding; HTTP/3 eliminates this need"
+      - "A lost TCP packet in HTTP/2 stalls all multiplexed streams; HTTP/3 uses QUIC (UDP) so packet loss only affects the stream that lost the packet"
+      - "HTTP/2 has a 64KB frame size limit; HTTP/3 supports unlimited frame sizes"
+    correct: 2
+    explanation: "HTTP/2 multiplexes streams over a single TCP connection. When a TCP packet is lost, TCP's reliability mechanism stalls all streams until the packet is retransmitted -- TCP-level head-of-line blocking. HTTP/3 runs over QUIC (built on UDP), where each stream is independently reliable. A lost packet in one stream does not affect others."
+
+  - question: "You send a PUT request that fails with a network timeout. Is it safe to retry the request automatically?"
+    options:
+      - "No, because PUT creates resources and retrying may create duplicates"
+      - "Yes, because PUT is idempotent -- retrying with the same payload produces the same result"
+      - "Only if the server returns a 5xx before the timeout, not if no response is received"
+      - "No, retrying any mutating HTTP method requires manual deduplication logic"
+    correct: 1
+    explanation: "PUT is idempotent: replacing a resource with the same data twice results in the same state as replacing it once. When a PUT request times out, you don't know if the server received it -- but retrying is safe because the end state is identical. POST is not idempotent (retrying may create duplicates), so it requires idempotency keys or deduplication logic."
+
+  - question: "What is the purpose of the Content-Type HTTP header?"
+    options:
+      - "It specifies which content types the client will accept in the response"
+      - "It declares the media type of the request or response body so the recipient knows how to parse it"
+      - "It controls whether the response can be cached by intermediate proxies"
+      - "It identifies the server software and version handling the request"
+    correct: 1
+    explanation: "Content-Type declares the media type of the body (application/json, text/html, multipart/form-data). The recipient uses it to decide how to parse the body. Without Content-Type, the receiver must guess -- which leads to parsing errors. The Accept header (different from Content-Type) is what the client uses to tell the server which content types it can handle in the response."
