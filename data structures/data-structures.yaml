@@ -1,0 +1,789 @@
+# =============================================================================
+# Lesson 1: Arrays and Strings (8 cards)
+# =============================================================================
+
+- title: "Array -- Definition"
+  difficulty: "easy"
+  tags: ["array", "definition"]
+  lesson: ds-arrays-and-strings
+  Front: |
+    What is an array?
+  Back: |
+    A fixed-size sequence of elements stored in **contiguous memory**, accessed by index in O(1) via address arithmetic: `base + index * element_size`.
+
+- title: "Array -- Identify"
+  difficulty: "easy"
+  tags: ["array", "identify"]
+  lesson: ds-arrays-and-strings
+  Front: |
+    Which data structure stores elements in contiguous memory, provides O(1) access by index, and requires O(n) shifts to insert or delete in the middle?
+  Back: |
+    **Array.** Contiguous layout enables direct address calculation for any index. The O(n) shift cost is the main weakness compared to linked lists.
+
+- title: "Array -- Why O(1) Access"
+  difficulty: "easy"
+  tags: ["array", "complexity"]
+  lesson: ds-arrays-and-strings
+  Front: |
+    Why is array access by index O(1)?
+  Back: |
+    Elements are stored contiguously, so the address of element `i` is computed directly: `base + i * element_size`. No traversal needed.
+
+- title: "Array -- Insert/Delete Cost"
+  difficulty: "easy"
+  tags: ["array", "complexity"]
+  lesson: ds-arrays-and-strings
+  Front: |
+    Why is inserting or deleting in the middle of an array O(n)?
+  Back: |
+    Every element after the insertion/deletion point must shift one position to open or close the gap. n/2 shifts on average, O(n) worst case.
+
+- title: "Array -- Dynamic Resizing"
+  difficulty: "medium"
+  tags: ["array", "dynamic array", "amortized"]
+  lesson: ds-arrays-and-strings
+  Front: |
+    A dynamic array doubles its capacity when full. Why is append O(1) amortized despite occasional O(n) copies?
+  Back: |
+    After doubling from capacity k to 2k, the next resize won't happen for k more appends. The O(k) copy cost is spread over those k cheap appends. Total work for n appends: ~2n, so amortized cost per append is O(1).
+
+- title: "Array -- Cache Locality"
+  difficulty: "medium"
+  tags: ["array", "cache", "performance"]
+  lesson: ds-arrays-and-strings
+  Front: |
+    Why do arrays have better cache performance than linked lists for sequential access?
+  Back: |
+    Array elements are adjacent in memory. When the CPU loads one element, it pulls neighbors into the cache line too. Linked list nodes are scattered on the heap, causing cache misses on nearly every access.
+
+- title: "Array -- Search Complexities"
+  difficulty: "easy"
+  tags: ["array", "search", "complexity"]
+  lesson: ds-arrays-and-strings
+  Front: |
+    What is the time complexity of searching an unsorted array vs a sorted array?
+  Back: |
+    - **Unsorted:** O(n) linear scan -- must check every element.
+    - **Sorted:** O(log n) binary search -- each comparison halves the search space.
+
+- title: "String Concatenation Trap"
+  difficulty: "medium"
+  tags: ["string", "complexity", "pitfall"]
+  lesson: ds-arrays-and-strings
+  Front: |
+    Why is repeated string concatenation in a loop O(n^2) in languages with immutable strings?
+  Back: |
+    Each `result += s` allocates a new string and copies the entire accumulated result. After i iterations the copy costs O(i). Summing 1 + 2 + ... + n = O(n^2). Fix: use a string builder to batch writes.
+
+# =============================================================================
+# Lesson 2: Linked Lists (12 cards)
+# =============================================================================
+
+- title: "Linked List -- Identify"
+  difficulty: "easy"
+  tags: ["linked list", "identify"]
+  lesson: ds-linked-lists
+  Front: |
+    Which data structure consists of nodes connected by pointers, allows O(1) insertion at the head, but requires O(n) search?
+  Back: |
+    **Linked List.** Each node holds a value and a pointer to the next node. No contiguous memory, no index access.
+
+- title: "Linked List -- Insert at Head"
+  difficulty: "easy"
+  tags: ["linked list", "insert", "complexity"]
+  lesson: ds-linked-lists
+  Front: |
+    What is the time complexity of inserting at the head of a singly linked list, and why?
+  Back: |
+    **O(1).** Create a new node, point its `Next` to the current head, update the head pointer. No traversal, no shifting.
+
+- title: "Linked List -- Insert at Tail"
+  difficulty: "easy"
+  tags: ["linked list", "insert", "complexity"]
+  lesson: ds-linked-lists
+  Front: |
+    What is the time complexity of appending to a singly linked list with and without a tail pointer?
+  Back: |
+    - **With tail pointer:** O(1) -- direct access to the last node.
+    - **Without tail pointer:** O(n) -- must walk the entire list to find the end.
+
+- title: "Linked List -- Search"
+  difficulty: "easy"
+  tags: ["linked list", "search", "complexity"]
+  lesson: ds-linked-lists
+  Front: |
+    What is the time complexity of searching for a value in a linked list?
+  Back: |
+    **O(n).** No random access -- must traverse node by node from the head.
+
+- title: "Linked List -- Reverse"
+  difficulty: "medium"
+  tags: ["linked list", "reverse", "interview"]
+  lesson: ds-linked-lists
+  Front: |
+    How do you reverse a singly linked list iteratively? What is the time and space complexity?
+  Back: |
+    Use three pointers: `prev`, `cur`, `next`. At each step, save `cur.Next`, point `cur.Next` to `prev`, advance both. After the loop, `prev` is the new head.
+
+    O(n) time, O(1) space. One of the most common interview questions.
+
+- title: "Linked List -- Cycle Detection"
+  difficulty: "medium"
+  tags: ["linked list", "cycle", "two pointers"]
+  lesson: ds-linked-lists
+  Front: |
+    How does Floyd's cycle detection algorithm work? What is its time and space complexity?
+  Back: |
+    Two pointers: slow moves 1 step, fast moves 2 steps. If a cycle exists, fast laps slow and they meet inside the cycle. If no cycle, fast reaches nil.
+
+    **O(n) time, O(1) space.** The gap between pointers shrinks by 1 each step, so they meet within one cycle length.
+
+- title: "Linked List -- Find Middle"
+  difficulty: "easy"
+  tags: ["linked list", "two pointers"]
+  lesson: ds-linked-lists
+  Front: |
+    How do you find the middle node of a linked list in a single pass?
+  Back: |
+    Slow pointer moves 1 step, fast pointer moves 2 steps. When fast reaches the end, slow is at the middle.
+
+    This is the splitting step in merge sort for linked lists.
+
+- title: "Linked List -- Merge Sorted"
+  difficulty: "medium"
+  tags: ["linked list", "merge", "interview"]
+  lesson: ds-linked-lists
+  Front: |
+    How do you merge two sorted linked lists? What is the time and space complexity?
+  Back: |
+    Use a **dummy head node**. Compare heads of both lists, attach the smaller, advance that pointer. When one list is exhausted, attach the remainder.
+
+    **O(n + m) time, O(1) space** -- nodes are re-linked, not copied.
+
+- title: "Singly vs Doubly Linked"
+  difficulty: "easy"
+  tags: ["linked list", "doubly linked list", "comparison"]
+  lesson: ds-linked-lists
+  Front: |
+    What is the key difference between singly and doubly linked lists?
+  Back: |
+    A doubly linked list adds a `Prev` pointer per node, enabling O(1) deletion of any node given a direct reference. Singly linked lists require O(n) traversal to find the predecessor.
+
+    Trade-off: double the pointer storage per node.
+
+- title: "Doubly Linked List -- Identify"
+  difficulty: "easy"
+  tags: ["doubly linked list", "identify"]
+  lesson: ds-linked-lists
+  Front: |
+    Which data structure links each node to both its next and previous nodes, allowing O(1) insert/delete at both ends?
+  Back: |
+    **Doubly Linked List.** The `Prev` pointer enables O(1) deletion without traversal. Used in LRU caches paired with a hash map.
+
+- title: "Doubly Linked List -- Delete"
+  difficulty: "easy"
+  tags: ["doubly linked list", "delete", "complexity"]
+  lesson: ds-linked-lists
+  Front: |
+    Why can a doubly linked list delete a node in O(1) given a pointer to it, while a singly linked list cannot?
+  Back: |
+    The `Prev` pointer gives direct access to the predecessor. Unlinking is just:
+    ```
+    node.Prev.Next = node.Next
+    node.Next.Prev = node.Prev
+    ```
+    A singly linked list must walk from head to find the predecessor -- O(n).
+
+- title: "Array vs Linked List"
+  difficulty: "medium"
+  tags: ["array", "linked list", "comparison"]
+  lesson: ds-linked-lists
+  Front: |
+    When should you choose a linked list over an array?
+  Back: |
+    Choose a linked list when you need frequent insertions/deletions at arbitrary positions and don't need index access. Choose an array when you need fast random access or sequential iteration with cache locality.
+
+    | | Array | Linked List |
+    |---|---|---|
+    | Index access | O(1) | O(n) |
+    | Head insert | O(n) | O(1) |
+    | Cache | Excellent | Poor |
+
+# =============================================================================
+# Lesson 3: Stacks and Queues (10 cards)
+# =============================================================================
+
+- title: "Stack -- Identify"
+  difficulty: "easy"
+  tags: ["stack", "identify"]
+  lesson: ds-stacks-and-queues
+  Front: |
+    Which data structure operates on a last-in, first-out principle with O(1) push, pop, and peek?
+  Back: |
+    **Stack.** Elements are added and removed from the same end (the top). Use when the most recent item matters: parsing, backtracking, DFS.
+
+- title: "Stack -- Operations"
+  difficulty: "easy"
+  tags: ["stack", "operations", "complexity"]
+  lesson: ds-stacks-and-queues
+  Front: |
+    What are the three core stack operations and their time complexities?
+  Back: |
+    - **Push:** add to top -- O(1)
+    - **Pop:** remove from top -- O(1)
+    - **Peek:** read top without removing -- O(1)
+
+    Backed by a dynamic array: push is `append`, pop reads and shrinks the last element.
+
+- title: "Stack -- Balanced Parentheses"
+  difficulty: "medium"
+  tags: ["stack", "interview", "parentheses"]
+  lesson: ds-stacks-and-queues
+  Front: |
+    How does a stack solve the balanced parentheses problem? What is the time and space complexity?
+  Back: |
+    Push every opener. On a closer, check that the top is its matching opener (pop it). At the end, the stack must be empty.
+
+    **O(n) time, O(n) space.** Generalizes to any nesting problem: HTML tags, function calls, expression parsing.
+
+- title: "Stack -- Min Stack"
+  difficulty: "hard"
+  tags: ["stack", "interview", "design"]
+  lesson: ds-stacks-and-queues
+  Front: |
+    How do you design a stack that supports push, pop, and getMin all in O(1)?
+  Back: |
+    Maintain an auxiliary stack of minimums. Push to `mins` when the new value is <= current min. Pop from `mins` when the popped value equals current min.
+
+    O(1) time per operation, O(n) worst-case extra space. The `<=` (not `<`) handles duplicate minimums.
+
+- title: "Stack -- RPN Evaluation"
+  difficulty: "medium"
+  tags: ["stack", "interview", "rpn"]
+  lesson: ds-stacks-and-queues
+  Front: |
+    How does a stack evaluate Reverse Polish Notation expressions?
+  Back: |
+    Push numbers. When an operator appears, pop two operands, apply the operator, push the result. The final stack value is the answer.
+
+    Pop order matters: pop `b` first, then `a`, to compute `a op b`. O(n) time, O(n) space.
+
+- title: "Queue -- Identify"
+  difficulty: "easy"
+  tags: ["queue", "identify"]
+  lesson: ds-stacks-and-queues
+  Front: |
+    Which data structure operates on a first-in, first-out principle with enqueue at the rear and dequeue at the front?
+  Back: |
+    **Queue.** Elements are processed in arrival order. Use for BFS, task scheduling, and message buffering.
+
+- title: "Queue -- Memory Leak"
+  difficulty: "medium"
+  tags: ["queue", "go", "pitfall"]
+  lesson: ds-stacks-and-queues
+  Front: |
+    What is the memory leak problem with a slice-backed queue using `q = q[1:]` for dequeue?
+  Back: |
+    Reslicing advances the slice header but never frees the underlying array. Old elements are unreachable but not garbage-collected. The backing array grows unboundedly.
+
+    Fix: use a ring buffer (circular array) or `container/list`.
+
+- title: "Queue from Two Stacks"
+  difficulty: "hard"
+  tags: ["queue", "stack", "interview"]
+  lesson: ds-stacks-and-queues
+  Front: |
+    How do you implement a FIFO queue using two LIFO stacks? What is the amortized complexity?
+  Back: |
+    Push to `in` stack. On dequeue, if `out` is empty, pour all from `in` to `out` (reversing order), then pop from `out`.
+
+    **Amortized O(1)** per operation. Each element moves from `in` to `out` at most once. Key insight: two reversals cancel out LIFO into FIFO.
+
+- title: "BFS Frontier Pattern"
+  difficulty: "medium"
+  tags: ["queue", "bfs"]
+  lesson: ds-stacks-and-queues
+  Front: |
+    Why is a queue the correct data structure for BFS? What happens if you replace it with a stack?
+  Back: |
+    The queue's FIFO order guarantees level-by-level exploration. Replacing with a stack turns BFS into DFS -- you explore one branch deeply before visiting siblings.
+
+    BFS space: O(w) where w is the max width.
+
+- title: "Deque"
+  difficulty: "easy"
+  tags: ["deque", "definition"]
+  lesson: ds-stacks-and-queues
+  Front: |
+    What is a deque?
+  Back: |
+    A **double-ended queue** supporting O(1) push and pop at both ends. Generalizes both stacks (use one end) and queues (push one end, pop the other). Used in sliding window max/min problems.
+
+# =============================================================================
+# Lesson 4: Hash Tables (9 cards)
+# =============================================================================
+
+- title: "Hash Map -- Identify"
+  difficulty: "easy"
+  tags: ["hash map", "identify"]
+  lesson: ds-hash-tables
+  Front: |
+    Which data structure maps keys to values via a hash function with O(1) average-case operations, but degrades to O(n) on collisions?
+  Back: |
+    **Hash Map.** A hash function maps keys to bucket indices. O(1) average for insert, delete, and lookup. Worst case O(n) when all keys collide.
+
+- title: "Hash Table -- How It Works"
+  difficulty: "easy"
+  tags: ["hash map", "mechanism"]
+  lesson: ds-hash-tables
+  Front: |
+    Describe the three steps of a hash table lookup.
+  Back: |
+    1. Compute `hash(key)` to get an integer.
+    2. Map to bucket: `index = hash(key) % num_buckets`.
+    3. Search the bucket for the matching key (handle collisions).
+
+- title: "Hash Table -- Chaining"
+  difficulty: "medium"
+  tags: ["hash map", "collision", "chaining"]
+  lesson: ds-hash-tables
+  Front: |
+    How does chaining resolve hash table collisions?
+  Back: |
+    Each bucket holds a linked list. Colliding keys are appended to the list. Lookup walks the list to find the matching key.
+
+    Average O(1) with a good hash function. Worst case O(n) if all keys land in one bucket.
+
+- title: "Hash Table -- Open Addressing"
+  difficulty: "medium"
+  tags: ["hash map", "collision", "open addressing"]
+  lesson: ds-hash-tables
+  Front: |
+    How does open addressing resolve hash table collisions?
+  Back: |
+    On collision, probe the array for the next empty slot. Common strategies: linear probing (index+1, index+2, ...), quadratic probing, double hashing.
+
+    Better cache locality than chaining (no linked list pointers), but more sensitive to high load factors.
+
+- title: "Hash Table -- Load Factor"
+  difficulty: "medium"
+  tags: ["hash map", "load factor", "rehashing"]
+  lesson: ds-hash-tables
+  Front: |
+    What is the load factor of a hash table? What happens when it gets too high?
+  Back: |
+    Load factor = `n / num_buckets`. When it exceeds ~0.7-0.75, collisions become frequent. The table **rehashes**: allocate double the buckets, recompute every key's index, reinsert.
+
+    Individual rehash is O(n), but it happens infrequently -- amortized insert stays O(1).
+
+- title: "Hash Set -- Definition"
+  difficulty: "easy"
+  tags: ["hash set", "definition"]
+  lesson: ds-hash-tables
+  Front: |
+    What is a hash set, and how does it relate to a hash map?
+  Back: |
+    A hash set stores keys only (no values). It is a hash map where every value is effectively `true`. Same performance: O(1) average add, remove, contains.
+
+    Use for deduplication and fast membership testing.
+
+- title: "Hash Set -- Operations"
+  difficulty: "easy"
+  tags: ["hash set", "operations"]
+  lesson: ds-hash-tables
+  Front: |
+    What are the three common set operations and their time complexities?
+  Back: |
+    - **Union (A | B):** all elements from both sets -- O(n + m)
+    - **Intersection (A & B):** elements in both -- O(min(n, m))
+    - **Difference (A - B):** elements in A but not B -- O(n)
+
+    Each operation iterates one set and checks membership in the other (O(1) per check).
+
+- title: "Hash Table vs BST"
+  difficulty: "medium"
+  tags: ["hash map", "bst", "comparison"]
+  lesson: ds-hash-tables
+  Front: |
+    When should you use a BST instead of a hash table?
+  Back: |
+    Use a BST when you need sorted traversal, range queries, or guaranteed O(log n) worst case. Use a hash table when you only need O(1) average lookup and order doesn't matter.
+
+    Hash tables cannot iterate in sorted order or answer "find all keys between 10 and 50."
+
+- title: "Hash Table -- Worst Case"
+  difficulty: "medium"
+  tags: ["hash map", "complexity"]
+  lesson: ds-hash-tables
+  Front: |
+    When does a hash table degrade to O(n) operations?
+  Back: |
+    When many keys collide into the same bucket. With chaining, the bucket becomes a long linked list. With open addressing, probe sequences become long.
+
+    Causes: bad hash function, adversarial input, or extreme load factor. Mitigations: good hash function, randomized hashing, rehashing at threshold.
+
+# =============================================================================
+# Lesson 5: Trees and Traversals (8 cards)
+# =============================================================================
+
+- title: "Binary Tree -- Identify"
+  difficulty: "easy"
+  tags: ["binary tree", "identify"]
+  lesson: ds-trees-and-traversals
+  Front: |
+    Which data structure is a hierarchical collection where each node has up to two children, with no inherent ordering constraint?
+  Back: |
+    **Binary Tree.** Each node has at most a left and right child. Foundation for BSTs, heaps, and expression trees.
+
+- title: "Tree Shape Definitions"
+  difficulty: "medium"
+  tags: ["binary tree", "definitions"]
+  lesson: ds-trees-and-traversals
+  Front: |
+    Define full, complete, perfect, and balanced binary trees.
+  Back: |
+    - **Full:** every node has 0 or 2 children.
+    - **Complete:** all levels filled except possibly the last, which is filled left to right. (Heaps are complete.)
+    - **Perfect:** every internal node has 2 children and all leaves are at the same depth.
+    - **Balanced:** subtree heights of every node differ by at most 1. (AVL trees enforce this.)
+
+- title: "In-order Traversal"
+  difficulty: "easy"
+  tags: ["binary tree", "traversal"]
+  lesson: ds-trees-and-traversals
+  Front: |
+    What is in-order traversal, and what does it produce on a BST?
+  Back: |
+    Visit left subtree, then root, then right subtree. On a BST, this produces **sorted output**.
+
+    O(n) time, O(h) space for the recursion stack.
+
+- title: "Pre-order Traversal"
+  difficulty: "easy"
+  tags: ["binary tree", "traversal"]
+  lesson: ds-trees-and-traversals
+  Front: |
+    What is pre-order traversal, and when is it useful?
+  Back: |
+    Visit root first, then left, then right. The root is always the first node visited.
+
+    Used for **tree serialization/cloning** -- recording nodes in pre-order lets you reconstruct the tree.
+
+- title: "Post-order Traversal"
+  difficulty: "easy"
+  tags: ["binary tree", "traversal"]
+  lesson: ds-trees-and-traversals
+  Front: |
+    What is post-order traversal, and when is it useful?
+  Back: |
+    Visit left, then right, then root last. Children are always processed before their parent.
+
+    Used for **safe deletion** (free children first) and **expression tree evaluation** (evaluate operands before operator).
+
+- title: "Level-order Traversal"
+  difficulty: "medium"
+  tags: ["binary tree", "traversal", "bfs"]
+  lesson: ds-trees-and-traversals
+  Front: |
+    What is level-order traversal? What data structure does it use and what is its space complexity?
+  Back: |
+    Visit nodes level by level using a **queue**. Dequeue a node, process it, enqueue its children.
+
+    Space: O(w) where w is the max width. For a complete tree, the last level holds ~n/2 nodes, so O(n) in the worst case.
+
+- title: "DFS vs BFS Space"
+  difficulty: "hard"
+  tags: ["binary tree", "dfs", "bfs", "complexity"]
+  lesson: ds-trees-and-traversals
+  Front: |
+    On a balanced binary tree, which uses less space: DFS or BFS?
+  Back: |
+    **DFS: O(h) = O(log n).** BFS: O(w) = O(n) since the last level has ~n/2 nodes.
+
+    On a skewed tree it flips: DFS uses O(n) (deep recursion), BFS uses O(1) (width is 1).
+
+- title: "Traversal Cheat Sheet"
+  difficulty: "medium"
+  tags: ["binary tree", "traversal", "decision"]
+  lesson: ds-trees-and-traversals
+  Front: |
+    How do you choose the right tree traversal for a problem?
+  Back: |
+    - **Sorted order on a BST?** In-order.
+    - **Serialize/clone a tree?** Pre-order.
+    - **Delete nodes or aggregate subtrees?** Post-order.
+    - **Level-by-level info (depth, width)?** Level-order (BFS).
+
+    Rule of thumb: "depth" or "level" = BFS. "Subtree" = DFS.
+
+# =============================================================================
+# Lesson 6: Binary Search Trees (7 cards)
+# =============================================================================
+
+- title: "BST -- Identify"
+  difficulty: "easy"
+  tags: ["bst", "identify"]
+  lesson: ds-binary-search-trees
+  Front: |
+    Which data structure maintains left < parent < right ordering and offers O(log n) operations when balanced?
+  Back: |
+    **Binary Search Tree.** All values in the left subtree are less than the node; all in the right are greater. Degrades to O(n) if unbalanced.
+
+- title: "BST -- Search"
+  difficulty: "medium"
+  tags: ["bst", "search", "complexity"]
+  lesson: ds-binary-search-trees
+  Front: |
+    What is the time complexity of BST search, and why?
+  Back: |
+    **O(h)** where h is the tree height. Each comparison eliminates one subtree. On a balanced tree, h = O(log n). On a skewed tree (sorted insertions), h = O(n).
+
+- title: "BST -- Insert Worst Case"
+  difficulty: "medium"
+  tags: ["bst", "insert", "complexity"]
+  lesson: ds-binary-search-trees
+  Front: |
+    What happens when you insert sorted data into a plain BST?
+  Back: |
+    Every node goes to the right, creating a linked-list-shaped tree. Height becomes n, so all operations are O(n). This is why self-balancing trees (AVL, red-black) exist.
+
+- title: "BST -- Delete Three Cases"
+  difficulty: "hard"
+  tags: ["bst", "delete", "interview"]
+  lesson: ds-binary-search-trees
+  Front: |
+    What are the three cases for deleting a node from a BST?
+  Back: |
+    1. **Leaf:** remove it directly.
+    2. **One child:** replace the node with its child.
+    3. **Two children:** replace with the **in-order successor** (smallest in right subtree), then delete the successor.
+
+    The successor preserves the BST invariant because it is the smallest value greater than the deleted node. Time: O(h).
+
+- title: "BST -- Validate"
+  difficulty: "medium"
+  tags: ["bst", "validate", "interview"]
+  lesson: ds-binary-search-trees
+  Front: |
+    How do you validate a BST? Why does checking only immediate children fail?
+  Back: |
+    Pass down min/max bounds. Left children tighten the upper bound; right children tighten the lower bound.
+
+    Checking only `left < node < right` misses global violations: a node deep in the left subtree could exceed the root. The BST invariant is **global**, not local.
+
+- title: "BST -- In-order Successor"
+  difficulty: "medium"
+  tags: ["bst", "successor"]
+  lesson: ds-binary-search-trees
+  Front: |
+    What is the in-order successor of a BST node, and how do you find it?
+  Back: |
+    The smallest value greater than the node. If the node has a right subtree, it is the leftmost node in that subtree. If not, it is the nearest ancestor for which the node is in the left subtree.
+
+    Used in BST deletion (two-children case) and finding the next value in sorted order.
+
+- title: "BST vs Hash Map"
+  difficulty: "medium"
+  tags: ["bst", "hash map", "comparison"]
+  lesson: ds-binary-search-trees
+  Front: |
+    When should you choose a BST over a hash map?
+  Back: |
+    When you need **ordered operations**: sorted iteration, range queries ("values between 10 and 50"), predecessor/successor lookups. Hash maps give O(1) average lookup but cannot provide ordering.
+
+    When you need guaranteed worst-case performance: balanced BSTs are always O(log n). Hash maps can degrade to O(n).
+
+# =============================================================================
+# Lesson 7: Heaps and Priority Queues (8 cards)
+# =============================================================================
+
+- title: "Binary Heap -- Identify"
+  difficulty: "easy"
+  tags: ["heap", "identify"]
+  lesson: ds-heaps-and-priority-queues
+  Front: |
+    Which data structure is a complete binary tree stored in an array, with O(log n) insert/extract and O(1) peek?
+  Back: |
+    **Binary Heap.** Min-heap: every parent <= children (root is min). Max-heap: every parent >= children (root is max). Array layout avoids pointer overhead.
+
+- title: "Heap -- Index Formulas"
+  difficulty: "easy"
+  tags: ["heap", "array", "index"]
+  lesson: ds-heaps-and-priority-queues
+  Front: |
+    In a 0-indexed array heap, what are the indices of a node's children and parent?
+  Back: |
+    For node at index `i`:
+    - **Left child:** `2i + 1`
+    - **Right child:** `2i + 2`
+    - **Parent:** `(i - 1) / 2`
+
+    No pointers needed because the heap is always a complete binary tree.
+
+- title: "Heap -- Sift-Up"
+  difficulty: "medium"
+  tags: ["heap", "insert"]
+  lesson: ds-heaps-and-priority-queues
+  Front: |
+    How does heap insertion (sift-up) work?
+  Back: |
+    Append the new element at the end of the array, then bubble it up by swapping with its parent while the heap property is violated.
+
+    Maximum swaps = tree height = O(log n).
+
+- title: "Heap -- Sift-Down"
+  difficulty: "medium"
+  tags: ["heap", "extract"]
+  lesson: ds-heaps-and-priority-queues
+  Front: |
+    How does extracting the min/max from a heap (sift-down) work?
+  Back: |
+    Replace the root with the last element, then sift down: swap with the smaller child (min-heap) or larger child (max-heap) until settled.
+
+    O(log n). The last element maintains completeness; sifting restores order.
+
+- title: "Heapify -- O(n)"
+  difficulty: "hard"
+  tags: ["heap", "heapify", "complexity"]
+  lesson: ds-heaps-and-priority-queues
+  Front: |
+    Building a heap from an unsorted array is O(n), not O(n log n). Why?
+  Back: |
+    Sift down from the last non-leaf to the root. Leaves (half the array) need no work. Nodes at height h sift at most h levels. Summing across all nodes: most nodes are near the bottom and sift very few levels.
+
+    The sum converges to O(n). Inserting elements one by one would be O(n log n).
+
+- title: "Priority Queue"
+  difficulty: "easy"
+  tags: ["priority queue", "definition"]
+  lesson: ds-heaps-and-priority-queues
+  Front: |
+    What is a priority queue, and how is it typically implemented?
+  Back: |
+    An abstract data type: insert elements with priorities, always extract the highest-priority element first. The standard implementation is a **binary heap**.
+
+    Insert: O(log n). Extract: O(log n). Peek: O(1).
+
+- title: "Top-K Pattern"
+  difficulty: "hard"
+  tags: ["heap", "top-k", "interview"]
+  lesson: ds-heaps-and-priority-queues
+  Front: |
+    How do you find the k largest elements from a stream of n numbers? What is the time complexity?
+  Back: |
+    Maintain a **min-heap of size k**. For each new number, if it exceeds the heap's root (the smallest of the k candidates), replace the root and sift down.
+
+    **O(n log k) time, O(k) space.** A min-heap lets you quickly discard the weakest candidate.
+
+- title: "Heap Sort"
+  difficulty: "medium"
+  tags: ["heap", "sorting"]
+  lesson: ds-heaps-and-priority-queues
+  Front: |
+    How does heap sort work, and what are its time/space characteristics?
+  Back: |
+    Build a max-heap from the array (O(n)), then repeatedly extract the max and place it at the end. Total: **O(n log n), in-place, not stable.**
+
+    Quicksort is usually faster in practice (better cache behavior), but heap sort has a guaranteed O(n log n) worst case.
+
+# =============================================================================
+# Lesson 8: Graphs (9 cards)
+# =============================================================================
+
+- title: "Graph -- Definition"
+  difficulty: "easy"
+  tags: ["graph", "definition"]
+  lesson: ds-graphs
+  Front: |
+    What is a graph?
+  Back: |
+    A set of **vertices** (nodes) connected by **edges** (links). Unlike trees, graphs can have cycles, no root, and arbitrary connectivity. Models relationships: social networks, road maps, dependencies.
+
+- title: "Directed vs Undirected"
+  difficulty: "easy"
+  tags: ["graph", "directed", "undirected"]
+  lesson: ds-graphs
+  Front: |
+    What is the difference between a directed and undirected graph?
+  Back: |
+    - **Undirected:** edges have no direction. A-B implies B-A. (Facebook friendships.)
+    - **Directed:** edges have direction. A->B does not imply B->A. (Twitter follows, prerequisites.)
+
+    In an adjacency list, undirected edges add both directions; directed edges add one.
+
+- title: "Adjacency List"
+  difficulty: "easy"
+  tags: ["graph", "adjacency list"]
+  lesson: ds-graphs
+  Front: |
+    What is an adjacency list, and what is its space complexity?
+  Back: |
+    Each vertex stores a list of its neighbors. Space: **O(V + E).** Efficient for sparse graphs. Iterating neighbors is O(degree), but checking a specific edge is also O(degree).
+
+- title: "Adjacency Matrix"
+  difficulty: "easy"
+  tags: ["graph", "adjacency matrix"]
+  lesson: ds-graphs
+  Front: |
+    What is an adjacency matrix, and what is its space complexity?
+  Back: |
+    A V x V grid where `matrix[i][j] = 1` if an edge exists. Space: **O(V^2).** Edge lookup is O(1), but iterating neighbors is O(V) and sparse graphs waste memory.
+
+- title: "Adjacency List vs Matrix"
+  difficulty: "medium"
+  tags: ["graph", "comparison"]
+  lesson: ds-graphs
+  Front: |
+    When should you use an adjacency list vs an adjacency matrix?
+  Back: |
+    | | List | Matrix |
+    |---|---|---|
+    | Space | O(V+E) | O(V^2) |
+    | Edge lookup | O(degree) | O(1) |
+    | Neighbor iteration | O(degree) | O(V) |
+
+    **Default to adjacency list** -- most graphs are sparse. Use matrix when you need O(1) edge lookup in a dense graph.
+
+- title: "Graph -- BFS"
+  difficulty: "medium"
+  tags: ["graph", "bfs"]
+  lesson: ds-graphs
+  Front: |
+    What does BFS guarantee on an unweighted graph, and what is its time complexity?
+  Back: |
+    BFS explores vertices in order of distance from the source, guaranteeing **shortest path** (by edge count). Uses a queue.
+
+    **Time: O(V + E).** Mark vertices visited before enqueuing (not after dequeuing) to avoid duplicates.
+
+- title: "Graph -- DFS"
+  difficulty: "medium"
+  tags: ["graph", "dfs"]
+  lesson: ds-graphs
+  Front: |
+    What is DFS on a graph used for? What is its time complexity?
+  Back: |
+    DFS explores one branch fully before backtracking. Uses a stack or recursion.
+
+    **Time: O(V + E).** Used for: cycle detection, topological sort, finding connected components, path finding.
+
+- title: "Connected Components"
+  difficulty: "medium"
+  tags: ["graph", "connected components"]
+  lesson: ds-graphs
+  Front: |
+    What is a connected component, and how do you find all of them?
+  Back: |
+    A maximal set of vertices where every pair has a path between them. Find all by iterating vertices: for each unvisited vertex, run BFS/DFS and mark all reachable vertices as one component.
+
+    Total time: O(V + E).
+
+- title: "Graph Cycle Detection"
+  difficulty: "hard"
+  tags: ["graph", "cycle", "dfs"]
+  lesson: ds-graphs
+  Front: |
+    How do you detect a cycle in a directed graph vs an undirected graph?
+  Back: |
+    **Directed:** During DFS, track the current path (not just visited globally). A back edge to a vertex still on the current path means a cycle.
+
+    **Undirected:** During BFS/DFS, if you reach an already-visited vertex that is not the parent of the current vertex, a cycle exists.

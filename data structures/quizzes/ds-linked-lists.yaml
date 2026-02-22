@@ -1,0 +1,47 @@
+title: "Linked Lists"
+lesson_slug: "ds-linked-lists"
+questions:
+  - question: "What is the time complexity of inserting a node at the head of a singly linked list?"
+    options:
+      - "O(n) -- must traverse to find the current head"
+      - "O(log n) -- binary search for the position"
+      - "O(1) -- create a new node pointing to the old head"
+      - "O(n^2) -- must shift all elements"
+    correct: 2
+    explanation: "Head insertion creates a new node, sets its Next to the current head, and updates the head pointer. No traversal needed -- pure pointer manipulation in O(1)."
+
+  - question: "What is the key advantage of a doubly linked list over a singly linked list?"
+    options:
+      - "It supports O(1) search by value"
+      - "It uses less memory per node"
+      - "It allows O(1) deletion of any node given a direct pointer to it"
+      - "It maintains sorted order automatically"
+    correct: 2
+    explanation: "With both Prev and Next pointers, you can unlink a node without traversing to find its predecessor. In a singly linked list, deletion requires O(n) traversal to find the node before the one being deleted."
+
+  - question: "How does Floyd's cycle detection algorithm work?"
+    options:
+      - "It uses a hash set to track visited nodes -- O(n) time, O(n) space"
+      - "It uses two pointers moving at different speeds. If they meet, there is a cycle -- O(n) time, O(1) space"
+      - "It reverses the list and checks if the head is the same -- O(n) time, O(1) space"
+      - "It counts the number of nodes and checks if any node is visited twice -- O(n^2) time, O(1) space"
+    correct: 1
+    explanation: "Floyd's algorithm uses a slow pointer (1 step) and a fast pointer (2 steps). If a cycle exists, the fast pointer eventually laps the slow pointer and they meet. O(n) time, O(1) space -- the hash set approach is the naive alternative."
+
+  - question: "You need to append to a singly linked list frequently. What optimization turns this from O(n) to O(1)?"
+    options:
+      - "Use a hash map to index nodes by position"
+      - "Sort the list so the tail is always the smallest element"
+      - "Maintain a tail pointer alongside the head pointer"
+      - "Convert to a doubly linked list"
+    correct: 2
+    explanation: "Without a tail pointer, appending requires walking the entire list to find the end. A tail pointer gives direct access to the last node, making append O(1). This is standard in queue implementations."
+
+  - question: "When merging two sorted linked lists, why use a dummy head node?"
+    options:
+      - "It doubles the speed of the merge"
+      - "It eliminates null-check logic for the first insertion -- you always have a node to attach to"
+      - "It sorts the merged list automatically"
+      - "It reduces space complexity from O(n) to O(1)"
+    correct: 1
+    explanation: "Without a dummy node, you need special-case logic to determine which list's head becomes the merged list's head. The dummy node provides a starting point so the merge loop has uniform logic. Return dummy.Next to skip it."
