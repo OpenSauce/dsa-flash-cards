@@ -1,0 +1,56 @@
+title: "Docker Networking"
+lesson_slug: "docker-networking"
+questions:
+  - question: "What is the default networking mode for a Docker container?"
+    options:
+      - "Host"
+      - "None"
+      - "Bridge"
+      - "Overlay"
+    correct: 2
+    explanation: "Bridge is the default. The container gets its own private IP on a virtual network. You use -p to expose ports to the host."
+
+  - question: "Containers on the default bridge network can communicate by IP address, but NOT by container name. How do you fix this?"
+    options:
+      - "Use host networking mode instead"
+      - "Add EXPOSE instructions to both Dockerfiles"
+      - "Create a user-defined bridge network -- it includes DNS resolution by container name"
+      - "Set static IP addresses for each container"
+    correct: 2
+    explanation: "User-defined bridge networks run Docker's embedded DNS server, which resolves container names to IPs automatically. The default bridge does not provide this."
+
+  - question: "What does `-p 8080:80` do in `docker run -p 8080:80 nginx`?"
+    options:
+      - "Sets the container's internal port to 8080 and external to 80"
+      - "Maps host port 8080 to container port 80, so traffic to localhost:8080 reaches port 80 inside the container"
+      - "Opens ports 8080 through 80 on the host"
+      - "Exposes both port 8080 and port 80 on the container"
+    correct: 1
+    explanation: "The -p syntax is HOST_PORT:CONTAINER_PORT. Traffic arriving at port 8080 on the host is forwarded to port 80 inside the container."
+
+  - question: "When would you use `--network host` instead of the default bridge?"
+    options:
+      - "When you want maximum network isolation between containers"
+      - "When you need maximum network performance with no NAT overhead"
+      - "When running containers on different physical hosts"
+      - "When you want Docker to assign random ports"
+    correct: 1
+    explanation: "Host mode removes all network isolation -- the container shares the host's network stack directly. No port translation means no NAT overhead. Use it when network performance is critical."
+
+  - question: "What does EXPOSE in a Dockerfile actually do at runtime?"
+    options:
+      - "It automatically publishes the port to the host"
+      - "It blocks all other ports from being accessed"
+      - "It does nothing at runtime -- it is documentation for humans and tooling"
+      - "It creates a firewall rule allowing traffic on that port"
+    correct: 2
+    explanation: "EXPOSE is metadata only. It documents which ports the container listens on, but does not publish them. You still need -p when running the container to actually map ports."
+
+  - question: "What does `--network none` do?"
+    options:
+      - "Uses the host's network but disables DNS"
+      - "Creates a new isolated bridge network for this container only"
+      - "Disables all networking -- the container has only a loopback interface"
+      - "Connects the container to all available networks"
+    correct: 2
+    explanation: "None mode gives the container only a loopback interface (127.0.0.1). No inbound or outbound network access. Use for security-sensitive workloads that must be network-isolated."

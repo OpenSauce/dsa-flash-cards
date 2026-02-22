@@ -1,0 +1,56 @@
+title: "Essential Docker Commands"
+lesson_slug: "docker-essential-commands"
+questions:
+  - question: "What does the `-d` flag do in `docker run -d nginx`?"
+    options:
+      - "Deletes the container after it stops"
+      - "Runs the container in debug mode with verbose logging"
+      - "Runs the container in detached mode (background)"
+      - "Downloads the image without running it"
+    correct: 2
+    explanation: "The -d flag runs the container in the background (detached). Without it, the container's stdout/stderr is attached to your terminal and blocks it."
+
+  - question: 'You run `docker run myimage bash`. The Dockerfile has `CMD ["python", "app.py"]`. What happens?'
+    options:
+      - "The container runs python app.py, then runs bash"
+      - "The container runs bash, ignoring the CMD entirely"
+      - "The container fails because CMD and the run argument conflict"
+      - "The container runs python app.py with bash as an argument"
+    correct: 1
+    explanation: "CMD sets the default command. Arguments passed to docker run replace CMD entirely. The container runs bash instead of python app.py."
+
+  - question: 'What happens if you use ENTRYPOINT with shell form (`ENTRYPOINT python app.py`) instead of exec form (`ENTRYPOINT ["python", "app.py"]`)?'
+    options:
+      - "Nothing different -- they behave identically"
+      - "Shell form runs the command as a child of /bin/sh -c, so it is not PID 1 and does not receive SIGTERM"
+      - "Shell form is faster because it skips JSON parsing"
+      - "Shell form automatically restarts the process on failure"
+    correct: 1
+    explanation: "Shell form wraps the command in /bin/sh -c, making sh the container's PID 1 instead of your process. SIGTERM goes to sh, not your app, preventing graceful shutdown. Always use exec form."
+
+  - question: "What is the difference between `docker stop` and `docker kill`?"
+    options:
+      - "stop removes the container; kill just pauses it"
+      - "stop sends SIGTERM with a grace period, then SIGKILL; kill sends SIGKILL immediately"
+      - "stop works on running containers; kill works on stopped containers"
+      - "There is no difference -- they are aliases"
+    correct: 1
+    explanation: "docker stop sends SIGTERM and waits up to 10 seconds for graceful shutdown before escalating to SIGKILL. docker kill sends SIGKILL immediately with no grace period."
+
+  - question: "Why should you prefer COPY over ADD in a Dockerfile?"
+    options:
+      - "COPY is faster because it uses a different filesystem driver"
+      - "ADD cannot copy files from the build context"
+      - "COPY only copies files; ADD implicitly extracts tar archives and can fetch URLs, making behavior harder to predict"
+      - "COPY supports multi-stage builds but ADD does not"
+    correct: 2
+    explanation: "COPY does one thing: copies files from the build context. ADD auto-extracts tar files and can download URLs, introducing implicit behavior. Explicit is better than implicit."
+
+  - question: "A container was stopped with `docker stop myapp`. What is the state of its data?"
+    options:
+      - "All data is deleted -- stopping a container removes its writable layer"
+      - "Data in the writable layer is preserved -- the container still exists on disk, just not running"
+      - "Only data in volumes is preserved; the writable layer is cleared"
+      - "Data is compressed and archived to /var/lib/docker/archive/"
+    correct: 1
+    explanation: "docker stop halts the process but the container (including its writable layer) remains on disk. You can restart it and find your files intact. Only docker rm deletes the container and its writable layer."
