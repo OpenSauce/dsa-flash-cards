@@ -106,7 +106,7 @@
   Front: |
     What is the container runtime in Kubernetes, and what is the most common one?
   Back: |
-    The software that actually executes containers. Kubernetes communicates with it via the Container Runtime Interface (CRI). The most common runtime is **containerd** -- lightweight and purpose-built. Docker was removed as a Kubernetes runtime in v1.24 (Docker-built images still run fine since they follow the OCI image format).
+    The software that actually executes containers. Kubernetes communicates with it via the Container Runtime Interface (CRI). The most common runtime is **containerd** -- lightweight and purpose-built. Support for Docker Engine as a built-in Kubernetes runtime was removed in v1.24 (released in 2022), and current Kubernetes versions expect a CRI-compatible runtime like containerd; Docker-built images still run fine since they follow the OCI image format.
 
 # =============================================================================
 # Lesson 2: Pods and Workloads (10 cards)

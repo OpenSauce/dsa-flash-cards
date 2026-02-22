@@ -39,7 +39,7 @@ Worker nodes are where application Pods actually run. Each node runs three essen
 
 **Kube-proxy** manages networking rules on each node. It maintains iptables or IPVS rules that route traffic from Service virtual IPs to the actual Pod IPs behind them. When a Pod sends traffic to a Service's ClusterIP, kube-proxy's rules transparently redirect it to a healthy backend Pod.
 
-**Container runtime** is the software that actually runs containers. Kubernetes communicates with it via the Container Runtime Interface (CRI). The default in most distributions is **containerd** -- lightweight and purpose-built for Kubernetes. CRI-O is common in OpenShift. Docker was removed as a direct Kubernetes runtime in v1.24 (though Docker-built images still run fine, since they follow the same OCI image format).
+**Container runtime** is the software that actually runs containers. Kubernetes communicates with it via the Container Runtime Interface (CRI). The default in most distributions is **containerd** -- lightweight and purpose-built for Kubernetes. CRI-O is common in OpenShift. Historically, Docker could act as the Kubernetes runtime, but it was removed as a direct runtime starting in v1.24 (released in 2022). As of 2026, all supported Kubernetes versions use a CRI-compliant runtime such as containerd or CRI-O, but Docker-built images still run fine because they follow the same OCI image format.
 
 ## The Reconciliation Loop in Practice
 
