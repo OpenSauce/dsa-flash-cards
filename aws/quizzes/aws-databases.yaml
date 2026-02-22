@@ -1,0 +1,56 @@
+title: "Databases"
+lesson_slug: "aws-databases"
+questions:
+  - question: "You need to store and query user session data with simple get-by-ID access patterns at millions of requests per second. Which database is the best fit?"
+    options:
+      - "Amazon RDS (PostgreSQL)"
+      - "Amazon Aurora"
+      - "Amazon DynamoDB"
+      - "Amazon Redshift"
+    correct: 2
+    explanation: "DynamoDB is designed for simple key-based access at massive scale with single-digit millisecond latency. Session data (get/set by session ID) is a textbook DynamoDB use case. RDS and Aurora are relational databases optimized for complex queries and ACID transactions -- overkill and harder to scale for this access pattern."
+
+  - question: "What is Aurora's key architectural advantage over standard RDS?"
+    options:
+      - "Aurora uses a distributed storage layer that auto-scales, replicates 6 ways across 3 AZs, and provides sub-10ms replica lag"
+      - "Aurora is significantly cheaper than RDS at all scales"
+      - "Aurora supports database engines that RDS does not, including MongoDB and Cassandra"
+      - "Aurora automatically optimizes SQL queries in ways that RDS cannot"
+    correct: 0
+    explanation: "Aurora separates compute from storage. Its distributed storage auto-scales up to 128 TB, replicates 6 ways across 3 Availability Zones automatically, provides sub-10ms replication lag to read replicas, and enables ~30 second failover (versus 1-2 minutes for RDS Multi-AZ). Aurora is more expensive but more capable for high-availability, high-throughput workloads."
+
+  - question: "What is ElastiCache used for?"
+    options:
+      - "Storing relational data as an alternative to RDS"
+      - "Archiving infrequently accessed database records to reduce storage costs"
+      - "Serving frequently accessed data from memory to reduce database load and latency"
+      - "Running batch database queries during off-peak hours"
+    correct: 2
+    explanation: "ElastiCache (Redis or Memcached) is an in-memory cache. The application checks the cache first; on a hit, it returns data in microseconds without touching the database. On a miss, it queries the database, stores the result in cache, and returns it. This is the standard pattern for reducing database load on read-heavy workloads."
+
+  - question: "What is the purpose of RDS Multi-AZ?"
+    options:
+      - "To distribute read traffic across multiple database instances"
+      - "To reduce storage costs by replicating data across cheaper Availability Zones"
+      - "To provide automatic failover to a standby instance in a different AZ if the primary fails"
+      - "To enable DynamoDB-like global replication across regions"
+    correct: 2
+    explanation: "Multi-AZ maintains a synchronous standby replica in a different Availability Zone. The standby receives no traffic during normal operation. If the primary fails, AWS promotes the standby and updates the DNS endpoint automatically. Multi-AZ is a high-availability feature -- it does not scale reads. For read scaling, use read replicas."
+
+  - question: "What is DynamoDB's fundamental trade-off compared to RDS?"
+    options:
+      - "DynamoDB requires more operational overhead than RDS because you manage the cluster"
+      - "DynamoDB requires you to design your data model around access patterns upfront; changing patterns later often requires table redesign"
+      - "DynamoDB can only store up to 10 GB of data before requiring a different service"
+      - "DynamoDB does not support strongly consistent reads under any circumstances"
+    correct: 1
+    explanation: "DynamoDB queries must target the partition key or a configured index. There is no flexible SQL WHERE clause. If you need a new access pattern later (query by a different field), you must add a Global Secondary Index or restructure the table. RDS is more flexible for evolving query needs but doesn't scale horizontally as easily."
+
+  - question: "What is the difference between a read replica and Multi-AZ in RDS?"
+    options:
+      - "Read replicas are for high availability; Multi-AZ is for read scalability"
+      - "Read replicas scale read traffic; Multi-AZ provides high availability via automatic failover -- they serve different purposes"
+      - "They are the same feature with different names"
+      - "Read replicas work only with DynamoDB; Multi-AZ works only with RDS"
+    correct: 1
+    explanation: "Read replicas and Multi-AZ are distinct features serving different purposes. Read replicas are copies of the primary that serve read queries, reducing load on the primary for read-heavy workloads. Multi-AZ maintains a standby for failover -- it handles no traffic under normal conditions. A production database often needs both."
