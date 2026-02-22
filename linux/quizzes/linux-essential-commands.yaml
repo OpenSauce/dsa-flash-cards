@@ -1,0 +1,56 @@
+title: "Essential Commands"
+lesson_slug: "linux-essential-commands"
+questions:
+  - question: "What is the difference between `find` and `grep`?"
+    options:
+      - "find is faster; grep is more accurate"
+      - "find locates files by filesystem metadata (name, size, date); grep searches file contents for patterns"
+      - "find works on directories; grep works only on regular files"
+      - "find is for text files; grep is for binary files"
+    correct: 1
+    explanation: "find traverses the filesystem looking for files matching criteria like name pattern, type, size, or modification date -- it operates on filesystem metadata. grep reads file contents and outputs lines matching a regular expression pattern. Use find to answer 'where is the file?'; use grep to answer 'which files contain this text?'"
+
+  - question: "What does `awk` do that `sed` does not?"
+    options:
+      - "awk edits files in place; sed only operates on streams"
+      - "awk processes input field by field (column-aware); sed operates on entire lines as text"
+      - "awk supports regular expressions; sed uses only literal string matching"
+      - "awk runs faster on large files; sed is for small files"
+    correct: 1
+    explanation: "awk automatically splits each line into fields (by whitespace or a specified delimiter), making it easy to extract, filter, and compute on specific columns. sed operates on lines as whole text strings, ideal for substitutions and deletions. Use awk when you need column 3, a sum, or a filtered row based on a field value. Use sed for find-and-replace or line deletion."
+
+  - question: "You want to see which mounted filesystem is nearly full. Which command do you use?"
+    options:
+      - "`du -sh /*` to check each directory"
+      - "`df -h` to show disk usage per mounted filesystem"
+      - "`free -h` to show filesystem and memory usage"
+      - "`ps aux` to show processes consuming disk I/O"
+    correct: 1
+    explanation: "df (disk free) shows available and used space per mounted filesystem -- it answers 'is any filesystem full?'. du (disk usage) shows how much space a specific directory or file tree uses -- it answers 'what is consuming the space?'. Use df first to identify the full filesystem, then du to find the large directories within it."
+
+  - question: "What does `grep -v 'DEBUG' app.log` do?"
+    options:
+      - "It matches only lines containing 'DEBUG' (verbose mode)"
+      - "It validates that every line matches the 'DEBUG' format"
+      - "It inverts the match -- outputs lines that do NOT contain 'DEBUG'"
+      - "It counts the number of lines matching 'DEBUG'"
+    correct: 2
+    explanation: "The -v flag inverts the match. grep -v outputs lines that do NOT match the pattern. This is useful for filtering out noise: `grep -v DEBUG app.log` shows everything except debug lines. Compare with -c (count matches) and -i (case-insensitive)."
+
+  - question: "When should you use `curl` instead of `wget`?"
+    options:
+      - "curl is for Linux; wget is for macOS"
+      - "curl when you need API testing, custom headers, or to use output in a pipe; wget when downloading files (especially large ones to resume)"
+      - "curl for HTTP; wget for FTP"
+      - "curl when root; wget when a regular user"
+    correct: 1
+    explanation: "curl is a better tool for API work: it supports arbitrary HTTP methods, custom headers, request bodies, and verbose mode for debugging. Its output goes to stdout by default, making it pipe-friendly. wget is optimized for downloading files: it handles redirects automatically, supports resuming interrupted downloads (-c), and mirrors entire sites. Both support HTTP and FTP."
+
+  - question: "You want to find the 5 largest files in /var/log. Which command sequence works?"
+    options:
+      - "`ls -la /var/log | sort | head -5`"
+      - "`df -h /var/log | head -5`"
+      - "`find /var/log -type f -printf '%s %p\\n' | sort -rn | head -5`"
+      - "`du -sh /var/log/* | head -5`"
+    correct: 2
+    explanation: "find with -printf '%s %p\\n' prints the size in bytes followed by the path. sort -rn sorts numerically in reverse (largest first). head -5 takes the top 5 results. ls -la | sort would sort alphabetically unless additional flags are used. du -sh shows directory totals, not individual files. df shows filesystem-level usage."

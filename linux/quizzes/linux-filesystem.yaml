@@ -1,0 +1,56 @@
+title: "The Linux Filesystem"
+lesson_slug: "linux-filesystem"
+questions:
+  - question: "In the Linux Filesystem Hierarchy Standard, what is the purpose of `/var`?"
+    options:
+      - "System-wide configuration files that admins edit"
+      - "Temporary files cleared on reboot"
+      - "Variable runtime data like logs, mail spools, and package caches that grows during operation"
+      - "Installed user programs and libraries"
+    correct: 2
+    explanation: "/var holds variable data that changes during normal operation: logs (/var/log/), mail spools, package caches, database files. /etc holds static configuration. /tmp holds throwaway files. /usr holds programs and libraries."
+
+  - question: "What is an inode?"
+    options:
+      - "A file's name in the directory listing"
+      - "A kernel data structure storing file metadata (size, ownership, permissions, data pointers) but not the filename"
+      - "A type of symbolic link used by the kernel"
+      - "The root directory entry for a mounted filesystem"
+    correct: 1
+    explanation: "An inode stores everything about a file except its name: size, UID/GID ownership, permission bits, timestamps, and pointers to data blocks. Filenames live in directory entries that map a name to an inode number. This is how hardlinks work -- multiple names pointing to the same inode."
+
+  - question: "What is the key difference between a symlink and a hardlink at the inode level?"
+    options:
+      - "A hardlink copies the file data; a symlink copies only the metadata"
+      - "A hardlink is a second directory entry pointing to the same inode; a symlink is a separate file (its own inode) whose content is a path to the target"
+      - "Hardlinks can cross filesystems; symlinks cannot"
+      - "A symlink stores the file data inline; a hardlink stores only a reference count"
+    correct: 1
+    explanation: "A hardlink is just another directory entry referencing the same inode -- the same data, same permissions, same inode number. A symlink has its own inode; its content is a text path to the target. If the target is deleted, the symlink becomes a dangling reference. If the hardlink's 'original' is deleted, the data persists through the other reference."
+
+  - question: "Why can hardlinks not cross filesystem boundaries?"
+    options:
+      - "It is a security restriction enforced by SELinux"
+      - "Inodes are numbered per-filesystem, so a directory entry on one filesystem cannot reference an inode on a different filesystem"
+      - "The kernel prevents it to stop infinite directory loops"
+      - "Cross-filesystem hardlinks require root privileges that most systems disable"
+    correct: 1
+    explanation: "Inode numbers are only unique within a single filesystem. A directory entry holds an inode number; if that number referred to a different filesystem, the kernel would have no way to locate the correct inode. Symlinks work across filesystems because they reference a path (a name), not an inode number."
+
+  - question: "What does `/proc` contain, and what is unique about it?"
+    options:
+      - "Process executable binaries installed system-wide"
+      - "A virtual filesystem -- not on disk -- where the kernel exposes process and system information as readable files"
+      - "The process log directory where the kernel writes crash reports"
+      - "Shared libraries used by all running processes"
+    correct: 1
+    explanation: "/proc is a virtual filesystem with no physical storage. The kernel synthesizes its contents on demand. /proc/<pid>/ contains information about each running process (open FDs, memory maps, status). /proc/cpuinfo, /proc/meminfo, and similar files expose system-wide kernel information. Tools like ps and top read from /proc."
+
+  - question: "What does 'everything is a file' mean in Linux?"
+    options:
+      - "All data must be stored in regular text files; binary formats are not supported"
+      - "Devices, processes, sockets, and pipes are exposed through the filesystem and accessible via the same read/write interface as regular files"
+      - "All configuration must be stored in files rather than databases or environment variables"
+      - "The kernel stores its own data structures as files in /sys"
+    correct: 1
+    explanation: "In Linux, hardware devices (/dev/sda), running processes (/proc/<pid>/), network sockets, and named pipes all appear as filesystem entries. This uniform interface lets tools like cat, grep, and awk work with hardware and processes using the same system calls (open, read, write) they use on regular files."

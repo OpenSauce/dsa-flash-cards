@@ -1,0 +1,56 @@
+title: "Users, Groups, and Permissions"
+lesson_slug: "linux-permissions"
+questions:
+  - question: "What does the octal permission `755` mean in rwx notation?"
+    options:
+      - "rwxrwxr-x -- owner and group have full access, others can read and execute"
+      - "rwxr-xr-x -- owner has full access, group and others can read and execute"
+      - "rw-r--r-- -- owner can read and write, group and others can only read"
+      - "rwx------ -- owner has full access, no one else has any access"
+    correct: 1
+    explanation: "755: user=7 (4+2+1=rwx), group=5 (4+0+1=r-x), other=5 (4+0+1=r-x). The owner can read, write, and execute. Group members and others can read and execute but not write. This is the standard permission for directories and executable scripts."
+
+  - question: "Why do directories need the execute bit to be useful?"
+    options:
+      - "The execute bit allows the directory to be run as a program"
+      - "Without the execute bit, you cannot list the directory's contents with ls"
+      - "The execute bit on a directory means 'permission to traverse' -- without it, you cannot cd into it or access files inside by path"
+      - "The execute bit is required for symbolic links inside the directory to work"
+    correct: 2
+    explanation: "For directories, execute means 'permission to traverse.' Without it, you cannot cd into the directory or open files inside it by path, even if you can see the directory name itself. The read bit on a directory lets you list its contents (ls); the execute bit lets you enter it and access its contents."
+
+  - question: "What is the difference between `chmod` and `chown`?"
+    options:
+      - "chmod changes the file's group; chown changes the file's owner"
+      - "chmod changes permission bits (rwx); chown changes the file's owner and/or group"
+      - "chmod applies only to files; chown applies only to directories"
+      - "chmod requires root; chown can be run by any user on their own files"
+    correct: 1
+    explanation: "chmod changes the permission bits (read/write/execute) on a file or directory. chown changes who owns the file (user and optionally group). A file's owner can chmod their own files. Only root can chown files to a different owner."
+
+  - question: "You create a new file with default permissions. Your umask is 022. What permissions does the file get?"
+    options:
+      - "777 (rwxrwxrwx)"
+      - "755 (rwxr-xr-x)"
+      - "644 (rw-r--r--)"
+      - "600 (rw-------)"
+    correct: 2
+    explanation: "Files start with a default of 666 (rw-rw-rw-). The umask subtracts bits: 666 minus 022 = 644 (rw-r--r--). The umask removes write from group and other. Directories start at 777, so 777 - 022 = 755."
+
+  - question: "What does the 'group' in the user/group/other permission model represent?"
+    options:
+      - "The superuser group that overrides all other permissions"
+      - "The file's assigned group -- any user who is a member of that group gets the group permission bits"
+      - "The group of processes running as the file's owner"
+      - "A set of users who share the same home directory"
+    correct: 1
+    explanation: "Every file is assigned to one group (a GID). Any user who is a member of that group (via /etc/group) gets the group permission bits applied when accessing the file. The kernel checks in order: if you are the owner, apply user bits; if you are in the group, apply group bits; otherwise apply other bits."
+
+  - question: "What command would change the owner of `/var/www/html` and all its contents to the user `www-data` with group `www-data`?"
+    options:
+      - "`chmod -R www-data:www-data /var/www/html`"
+      - "`chgrp -R www-data /var/www/html && chown -R www-data /var/www/html`"
+      - "`chown -R www-data:www-data /var/www/html`"
+      - "`usermod -d /var/www/html www-data`"
+    correct: 2
+    explanation: "chown accepts user:group syntax to change both owner and group in one command. The -R flag applies the change recursively to all files and directories under /var/www/html. chmod changes permissions, not ownership. chgrp changes only the group."
