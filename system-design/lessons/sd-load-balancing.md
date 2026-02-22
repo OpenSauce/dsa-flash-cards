@@ -1,7 +1,8 @@
 ---
 title: "Load Balancing"
-order: 1
 summary: "How load balancers distribute traffic, the major algorithms and their trade-offs, L4 vs L7 operation, health checks, and session affinity."
+reading_time_minutes: 5
+order: 2
 ---
 
 ## Why This Matters

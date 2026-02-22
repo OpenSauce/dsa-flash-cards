@@ -1,0 +1,56 @@
+title: "Rate Limiting and Throttling"
+lesson_slug: "sd-rate-limiting"
+questions:
+  - question: "What is the key difference between the token bucket and leaky bucket algorithms?"
+    options:
+      - "Token bucket is for IP-based limiting; leaky bucket is for user-based limiting"
+      - "Token bucket allows bursting up to bucket capacity; leaky bucket produces a constant output rate regardless of input"
+      - "Token bucket is more complex to implement; leaky bucket is simpler"
+      - "Leaky bucket uses Redis; token bucket uses in-memory counters"
+    correct: 1
+    explanation: "Token bucket: requests consume tokens that refill at a fixed rate. A full bucket means a burst of requests is allowed immediately. After the burst, the rate is throttled to the refill rate. Leaky bucket: requests enter a queue and are processed at a fixed output rate, smoothing out bursts. Use token bucket to allow short bursts; use leaky bucket when downstream systems need a constant input rate."
+
+  - question: "Where should rate limiting be implemented for maximum effectiveness?"
+    options:
+      - "Only at the database layer, closest to the resource being protected"
+      - "Only in the application code"
+      - "At the API gateway for global protection, plus application-layer limits for per-feature control"
+      - "Only at the client side, to reduce wasted requests"
+    correct: 2
+    explanation: "API gateway rate limiting enforces limits before requests reach application servers, with global visibility across all instances. Application-layer limits enable fine-grained per-endpoint rules (different limits for login vs. search). Client-side throttling helps well-behaved clients but cannot be trusted for security. A defense-in-depth approach uses both gateway and application layers."
+
+  - question: "What HTTP status code is returned when a request is rate limited, and what header helps clients retry correctly?"
+    options:
+      - "503 Service Unavailable with a Retry-After header"
+      - "429 Too Many Requests with a Retry-After header"
+      - "400 Bad Request with a Rate-Limit header"
+      - "403 Forbidden with a Quota-Exceeded header"
+    correct: 1
+    explanation: "HTTP 429 Too Many Requests is the standard code for rate limiting. The Retry-After header tells the client how many seconds to wait before retrying. Without it, clients immediately retry, generating more rejected requests. Well-behaved SDKs read Retry-After and implement exponential backoff. Additional headers like X-RateLimit-Remaining and X-RateLimit-Reset help clients self-throttle proactively."
+
+  - question: "Why does distributed rate limiting require shared state, such as Redis?"
+    options:
+      - "Because Redis is faster than in-memory counters"
+      - "Because each server only sees its fraction of total traffic; without shared state, the global limit is not enforced"
+      - "Because rate limit rules are stored in Redis by convention"
+      - "Because Redis supports the token bucket algorithm natively"
+    correct: 1
+    explanation: "With 10 application servers and a limit of 100 requests/minute, each server's in-memory counter sees only ~10% of traffic. A user can hit each server 100 times and exceed the global limit 10x. Redis provides a shared atomic counter: `INCR user:123:window` is atomic across all servers. All rate-limit checks go through the same Redis key, enforcing the global limit correctly."
+
+  - question: "What guarantee does the leaky bucket algorithm provide that token bucket does not?"
+    options:
+      - "Zero request loss under any load"
+      - "A constant, smooth output rate regardless of input burst size"
+      - "Fairer distribution across users"
+      - "Lower implementation complexity"
+    correct: 1
+    explanation: "Leaky bucket: requests queue up and are processed at a fixed rate -- like water leaking at a steady drip. No matter how large a burst arrives, the output rate is constant. This protects downstream services that cannot handle spikes. Token bucket allows bursts to pass through (if the bucket is full), which can overwhelm a downstream service that expects steady input."
+
+  - question: "When is per-user rate limiting preferable to per-IP rate limiting?"
+    options:
+      - "For public APIs that do not require authentication"
+      - "For protecting login and signup endpoints"
+      - "For authenticated API endpoints where each user's quota should be enforced independently"
+      - "When users share a corporate network and would all share the same IP limit"
+    correct: 2
+    explanation: "Per-user limits apply after authentication, tying the quota to the authenticated identity. This is fair and precise for API billing and abuse prevention. Per-IP limits work for unauthenticated endpoints (login, signup) but break in corporate networks where thousands of users share one IP -- one abusive user blocks everyone. Per-user limits cannot protect unauthenticated endpoints."

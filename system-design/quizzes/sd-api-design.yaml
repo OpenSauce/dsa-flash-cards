@@ -1,0 +1,56 @@
+title: "API Design and Communication Patterns"
+lesson_slug: "sd-api-design"
+questions:
+  - question: "When should you choose GraphQL over REST?"
+    options:
+      - "When the API must support simple CRUD operations"
+      - "When multiple clients (mobile, web, third-party) have varied data needs and over/under-fetching is a real problem"
+      - "When low latency is the top priority"
+      - "When the API will be public and consumed by external developers"
+    correct: 1
+    explanation: "GraphQL eliminates over-fetching (getting fields you do not need) and under-fetching (needing multiple requests to get all required data). It shines when clients with different needs (mobile app wants 3 fields, web app wants 15) consume the same API. REST is simpler for uniform CRUD APIs and developer-facing public APIs where predictability matters more."
+
+  - question: "What does idempotency mean for an API operation?"
+    options:
+      - "The operation always returns the same response body"
+      - "The operation can be called multiple times without changing the result beyond the first call"
+      - "The operation is safe to call without authentication"
+      - "The operation does not modify any data"
+    correct: 1
+    explanation: "Idempotency: calling an operation N times produces the same state as calling it once. GET, PUT, and DELETE are idempotent by convention. POST is not. For non-idempotent operations that must handle retries (e.g., payment processing), use an idempotency key: the client sends a unique ID per logical operation, and the server deduplicates based on it."
+
+  - question: "What HTTP status code should a successful POST request that creates a new resource return?"
+    options:
+      - "200 OK"
+      - "201 Created"
+      - "202 Accepted"
+      - "204 No Content"
+    correct: 1
+    explanation: "201 Created is the correct response for a POST that creates a resource. It should include a Location header pointing to the new resource's URL (e.g., Location: /users/456). 200 OK is for successful GETs or updates. 202 Accepted means the request was received but processing has not finished (async). 204 No Content is for successful DELETEs with no body."
+
+  - question: "When is gRPC preferred over REST for service-to-service communication?"
+    options:
+      - "When the API must be accessible directly from web browsers"
+      - "When the API must be human-readable for debugging"
+      - "When performance and type safety matter for internal services, and payload size reduction is valuable"
+      - "When the services use different programming languages"
+    correct: 2
+    explanation: "gRPC uses Protocol Buffers (binary serialization, 3-10x smaller than JSON) over HTTP/2 (multiplexed, persistent connections). This makes it significantly faster than REST for internal service communication. Strongly typed interfaces enforce contracts and enable code generation in multiple languages. It is not ideal for public APIs because browser support requires a proxy layer."
+
+  - question: "What is the trade-off between cursor-based and offset-based pagination?"
+    options:
+      - "Cursor-based is slower; offset-based is faster for all use cases"
+      - "Cursor-based is consistent for real-time data and efficient on large datasets; offset-based allows jumping to any page but has boundary artifacts and is slow on large offsets"
+      - "Offset-based is better for mobile clients; cursor-based is better for web clients"
+      - "Cursor-based requires a sorted dataset; offset-based works with any ordering"
+    correct: 1
+    explanation: "Cursor-based pagination: query uses WHERE id > cursor LIMIT N -- efficient regardless of how deep you are in the dataset. No boundary artifacts when items are inserted/deleted. Cannot jump to page 5 directly. Offset-based: OFFSET 10000 LIMIT 20 forces the database to scan and discard 10,000 rows -- slow on large offsets. Items shift when data changes, causing duplicates or skips."
+
+  - question: "What is a webhook, and what distinguishes it from polling?"
+    options:
+      - "A webhook is a type of REST API endpoint; polling is a GraphQL pattern"
+      - "A webhook is a callback URL the server calls when an event occurs; polling is the client repeatedly requesting for updates"
+      - "A webhook uses WebSockets; polling uses HTTP"
+      - "A webhook is for real-time data; polling is for historical data"
+    correct: 1
+    explanation: "Polling: the client repeatedly asks the server 'anything new?' -- most requests return nothing. Wasteful and high latency. Webhooks: the client registers a URL; the server calls that URL when an event occurs. Zero wasted requests. The client receives data only when something happens. Trade-off: the client's server must be publicly reachable, and the server must handle delivery failures with retries."

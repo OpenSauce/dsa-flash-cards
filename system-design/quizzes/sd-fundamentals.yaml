@@ -1,0 +1,56 @@
+title: "System Design Fundamentals"
+lesson_slug: "sd-fundamentals"
+questions:
+  - question: "What should be your first action when given a system design prompt in an interview?"
+    options:
+      - "Start drawing the high-level architecture immediately"
+      - "Clarify functional and non-functional requirements with the interviewer"
+      - "Choose the database technology"
+      - "Estimate the number of servers needed"
+    correct: 1
+    explanation: "Clarifying requirements first is critical. Interviewers deliberately leave prompts vague to see if you jump to solutions before understanding the problem. Functional requirements define what the system does; non-functional requirements (scale, latency, availability) determine which trade-offs to make."
+
+  - question: "What does back-of-the-envelope estimation help you determine before designing?"
+    options:
+      - "The exact number of database rows"
+      - "Which programming language to use"
+      - "The order of magnitude of load -- whether you need caching, sharding, or CDN"
+      - "The exact cloud provider to recommend"
+    correct: 2
+    explanation: "Estimation tells you whether you are building for thousands or billions of requests. That difference determines whether a single server suffices or you need horizontal scaling, caching layers, and CDN. Exact numbers do not matter -- order of magnitude does."
+
+  - question: "A system has 100 million daily active users, each making 10 requests per day. What is the approximate average QPS?"
+    options:
+      - "~120 QPS"
+      - "~1,200 QPS"
+      - "~12,000 QPS"
+      - "~120,000 QPS"
+    correct: 2
+    explanation: "100M users × 10 requests/day = 1B requests/day. Divided by 86,400 seconds/day ≈ 11,574 QPS, roughly 12,000 QPS at average. Peak is typically 3x average, so ~36,000 QPS at peak."
+
+  - question: "What is the difference between functional and non-functional requirements?"
+    options:
+      - "Functional requirements cover the database schema; non-functional cover the API"
+      - "Functional requirements define what the system does; non-functional define how it must behave (scale, latency, availability)"
+      - "Functional requirements are mandatory; non-functional are optional"
+      - "Functional requirements come from engineers; non-functional come from product managers"
+    correct: 1
+    explanation: "Functional requirements describe the user-facing behavior: what actions are possible, what data the system stores, what it returns. Non-functional requirements describe constraints: how fast, how reliable, how consistent. Non-functional requirements drive architectural decisions."
+
+  - question: "When should you introduce a message queue into a design rather than a direct synchronous call?"
+    options:
+      - "Whenever two services need to communicate"
+      - "Only when the downstream service uses Kafka"
+      - "When the caller does not need an immediate result, or when the operation takes too long to block a user request"
+      - "Only when there are more than 1,000 requests per second"
+    correct: 2
+    explanation: "Message queues are for async workflows: sending emails, resizing images, generating reports -- tasks where the user does not wait for completion. Sync calls are fine when the result is needed immediately. Adding a queue when a sync call suffices adds unnecessary complexity."
+
+  - question: "In what order should you draw components in a high-level architecture diagram?"
+    options:
+      - "Database first, then work backward to the client"
+      - "Left to right, starting from the client and tracing a request through the system"
+      - "The most complex component first"
+      - "Alphabetical order by component name"
+    correct: 1
+    explanation: "Drawing left to right from client to backend mirrors how a request flows through the system. This makes the diagram readable and ensures you do not skip components -- a request naturally passes through the load balancer before the app server before the cache before the database."

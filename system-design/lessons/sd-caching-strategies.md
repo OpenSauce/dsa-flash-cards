@@ -1,7 +1,8 @@
 ---
 title: "Caching Strategies"
-order: 2
-summary: "Write-through, write-back, and write-around caching patterns, eviction policies (LRU, LFU, FIFO), and the hard problem of cache invalidation."
+summary: "Write-through, write-back, and write-around caching patterns, read strategies, eviction policies (LRU, LFU, FIFO), and cache invalidation."
+reading_time_minutes: 5
+order: 3
 ---
 
 ## Why This Matters
@@ -130,6 +131,7 @@ Keeping cached data consistent with the source of truth is famously difficult. P
 ## Key Takeaways
 
 - Write-through guarantees consistency at the cost of write latency. Write-back optimizes write throughput but risks data loss. Write-around avoids cache pollution from write-heavy workloads.
+- Cache-aside puts caching logic in the application. Read-through puts it in the cache layer.
 - LRU is the default eviction policy -- know how to implement it with a hash map and a doubly linked list for O(1) operations.
 - Cache invalidation is hard because of race conditions, distributed delays, and thundering herds. TTL is the simplest mitigation; event-driven invalidation is the most precise.
 - In system design interviews, always state which caching strategy you are using and why. "We use a write-through cache with LRU eviction and a 5-minute TTL" is a strong signal that you understand the trade-offs.
