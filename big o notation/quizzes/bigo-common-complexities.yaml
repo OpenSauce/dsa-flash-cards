@@ -1,0 +1,56 @@
+title: "Common Complexity Classes"
+lesson_slug: "bigo-common-complexities"
+questions:
+  - question: "Which ordering correctly ranks these complexity classes from fastest to slowest growth?"
+    options:
+      - "O(1) < O(log n) < O(n) < O(n log n) < O(n²) < O(2ⁿ) < O(n!)"
+      - "O(1) < O(n) < O(log n) < O(n²) < O(n log n) < O(2ⁿ) < O(n!)"
+      - "O(log n) < O(1) < O(n) < O(n log n) < O(n²) < O(n!) < O(2ⁿ)"
+      - "O(1) < O(log n) < O(n log n) < O(n) < O(n²) < O(2ⁿ) < O(n!)"
+    correct: 0
+    explanation: "The standard ordering from best to worst: constant < logarithmic < linear < linearithmic < quadratic < exponential < factorial. A useful mnemonic: 1, log, n, n log n, n², 2ⁿ, n!"
+
+  - question: "Binary search on a sorted array has what time complexity, and why?"
+    options:
+      - "O(n) — it must check every element in the worst case"
+      - "O(n²) — it compares all pairs of elements"
+      - "O(log n) — each step halves the search space"
+      - "O(1) — it accesses the middle element directly"
+    correct: 2
+    explanation: "Binary search eliminates half the remaining candidates each step. Starting from n elements, after k steps only n/2ᵏ remain. When n/2ᵏ = 1, we have found the answer. Solving for k: k = log₂(n). Each step is O(1) work, so total is O(log n)."
+
+  - question: "What complexity class is the lower bound for comparison-based sorting?"
+    options:
+      - "O(n)"
+      - "O(n log n)"
+      - "O(n²)"
+      - "O(log n)"
+    correct: 1
+    explanation: "Any sorting algorithm that determines order only by comparing elements must perform at least Ω(n log n) comparisons in the worst case. This is provable via decision tree analysis: sorting n elements requires distinguishing between n! orderings, and a binary decision tree of depth d can distinguish at most 2ᵈ outcomes, so d ≥ log₂(n!) = Θ(n log n)."
+
+  - question: "An algorithm generates all subsets of an n-element set. What is its complexity?"
+    options:
+      - "O(n²)"
+      - "O(n log n)"
+      - "O(n!)"
+      - "O(2ⁿ)"
+    correct: 3
+    explanation: "A set with n elements has exactly 2ⁿ subsets (each element is either in or out). Generating all of them requires at least O(2ⁿ) work. This is exponential — feasible only for very small n (n ≤ 20–25 in practice)."
+
+  - question: "Which operation on a hash map has O(1) average-case complexity?"
+    options:
+      - "Search by value"
+      - "Find the minimum key"
+      - "Lookup by key"
+      - "Iterate over all entries in sorted order"
+    correct: 2
+    explanation: "Lookup by key is O(1) average case because the hash function maps the key directly to a bucket, giving immediate access without scanning. Search by value requires scanning all entries: O(n). Finding the minimum and sorted iteration require either O(n) scan or an additional sorted structure."
+
+  - question: "What makes O(log n) algorithms particularly efficient at scale?"
+    options:
+      - "They use constant memory regardless of n"
+      - "Doubling the input size adds only one extra step"
+      - "They never need to compare elements"
+      - "They always run faster than O(1) algorithms"
+    correct: 1
+    explanation: "If an algorithm runs in k steps for input n, it runs in k+1 steps for input 2n. At n = 10^6, a binary search takes about 20 comparisons. At n = 10^12, it takes about 40 comparisons. This near-flat growth is what makes logarithmic algorithms practical for massive datasets."
