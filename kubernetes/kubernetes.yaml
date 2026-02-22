@@ -208,7 +208,8 @@
 
 - title: "Controller Types"
   difficulty: "easy"
-  tags: ["kubernetes", "controllers", "deployments", "statefulsets", "daemonsets"]
+  tags:
+    ["kubernetes", "controllers", "deployments", "statefulsets", "daemonsets"]
   lesson: k8s-pods-and-workloads
   Front: |
     When should you use a Deployment vs StatefulSet vs DaemonSet vs Job?
