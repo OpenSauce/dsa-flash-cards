@@ -1,0 +1,56 @@
+title: "The DP Problem-Solving Framework"
+lesson_slug: "dp-problem-solving-framework"
+questions:
+  - question: "What is the first step when approaching a DP problem using the 5-step framework?"
+    options:
+      - "Write the base cases"
+      - "Define the state -- what variables uniquely describe a subproblem"
+      - "Determine the iteration order"
+      - "Choose between memoization and tabulation"
+    correct: 1
+    explanation: "State definition is the first step. The state determines what you cache (or what table dimensions you allocate). All other steps depend on it -- you can't write a recurrence until you know what the state is."
+
+  - question: "What does 'state' mean in a DP problem?"
+    options:
+      - "The current value stored in the DP table"
+      - "The set of all subproblems that need to be solved"
+      - "A minimal set of variables that uniquely describes a subproblem"
+      - "The iteration direction (left-to-right or right-to-left)"
+    correct: 2
+    explanation: "A state is the minimum information needed to solve a subproblem. Extra variables inflate the table; missing variables make the recurrence wrong. For climbing stairs, the state is just the current step number -- nothing else is needed."
+
+  - question: "How do you convert a memoized (top-down) DP solution to a tabulation (bottom-up) solution?"
+    options:
+      - "Replace the hash map with a sorted array"
+      - "Replace the recursion with a loop, iterating in reverse topological order (smallest subproblems first), using the same recurrence"
+      - "Solve the problem backwards from the answer to the base case"
+      - "Replace recursive calls with a stack data structure"
+    correct: 1
+    explanation: "The recurrence stays identical. The key change is iteration order: instead of recursing down to base cases, iterate upward from base cases so each subproblem is solved before it's needed. The cache lookup becomes a direct table access."
+
+  - question: "When can you reduce the space of a 1D DP solution from O(n) to O(1)?"
+    options:
+      - "Whenever the problem is a counting problem rather than an optimization problem"
+      - "Only when the recurrence involves a single previous element"
+      - "When dp[i] depends on only a constant number of previous entries"
+      - "Whenever the answer is the value at dp[n], not the maximum over all dp[i]"
+    correct: 2
+    explanation: "If dp[i] depends on dp[i-1] and dp[i-2], you only need two variables -- no need to store the whole array. The rolling variable optimization applies whenever the window of needed previous entries is bounded by a constant."
+
+  - question: "Fibonacci requires DP. Binary search does not. Why?"
+    options:
+      - "Fibonacci has a larger input size"
+      - "Binary search always finds the answer on the first try"
+      - "Fibonacci has overlapping subproblems (fib(5) calls fib(4) and fib(3), which both call fib(2)); binary search has non-overlapping subproblems -- each recursive call operates on a disjoint subarray"
+      - "Binary search is always O(log n), so caching would be slower"
+    correct: 2
+    explanation: "DP applies only when subproblems overlap. Fibonacci's recursion tree has exponential branches with repeated sub-calls (fib(2), fib(3), etc. called many times). Binary search divides the array into halves that never overlap -- each subproblem is solved exactly once with no benefit from caching."
+
+  - question: "What is the purpose of identifying base cases before coding the recurrence?"
+    options:
+      - "Base cases determine the time complexity of the algorithm"
+      - "Base cases anchor the computation -- they are subproblems small enough to answer directly, preventing infinite recursion and providing the foundation values all other results build on"
+      - "Base cases only matter for memoization, not tabulation"
+      - "Base cases optimize space by reducing the table size"
+    correct: 1
+    explanation: "Without correct base cases, the recurrence has no starting point. A wrong base case propagates incorrect values through the entire table. Always ask: what is the answer when the state is at its minimum size (e.g., empty string, zero capacity, step 0)?"

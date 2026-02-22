@@ -1,0 +1,736 @@
+# =============================================================================
+# Lesson 1: The DP Problem-Solving Framework (7 cards)
+# =============================================================================
+
+- title: "DP Framework Step 1 -- Define the State"
+  difficulty: "easy"
+  tags: ["dynamic programming", "framework", "state"]
+  lesson: dp-problem-solving-framework
+  Front: |
+    What is the first step of the DP problem-solving framework, and what makes a good state definition?
+  Back: |
+    **Define the state:** a minimal set of variables that uniquely describes a subproblem.
+
+    A good state includes exactly what you need to make the next decision -- no more. Extra variables inflate the table; missing variables make the recurrence wrong.
+
+    For climbing stairs: `dp[i]` = number of ways to reach step i. The only thing that matters is which step you're on.
+
+- title: "DP Framework Step 2 -- Write the Recurrence"
+  difficulty: "easy"
+  tags: ["dynamic programming", "framework", "recurrence"]
+  lesson: dp-problem-solving-framework
+  Front: |
+    What is a recurrence relation in DP, and how do you derive it?
+  Back: |
+    A **recurrence** expresses the current state in terms of smaller states. It encodes the decision made at each step.
+
+    Derive it by asking: "What were the last choices that led to this state, and what did each cost?"
+
+    For climbing stairs: you arrived from step i-1 (one step) or step i-2 (two steps), so `dp[i] = dp[i-1] + dp[i-2]`.
+
+- title: "DP Framework Step 3 -- Base Cases"
+  difficulty: "easy"
+  tags: ["dynamic programming", "framework", "base cases"]
+  lesson: dp-problem-solving-framework
+  Front: |
+    What are base cases in DP, and what is a common bug related to them?
+  Back: |
+    **Base cases** are states small enough to answer directly, without the recurrence. They anchor the computation.
+
+    Common bug: setting a base case to the wrong value. A wrong base case propagates incorrect values through the entire table. Always verify: "What is the answer when the state is at its minimum size?"
+
+    For climbing stairs: `dp[0] = 1` (one way to be at the bottom), `dp[1] = 1`.
+
+- title: "DP Framework Step 4 -- Iteration Order"
+  difficulty: "medium"
+  tags: ["dynamic programming", "framework", "tabulation", "iteration order"]
+  lesson: dp-problem-solving-framework
+  Front: |
+    How do you determine the correct iteration order for a tabulation (bottom-up) DP solution?
+  Back: |
+    Fill the table so every dependency is computed before it's needed. Follow the topological order of the dependency graph.
+
+    For 1D DP where `dp[i]` depends on `dp[i-1]` and `dp[i-2]`: iterate i from 2 to n.
+
+    For 2D DP where `dp[i][j]` depends on `dp[i-1][j]`, `dp[i][j-1]`, and `dp[i-1][j-1]`: iterate i then j, both left to right.
+
+- title: "Memoization to Tabulation Conversion"
+  difficulty: "medium"
+  tags: ["dynamic programming", "memoization", "tabulation", "conversion"]
+  lesson: dp-problem-solving-framework
+  Front: |
+    What are the mechanical steps to convert a memoized (top-down) DP to a tabulated (bottom-up) one?
+  Back: |
+    1. Replace the recursive function with a loop.
+    2. Iterate in topological order (smallest subproblems first).
+    3. Replace cache lookups with direct table accesses.
+    4. Keep the recurrence identical.
+
+    The iteration direction is the main work -- it must mirror the dependency order that recursion handled automatically.
+
+- title: "Space Optimization -- Rolling Variables"
+  difficulty: "medium"
+  tags: ["dynamic programming", "space optimization", "rolling array"]
+  lesson: dp-problem-solving-framework
+  Front: |
+    When can you reduce a 1D DP from O(n) to O(1) space, and what is the technique called?
+  Back: |
+    When `dp[i]` depends on only a constant number of previous entries, you can discard earlier values.
+
+    **Rolling variables:** keep only the entries you still need.
+
+    If `dp[i]` needs `dp[i-1]` and `dp[i-2]`, use two variables (`prev1`, `prev2`). Before updating, save what the next iteration needs.
+
+    Climbing stairs reduces from O(n) to O(1) this way.
+
+- title: "When NOT to Use DP"
+  difficulty: "medium"
+  tags: ["dynamic programming", "greedy", "divide and conquer"]
+  lesson: dp-problem-solving-framework
+  Front: |
+    What are the two main situations where dynamic programming does NOT apply?
+  Back: |
+    **No overlapping subproblems:** divide-and-conquer algorithms (merge sort, binary search) split the problem into *disjoint* subproblems -- caching would waste memory with zero benefit.
+
+    **Greedy works:** if a locally optimal choice is always globally optimal (interval scheduling, Dijkstra's for non-negative weights), greedy is simpler and faster -- no need to explore all options.
+
+    Draw the recursion tree: if you see repeated nodes, DP applies. If every node is unique, it doesn't.
+
+# =============================================================================
+# Lesson 2: Linear DP and Counting (9 cards)
+# =============================================================================
+
+- title: "Climbing Stairs Recurrence"
+  difficulty: "easy"
+  tags: ["dynamic programming", "linear", "counting", "fibonacci"]
+  lesson: dp-linear-and-counting
+  Front: |
+    **Climbing Stairs** -- What is the recurrence and its base cases? (n stairs, 1 or 2 steps at a time)
+  Back: |
+    `dp[i] = dp[i-1] + dp[i-2]`
+
+    Ways to reach step i = ways from step i-1 (one step) + ways from step i-2 (two steps). This is Fibonacci.
+
+    **Base cases:** `dp[0] = 1`, `dp[1] = 1`
+    **Space optimization:** two rolling variables, O(1) space.
+
+- title: "Kadane's Algorithm Recurrence"
+  difficulty: "medium"
+  tags: ["dynamic programming", "kadane", "subarray", "linear"]
+  lesson: dp-linear-and-counting
+  Front: |
+    What is Kadane's recurrence for maximum subarray, and what does each term represent?
+  Back: |
+    `dp[i] = max(arr[i], dp[i-1] + arr[i])`
+
+    - `arr[i]`: start a new subarray at this element
+    - `dp[i-1] + arr[i]`: extend the subarray ending at i-1
+
+    **Answer:** `max(dp[0..n-1])` -- the best subarray ending at any index.
+    **Time:** O(n), **Space:** O(1) (only `curr_max` and `global_max` needed).
+
+- title: "Extend-or-Restart Decision"
+  difficulty: "medium"
+  tags: ["dynamic programming", "kadane", "subarray", "pattern"]
+  lesson: dp-linear-and-counting
+  Front: |
+    In Kadane's algorithm, when should you restart the subarray rather than extend it?
+  Back: |
+    Restart when `dp[i-1] < 0` -- when the previous running sum is negative.
+
+    Adding a negative prefix to the current element only makes the subarray sum smaller. Starting fresh at `arr[i]` is always better than `arr[i] + (negative number)`.
+
+    Even if `arr[i]` itself is negative, restarting is correct -- the best subarray ending at i is `[arr[i]]`.
+
+- title: "House Robber Recurrence"
+  difficulty: "medium"
+  tags: ["dynamic programming", "house robber", "skip-or-take", "linear"]
+  lesson: dp-linear-and-counting
+  Front: |
+    **House Robber** -- What is the recurrence? (maximize value; cannot rob two adjacent houses)
+  Back: |
+    `dp[i] = max(dp[i-1], dp[i-2] + nums[i])`
+
+    - `dp[i-1]`: skip house i, keep best from i-1
+    - `dp[i-2] + nums[i]`: rob house i, add to best from i-2 (i-1 must be skipped)
+
+    **Base cases:** `dp[0] = nums[0]`, `dp[1] = max(nums[0], nums[1])`
+    **Space:** O(1) with two variables.
+
+- title: "Skip-or-Take Pattern"
+  difficulty: "easy"
+  tags:
+    ["dynamic programming", "house robber", "pattern", "adjacency constraint"]
+  lesson: dp-linear-and-counting
+  Front: |
+    What is the "skip-or-take" DP pattern, and which classic problem exemplifies it?
+  Back: |
+    **Skip-or-take:** at each element, choose to skip it (no change to running result) or take it (gain its value, but the previous element is now off-limits).
+
+    `dp[i] = max(dp[i-1], dp[i-2] + value[i])`
+
+    **Classic example:** House Robber -- the adjacency constraint forces a binary choice with a one-step penalty for taking.
+
+    Same recurrence structure as climbing stairs, but maximizing value instead of counting ways.
+
+- title: "Counting DP vs Optimization DP"
+  difficulty: "easy"
+  tags: ["dynamic programming", "counting", "optimization"]
+  lesson: dp-linear-and-counting
+  Front: |
+    How does a counting DP differ from an optimization DP in combining subproblem answers and setting base cases?
+  Back: |
+    | | Optimization | Counting |
+    |---|---|---|
+    | Combines with | `max()` / `min()` | Addition |
+    | "Zero cost" base | 0 | 1 |
+    | "Unreachable" base | infinity | 0 |
+
+    **Example:** Coin change minimum coins (optimization) vs number of combinations (counting) -- same coin denominations, completely different recurrences.
+
+- title: "Decode Ways Recurrence"
+  difficulty: "medium"
+  tags: ["dynamic programming", "counting", "string", "decode ways"]
+  lesson: dp-linear-and-counting
+  Front: |
+    What is the recurrence for the Decode Ways problem? (count decodings of a digit string, 1=A ... 26=Z)
+  Back: |
+    `dp[i]` = number of ways to decode the first i characters.
+
+    ```
+    dp[i] = 0
+    if digit[i-1] != '0':
+        dp[i] += dp[i-1]              # decode one digit
+    if 10 <= int(digit[i-2:i]) <= 26:
+        dp[i] += dp[i-2]              # decode two digits
+    ```
+
+    **Base cases:** `dp[0] = 1`, `dp[1] = 1` if first digit non-zero.
+
+    '0' alone is invalid -- it can only appear as the second digit of 10 or 20.
+
+- title: "Rolling Variable Space Optimization"
+  difficulty: "medium"
+  tags: ["dynamic programming", "space optimization", "rolling variables", "1D"]
+  lesson: dp-linear-and-counting
+  Front: |
+    What determines how many rolling variables you need to reduce a 1D DP from O(n) to O(1) space?
+  Back: |
+    The number of rolling variables equals the number of previous entries `dp[i]` depends on.
+
+    - Depends on `dp[i-1]` only: **1 variable**
+    - Depends on `dp[i-1]` and `dp[i-2]`: **2 variables** (climbing stairs, house robber)
+    - Depends on `dp[i-1]`, `dp[i-2]`, `dp[i-3]`: **3 variables** (e.g., climb 1/2/3 steps)
+
+    Before updating, save the values the next iteration will need.
+
+- title: "Kadane's Time and Space Complexity"
+  difficulty: "easy"
+  tags: ["dynamic programming", "kadane", "complexity"]
+  lesson: dp-linear-and-counting
+  Front: |
+    What are the time and space complexities of Kadane's algorithm, and why is O(1) space achievable?
+  Back: |
+    **Time:** O(n) -- single pass through the array.
+    **Space:** O(1) -- only two variables needed: `curr_max` (best subarray ending here) and `global_max` (best seen so far).
+
+    `dp[i]` depends only on `dp[i-1]`, so the full array is never needed. Kadane's is one of the few DP problems that is naturally O(n) time and O(1) space without any optimization step.
+
+# =============================================================================
+# Lesson 3: Knapsack and Subset Problems (9 cards)
+# =============================================================================
+
+- title: "0/1 Knapsack Recurrence"
+  difficulty: "medium"
+  tags: ["dynamic programming", "knapsack", "0/1 knapsack"]
+  lesson: dp-knapsack-and-subset
+  Front: |
+    What is the 0/1 knapsack recurrence, and what does each term represent?
+  Back: |
+    `dp[i][w] = max(dp[i-1][w], dp[i-1][w - weight[i]] + value[i])`
+
+    - `dp[i-1][w]`: skip item i -- value unchanged, capacity unchanged
+    - `dp[i-1][w - weight[i]] + value[i]`: take item i -- add its value, reduce remaining capacity
+
+    The "0/1" means each item is either taken once or not at all.
+    **Base case:** `dp[0][w] = 0` for all w.
+    **Time:** O(n * W), **Space:** O(n * W), reducible to O(W).
+
+- title: "0/1 Knapsack Right-to-Left Trick"
+  difficulty: "medium"
+  tags:
+    ["dynamic programming", "knapsack", "space optimization", "iteration order"]
+  lesson: dp-knapsack-and-subset
+  Front: |
+    In the 1D (space-optimized) 0/1 knapsack, why must capacity be iterated right-to-left?
+  Back: |
+    When computing `dp[w]`, you need `dp[w - weight[i]]` from the **previous pass** (before item i was considered).
+
+    Iterating right-to-left ensures that when you update `dp[w]`, the value at `dp[w - weight[i]]` hasn't been updated yet in this pass -- it still reflects the "without item i" state.
+
+    Left-to-right would let `dp[w - weight[i]]` already include item i, effectively allowing item i to be used multiple times (turning 0/1 into unbounded knapsack).
+
+- title: "Unbounded vs 0/1 Knapsack -- Iteration Direction"
+  difficulty: "medium"
+  tags:
+    ["dynamic programming", "knapsack", "unbounded knapsack", "iteration order"]
+  lesson: dp-knapsack-and-subset
+  Front: |
+    What distinguishes unbounded knapsack from 0/1 knapsack in the 1D space-optimized implementation?
+  Back: |
+    | | 0/1 Knapsack | Unbounded Knapsack |
+    |---|---|---|
+    | Each item used | At most once | Unlimited times |
+    | Capacity iteration | Right-to-left | Left-to-right |
+
+    Left-to-right allows `dp[w - weight[i]]` to already reflect item i being included -- enabling it to be added again. Right-to-left prevents that by using only pre-update values.
+
+- title: "Coin Change -- Minimum Coins"
+  difficulty: "medium"
+  tags: ["dynamic programming", "coin change", "unbounded knapsack"]
+  lesson: dp-knapsack-and-subset
+  Front: |
+    What is the recurrence for coin change (minimum coins), and how is it related to unbounded knapsack?
+  Back: |
+    `dp[a] = min(dp[a - coin] + 1)` for each coin denomination.
+
+    **Base case:** `dp[0] = 0`, `dp[1..amount] = infinity`.
+
+    This is **unbounded knapsack** -- each coin can be used unlimited times. Left-to-right iteration per coin.
+
+    **Time:** O(amount * coins), **Space:** O(amount).
+
+- title: "Coin Change -- Combinations vs Permutations"
+  difficulty: "hard"
+  tags: ["dynamic programming", "coin change", "counting", "combinations"]
+  lesson: dp-knapsack-and-subset
+  Front: |
+    In counting coin combinations (number of ways to make amount), how does the loop order determine whether you count combinations or permutations?
+  Back: |
+    **Combinations (each arrangement counted once):** outer loop over coins, inner loop over amounts.
+
+    ```
+    for each coin:
+        for a from coin to amount:
+            dp[a] += dp[a - coin]
+    ```
+
+    **Permutations (order matters):** outer loop over amounts, inner loop over coins.
+
+    Coins-outer ensures each coin is fully processed before moving to the next. Each denomination's contribution is "locked in" before considering the next denomination -- preventing reorderings of the same coins from being counted separately.
+
+- title: "Subset Sum DP"
+  difficulty: "medium"
+  tags: ["dynamic programming", "subset sum", "boolean knapsack"]
+  lesson: dp-knapsack-and-subset
+  Front: |
+    What does `dp[j]` represent in subset sum DP, and what is the recurrence?
+  Back: |
+    `dp[j] = true` if some subset of processed numbers sums to exactly j.
+
+    ```
+    dp[0] = true       # empty subset sums to 0
+    dp[1..T] = false
+    for each num:
+        for j from T down to num:    # right-to-left: each number used at most once
+            dp[j] = dp[j] || dp[j - num]
+    ```
+
+    Boolean version of 0/1 knapsack -- feasibility instead of optimal value.
+
+- title: "Partition Equal Subset Sum Reduction"
+  difficulty: "hard"
+  tags: ["dynamic programming", "subset sum", "partition", "reduction"]
+  lesson: dp-knapsack-and-subset
+  Front: |
+    How do you reduce "partition equal subset sum" to a knapsack problem?
+  Back: |
+    **Reduction chain:**
+    1. If total sum is odd → return false (impossible to split evenly)
+    2. Target = total_sum / 2
+    3. Find a subset summing to target → subset sum problem
+    4. Subset sum is boolean 0/1 knapsack (feasibility check)
+
+    The insight interviewers want: articulate the chain ("partition → subset sum → 0/1 knapsack") before writing any code.
+
+- title: "Knapsack Family Recognition"
+  difficulty: "easy"
+  tags: ["dynamic programming", "knapsack", "pattern recognition"]
+  lesson: dp-knapsack-and-subset
+  Front: |
+    What are the three signals that a problem is a knapsack variant?
+  Back: |
+    1. You have a **collection of items** to consider one by one.
+    2. Each item is **included or excluded** (or included a bounded number of times).
+    3. There is a **capacity constraint** (weight limit, target sum, budget).
+
+    Then ask: each item used **at most once** (0/1, right-to-left) or **unlimited times** (unbounded, left-to-right)?
+
+- title: "0/1 Knapsack Space Complexity"
+  difficulty: "easy"
+  tags: ["dynamic programming", "knapsack", "space complexity"]
+  lesson: dp-knapsack-and-subset
+  Front: |
+    What is the space complexity of the 2D vs 1D (space-optimized) 0/1 knapsack?
+  Back: |
+    **2D table:** O(n * W) -- one row per item, one column per capacity value.
+
+    **1D optimized:** O(W) -- keep a single array and update in-place with right-to-left iteration.
+
+    The 1D version works because `dp[i][w]` only depends on the previous row `dp[i-1][...]`. Discarding all earlier rows loses nothing needed for future computation.
+
+# =============================================================================
+# Lesson 4: String DP (8 cards)
+# =============================================================================
+
+- title: "LCS Recurrence"
+  difficulty: "medium"
+  tags: ["dynamic programming", "LCS", "string", "2D"]
+  lesson: dp-string-dp
+  Front: |
+    What is the LCS (Longest Common Subsequence) recurrence? Give both the match and no-match cases.
+  Back: |
+    **Match** (`s1[i-1] == s2[j-1]`):
+    `dp[i][j] = dp[i-1][j-1] + 1`
+
+    **No match:**
+    `dp[i][j] = max(dp[i-1][j], dp[i][j-1])`
+
+    **Base cases:** `dp[0][j] = dp[i][0] = 0`
+    **Time:** O(m * n), **Space:** O(m * n), reducible to O(min(m, n)).
+
+- title: "LCS -- What the Two Cases Mean"
+  difficulty: "medium"
+  tags: ["dynamic programming", "LCS", "string", "intuition"]
+  lesson: dp-string-dp
+  Front: |
+    In the LCS recurrence, what does the no-match case `max(dp[i-1][j], dp[i][j-1])` represent?
+  Back: |
+    When characters don't match, you skip one character from one of the two strings and take the better result:
+
+    - `dp[i-1][j]`: skip `s1[i-1]` (advance s1, keep s2 position)
+    - `dp[i][j-1]`: skip `s2[j-1]` (advance s2, keep s1 position)
+
+    You're asking: "Can I get a longer common subsequence by dropping this character from s1 or from s2?" Keep the better option.
+
+- title: "LCS Reconstruction"
+  difficulty: "medium"
+  tags: ["dynamic programming", "LCS", "reconstruction", "backtracking"]
+  lesson: dp-string-dp
+  Front: |
+    How do you reconstruct the actual LCS string from the completed DP table?
+  Back: |
+    Backtrack from `dp[m][n]`:
+
+    - If `s1[i-1] == s2[j-1]`: record the character, move to `dp[i-1][j-1]`
+    - Else if `dp[i-1][j] >= dp[i][j-1]`: move to `dp[i-1][j]`
+    - Else: move to `dp[i][j-1]`
+
+    Continue until i = 0 or j = 0. Reverse the recorded characters.
+
+    The recorded path traces back through the matching characters that contributed to the LCS.
+
+- title: "LCS vs Longest Common Substring"
+  difficulty: "medium"
+  tags: ["dynamic programming", "LCS", "substring", "subsequence"]
+  lesson: dp-string-dp
+  Front: |
+    What is the single difference in the recurrence between Longest Common Subsequence and Longest Common Substring?
+  Back: |
+    Only the **no-match case** differs:
+
+    | | Match case | No-match case | Answer location |
+    |---|---|---|---|
+    | **Subsequence** | `dp[i-1][j-1] + 1` | `max(dp[i-1][j], dp[i][j-1])` | `dp[m][n]` |
+    | **Substring** | `dp[i-1][j-1] + 1` | `0` (reset) | `max over all dp[i][j]` |
+
+    Substring resets to 0 on mismatch because a gap breaks contiguity. The answer is the maximum cell value, not the corner cell.
+
+- title: "Edit Distance Recurrence"
+  difficulty: "medium"
+  tags: ["dynamic programming", "edit distance", "levenshtein", "string"]
+  lesson: dp-string-dp
+  Front: |
+    What is the edit distance recurrence, and what do the three table directions represent?
+  Back: |
+    **Match:** `dp[i][j] = dp[i-1][j-1]`
+
+    **No match:** `dp[i][j] = 1 + min(dp[i-1][j], dp[i][j-1], dp[i-1][j-1])`
+
+    Table directions when there's no match:
+    - `dp[i-1][j]` → delete from s1 (fewer s1 chars)
+    - `dp[i][j-1]` → insert into s1 (fewer s2 chars to match)
+    - `dp[i-1][j-1]` → replace s1[i-1] with s2[j-1]
+
+    **Base cases:** `dp[i][0] = i`, `dp[0][j] = j`.
+
+- title: "Edit Distance Base Cases"
+  difficulty: "easy"
+  tags: ["dynamic programming", "edit distance", "base cases"]
+  lesson: dp-string-dp
+  Front: |
+    What are the base cases for edit distance, and why?
+  Back: |
+    `dp[i][0] = i`: converting the first i characters of s1 to the empty string requires i deletions.
+
+    `dp[0][j] = j`: converting the empty string to the first j characters of s2 requires j insertions.
+
+    These are the costs of fully consuming one string when the other is empty -- the minimum possible.
+
+- title: "Longest Palindromic Subsequence via LCS"
+  difficulty: "medium"
+  tags: ["dynamic programming", "palindrome", "LCS", "reduction"]
+  lesson: dp-string-dp
+  Front: |
+    How do you find the longest palindromic subsequence using LCS?
+  Back: |
+    `LCS(s, reverse(s))`
+
+    A palindromic subsequence reads the same forwards and backwards. Any subsequence common to s and reverse(s) appears in order in s and in reverse order in s -- making it a palindrome.
+
+    No new recurrence needed: reduce to LCS, which you already know how to solve.
+
+- title: "Two-String DP State Pattern"
+  difficulty: "easy"
+  tags: ["dynamic programming", "string", "state", "2D"]
+  lesson: dp-string-dp
+  Front: |
+    Why is the state for two-string DP problems typically `dp[i][j]`?
+  Back: |
+    `dp[i][j]` captures exactly how much of each string has been processed: the first i characters of s1 and the first j characters of s2.
+
+    A single index would lose track of one string's position. Two indices encode all choices made so far for both strings independently, allowing the recurrence to branch on whether to advance s1, advance s2, or advance both.
+
+    This creates an (m+1) x (n+1) table with base cases along the first row and column.
+
+# =============================================================================
+# Lesson 5: Grid and Path DP (6 cards)
+# =============================================================================
+
+- title: "Minimum Path Sum Recurrence"
+  difficulty: "medium"
+  tags: ["dynamic programming", "grid", "minimum path sum", "2D"]
+  lesson: dp-grid-and-path
+  Front: |
+    What is the minimum path sum recurrence, and what are its base cases?
+  Back: |
+    `dp[i][j] = grid[i][j] + min(dp[i-1][j], dp[i][j-1])`
+
+    Each cell can only be reached from above or from the left. Take the cheaper predecessor.
+
+    **Base cases:**
+    - `dp[0][0] = grid[0][0]`
+    - First row: `dp[0][j] = dp[0][j-1] + grid[0][j]` (left only)
+    - First column: `dp[i][0] = dp[i-1][0] + grid[i][0]` (above only)
+
+    **Time:** O(m * n), **Space:** O(1) if modifying in-place.
+
+- title: "Unique Paths Counting"
+  difficulty: "easy"
+  tags: ["dynamic programming", "grid", "unique paths", "counting"]
+  lesson: dp-grid-and-path
+  Front: |
+    What is the recurrence for unique paths on an m x n grid (right/down only), and what is the combinatorial formula?
+  Back: |
+    **Recurrence:** `dp[i][j] = dp[i-1][j] + dp[i][j-1]`
+
+    Paths arriving from above + paths arriving from left.
+
+    **Base cases:** `dp[0][j] = 1` and `dp[i][0] = 1` (only one route along any edge).
+
+    **Combinatorial formula:** C(m+n-2, m-1) -- you make exactly (m-1) down moves and (n-1) right moves in any order. Choose which of the total steps are "down."
+
+- title: "Grid DP -- Why No Cycles Matters"
+  difficulty: "medium"
+  tags: ["dynamic programming", "grid", "DAG", "cycles"]
+  lesson: dp-grid-and-path
+  Front: |
+    Why does restricting movement to right and down make grid DP valid, while allowing arbitrary movement would break it?
+  Back: |
+    Right-and-down movement creates a **DAG** -- each cell can only be reached from a fixed set of predecessors, all of which have smaller coordinates and are computed first.
+
+    Arbitrary movement creates **cycles** (e.g., right then left revisits the same cell). Tabulation requires a topological order, which doesn't exist in a cyclic graph.
+
+    Greedy also fails: a locally minimum step might lead to an expensive later path. DP evaluates all paths by building optimal subpaths.
+
+- title: "Grid DP -- First Row and Column Base Cases"
+  difficulty: "easy"
+  tags: ["dynamic programming", "grid", "base cases"]
+  lesson: dp-grid-and-path
+  Front: |
+    Why do the first row and first column require special handling as base cases in grid DP?
+  Back: |
+    Cells in the first row have no cell above them -- they can only be reached from the left. Their value is the running sum from left to right.
+
+    Cells in the first column have no cell to their left -- they can only be reached from above. Their value is the running sum from top to bottom.
+
+    The recurrence `min(dp[i-1][j], dp[i][j-1])` assumes both predecessors exist. For edges, only one predecessor exists, so you must initialize those cells explicitly before running the main loop.
+
+- title: "In-Place Grid Optimization"
+  difficulty: "medium"
+  tags: ["dynamic programming", "grid", "space optimization", "in-place"]
+  lesson: dp-grid-and-path
+  Front: |
+    How does in-place grid modification achieve O(1) extra space for minimum path sum?
+  Back: |
+    Overwrite each cell with its minimum sum-from-top-left:
+
+    ```
+    for i from 0 to m-1:
+        for j from 0 to n-1:
+            if i == 0 and j == 0: skip
+            elif i == 0: grid[i][j] += grid[i][j-1]
+            elif j == 0: grid[i][j] += grid[i-1][j]
+            else: grid[i][j] += min(grid[i-1][j], grid[i][j-1])
+    ```
+
+    Safe because each cell reads from already-updated neighbors (above and left, both processed earlier in row-major order). The answer is `grid[m-1][n-1]`.
+
+- title: "Longest Increasing Path -- Memo vs Tabulation"
+  difficulty: "hard"
+  tags: ["dynamic programming", "grid", "memoization", "DFS"]
+  lesson: dp-grid-and-path
+  Front: |
+    Why does "longest increasing path in a matrix" require memoized DFS instead of tabulation?
+  Back: |
+    Tabulation needs a fixed topological order known before processing. For this problem, the order depends on the matrix values -- a cell with value 3 depends on all neighbors with smaller values, regardless of their position.
+
+    This order isn't known until runtime. **Memoized DFS** handles it lazily: compute each cell's result only when first visited, guaranteed to terminate because each step must go strictly upward in value (no cycles possible).
+
+    Tabulation fails because you can't determine the iteration order without first inspecting the values.
+
+# =============================================================================
+# Lesson 6: Interval DP and Advanced Patterns (8 cards)
+# =============================================================================
+
+- title: "Interval DP Template"
+  difficulty: "hard"
+  tags: ["dynamic programming", "interval DP", "template"]
+  lesson: dp-interval-and-advanced
+  Front: |
+    What is the interval DP template, and what is the correct outer loop variable?
+  Back: |
+    ```
+    for length from 2 to n:
+        for left from 0 to n - length:
+            right = left + length - 1
+            dp[left][right] = infinity
+            for split from left to right - 1:
+                dp[left][right] = min(
+                    dp[left][right],
+                    f(dp[left][split], dp[split+1][right], split)
+                )
+    ```
+
+    The outer loop is **subrange length**, not left endpoint. This guarantees all shorter intervals are fully computed before any longer interval uses them.
+
+- title: "Interval DP -- Why Iterate by Length"
+  difficulty: "hard"
+  tags: ["dynamic programming", "interval DP", "iteration order"]
+  lesson: dp-interval-and-advanced
+  Front: |
+    Why must interval DP iterate by subrange length as the outer loop, not by left endpoint?
+  Back: |
+    `dp[left][right]` depends on `dp[left][split]` and `dp[split+1][right]` -- both **strictly shorter** intervals.
+
+    Iterating by length ensures all intervals of length k-1 are complete before any interval of length k is computed.
+
+    If you iterate by left endpoint, when you process `(left, right)`, some sub-intervals ending at `right` may not be computed yet. The dependency chain would be broken.
+
+- title: "Matrix Chain Multiplication Recurrence"
+  difficulty: "hard"
+  tags: ["dynamic programming", "interval DP", "matrix chain"]
+  lesson: dp-interval-and-advanced
+  Front: |
+    What does `dp[i][j]` represent in matrix chain multiplication, and what is the recurrence?
+  Back: |
+    `dp[i][j]` = minimum scalar multiplications to compute the product of matrices i through j.
+
+    ```
+    dp[i][j] = min over k from i to j-1 of:
+        dp[i][k] + dp[k+1][j] + dims[i-1] * dims[k] * dims[j]
+    ```
+
+    k is the last split: multiply (i..k) and (k+1..j) separately, then combine them. The combine cost is `dims[i-1] * dims[k] * dims[j]`.
+
+    **Base case:** `dp[i][i] = 0` (one matrix, no cost).
+
+- title: "LIS O(n log n) -- Patience Sorting"
+  difficulty: "hard"
+  tags: ["dynamic programming", "LIS", "binary search", "patience sorting"]
+  lesson: dp-interval-and-advanced
+  Front: |
+    How does the patience sorting approach find LIS length in O(n log n)?
+  Back: |
+    Maintain `tails` where `tails[k]` = smallest tail element of all increasing subsequences of length k+1.
+
+    For each element x:
+    - Binary search for leftmost position where `tails[pos] >= x`
+    - If pos == len(tails): append x (extends longest)
+    - Else: replace `tails[pos] = x` (better tail for that length)
+
+    **Answer:** `len(tails)`
+
+    **Why it works:** a smaller tail is strictly better -- easier to extend. `tails` is always sorted, enabling binary search. Note: `tails` is not the actual LIS, just its length.
+
+- title: "State Machine DP -- Stock with Cooldown"
+  difficulty: "hard"
+  tags: ["dynamic programming", "state machine", "stock", "cooldown"]
+  lesson: dp-interval-and-advanced
+  Front: |
+    What are the states and transitions for the stock trading with cooldown problem?
+  Back: |
+    **States:** `held` (own stock), `sold` (just sold, must rest), `rest` (can act freely).
+
+    **Transitions:**
+    - `held[i] = max(held[i-1], rest[i-1] - price[i])` -- keep or buy
+    - `sold[i] = held[i-1] + price[i]` -- sell
+    - `rest[i] = max(rest[i-1], sold[i-1])` -- stay or enter from cooldown
+
+    **Answer:** `max(sold[n-1], rest[n-1])`
+
+    Each state encodes what actions are available. The cooldown constraint is modeled by routing `sold` through `rest` before allowing a buy.
+
+- title: "Bitmask DP -- What the Bitmask Encodes"
+  difficulty: "hard"
+  tags: ["dynamic programming", "bitmask DP", "subset"]
+  lesson: dp-interval-and-advanced
+  Front: |
+    What does the bitmask encode in bitmask DP, and what is the practical limit on n?
+  Back: |
+    The bitmask encodes **which items are in the current subset**. Bit k = 1 means item k is included.
+
+    A bitmask of n bits represents all 2^n subsets. State: `dp[mask][v]` -- optimal value for the subset encoded by `mask`, ending at element v.
+
+    **Practical limit:** n <= 20 (2^20 = ~1M states). For n > 20, bitmask DP is typically infeasible without additional pruning.
+
+    **Example:** TSP -- mask encodes which cities have been visited; v is the current city.
+
+- title: "DP Pattern Recognition -- Key Questions"
+  difficulty: "medium"
+  tags: ["dynamic programming", "pattern recognition", "classification"]
+  lesson: dp-interval-and-advanced
+  Front: |
+    What sequence of questions distinguishes the major DP patterns?
+  Back: |
+    1. **Single sequence, optimize over prefixes?** → Linear DP (Kadane's, house robber)
+    2. **Items + capacity constraint?** → Knapsack (0/1 or unbounded based on reuse)
+    3. **Two strings/sequences?** → 2D string DP -- state is `(i, j)` (LCS, edit distance)
+    4. **Grid, restricted movement?** → Grid DP (min path sum, unique paths)
+    5. **Contiguous subrange, try all split points?** → Interval DP (matrix chain, burst balloons)
+    6. **Explicit modes with constrained transitions?** → State machine DP (stock cooldown)
+    7. **Track a subset of n <= 20 items?** → Bitmask DP (TSP)
+
+- title: "Interval DP vs Knapsack -- Key Distinction"
+  difficulty: "medium"
+  tags:
+    ["dynamic programming", "interval DP", "knapsack", "pattern recognition"]
+  lesson: dp-interval-and-advanced
+  Front: |
+    What is the structural difference between interval DP and knapsack that helps you distinguish them?
+  Back: |
+    **Interval DP:** state is a contiguous subrange `[left, right]`; you try every split point within that range. The input is a sequence and you're combining subranges.
+
+    **Knapsack:** state is a capacity or target value; you process items one by one and decide to include or exclude each. The input is a collection of items.
+
+    Ask: "Am I combining subranges of a sequence?" → interval DP. "Am I selecting from a set of items with a budget?" → knapsack.
