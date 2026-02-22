@@ -1,0 +1,933 @@
+# =============================================================================
+# Lesson 1: Network Models (net-network-models)
+# =============================================================================
+
+- title: "Network Models — TCP/IP: Application layer role"
+  difficulty: easy
+  tags: ["networking", "TCP/IP", "layers"]
+  lesson: net-network-models
+  Front: |
+    **TCP/IP Model** — What does the Application layer do, and name three protocols that live there.
+  Back: |
+    The Application layer is where user-facing protocols live. It defines how applications format and interpret data.
+
+    Examples: **HTTP**, **DNS**, **SMTP**, **SSH**, **gRPC**, **WebSocket**
+
+    It does not concern itself with how data travels — that is the Transport and Internet layers' job.
+
+- title: "Network Models — TCP/IP: Transport layer role"
+  difficulty: easy
+  tags: ["networking", "TCP/IP", "layers", "TCP", "UDP"]
+  lesson: net-network-models
+  Front: |
+    **TCP/IP Model** — What does the Transport layer do, and which two protocols operate here?
+  Back: |
+    The Transport layer handles end-to-end communication between processes on different hosts.
+
+    - **TCP** — ordered, reliable delivery with flow control
+    - **UDP** — fast, connectionless delivery with no guarantees
+
+    Port numbers (0–65535) identify which process on a host should receive a given packet.
+
+- title: "Network Models — TCP/IP: Internet layer role"
+  difficulty: easy
+  tags: ["networking", "TCP/IP", "layers", "IP", "routing"]
+  lesson: net-network-models
+  Front: |
+    **TCP/IP Model** — What does the Internet layer do, and which protocol operates here?
+  Back: |
+    The Internet layer routes packets across networks using **IP (Internet Protocol)**.
+
+    - Assigns logical IP addresses to hosts
+    - Makes forwarding decisions at each hop based on the destination IP
+    - Does not guarantee delivery or ordering — that is TCP's job above
+
+- title: "Network Models — TCP/IP: Link layer role"
+  difficulty: easy
+  tags: ["networking", "TCP/IP", "layers", "Ethernet"]
+  lesson: net-network-models
+  Front: |
+    **TCP/IP Model** — What does the Link layer handle?
+  Back: |
+    The Link layer handles the physical transmission of bits over a medium.
+
+    - Ethernet, Wi-Fi, fiber optic, LTE
+    - Deals with MAC addresses (physical hardware identifiers)
+    - Handles framing and error detection at the local network level
+
+    It does not perform routing across networks — that is the Internet layer.
+
+- title: "Network Models — OSI vs TCP/IP layer mapping"
+  difficulty: medium
+  tags: ["networking", "OSI", "TCP/IP", "layers"]
+  lesson: net-network-models
+  Front: |
+    **OSI vs TCP/IP** — How do the 7 OSI layers map to the 4 TCP/IP layers?
+  Back: |
+    ```
+    OSI Layer          TCP/IP
+    ───────────────────────────
+    7  Application  ─┐
+    6  Presentation  ├─  Application
+    5  Session      ─┘
+    ───────────────────────────
+    4  Transport    ──   Transport
+    ───────────────────────────
+    3  Network      ──   Internet
+    ───────────────────────────
+    2  Data Link    ─┐
+    1  Physical     ─┘   Link
+    ```
+
+    In system design, OSI layer numbers are convention: Layer 3 = IP routing, Layer 4 = TCP/UDP, Layer 7 = HTTP.
+
+- title: "Network Models — encapsulation definition"
+  difficulty: medium
+  tags: ["networking", "encapsulation", "layers"]
+  lesson: net-network-models
+  Front: |
+    **Encapsulation** — What happens to data as it moves down the TCP/IP stack before transmission?
+  Back: |
+    Each layer wraps the data from the layer above with its own header:
+
+    ```
+    Application:  [HTTP data]
+    Transport:    [TCP header | HTTP data]
+    Internet:     [IP header | TCP header | HTTP data]
+    Link:         [Ethernet header | IP | TCP | HTTP | Ethernet trailer]
+    ```
+
+    At the receiver, each layer strips its header as the data moves up the stack (decapsulation).
+
+- title: "Network Models — Layer 7 vs Layer 4 load balancer"
+  difficulty: medium
+  tags: ["networking", "OSI", "load balancing"]
+  lesson: net-network-models
+  Front: |
+    **Layer 4 vs Layer 7 load balancer** — What is the difference in how they route traffic?
+  Back: |
+    **Layer 4 (Transport):** Routes based on TCP/UDP port numbers and IP addresses. Does not inspect the HTTP payload. Fast — minimal processing. Can handle any TCP/UDP traffic.
+
+    **Layer 7 (Application):** Routes based on HTTP headers, URL paths, cookies, or request body. Can route `/api/*` to one backend and `/static/*` to another. More flexible but more expensive per request.
+
+    Layer 7 load balancers are what most web applications use (Nginx, HAProxy in HTTP mode, AWS ALB).
+
+- title: "Network Models — why layering matters"
+  difficulty: easy
+  tags: ["networking", "OSI", "TCP/IP", "layers"]
+  lesson: net-network-models
+  Front: |
+    **Network model layering** — Why do layered models like TCP/IP enable protocol evolution?
+  Back: |
+    Each layer has a defined interface and can be replaced independently.
+
+    - New physical media (fiber, 5G) were added at Layer 1–2 without changing HTTP
+    - QUIC replaced TCP at Layer 4 without changing HTTP semantics at Layer 7
+    - VPNs tunnel inner TCP packets as data inside outer UDP packets — each layer sees just bytes
+
+    Separation of concerns is the reason the internet could grow from dial-up to 5G without redesigning everything.
+
+- title: "Network Models — protocol vs layer"
+  difficulty: easy
+  tags: ["networking", "OSI", "TCP/IP"]
+  lesson: net-network-models
+  Front: |
+    **Protocol vs Layer** — What is the distinction between a network layer and a network protocol?
+  Back: |
+    A **layer** is an abstraction — a role in the stack with a defined interface (e.g., Transport layer: deliver bytes between processes).
+
+    A **protocol** is a specific implementation of a layer's contract (e.g., TCP and UDP both implement the Transport layer).
+
+    Multiple protocols can exist at the same layer. TCP and UDP both solve end-to-end delivery differently. HTTP/1.1, HTTP/2, and HTTP/3 all solve application-layer communication differently.
+
+# =============================================================================
+# Lesson 2: TCP vs UDP (net-tcp-vs-udp)
+# =============================================================================
+
+- title: "TCP — three-way handshake steps"
+  difficulty: medium
+  tags: ["networking", "TCP", "handshake"]
+  lesson: net-tcp-vs-udp
+  Front: |
+    **TCP Three-Way Handshake** — What are the three steps, and what does each accomplish?
+  Back: |
+    ```
+    1. SYN     — Client picks random seq x, sends to server
+    2. SYN-ACK — Server picks random seq y, acknowledges client (ack=x+1)
+    3. ACK     — Client acknowledges server (ack=y+1). Connection open.
+    ```
+
+    **Purpose:** Both sides synchronize initial sequence numbers so they can track which bytes have been sent and received, enabling ordered delivery and retransmission.
+
+- title: "TCP — why three steps instead of two"
+  difficulty: medium
+  tags: ["networking", "TCP", "handshake"]
+  lesson: net-tcp-vs-udp
+  Front: |
+    **TCP Handshake** — Why are three steps required instead of two?
+  Back: |
+    Two messages would leave the server's sequence number unacknowledged.
+
+    After SYN + SYN-ACK, the client knows both sequence numbers — but the server does not know the client received its SYN-ACK. The third ACK confirms the client received the server's sequence number, ensuring both sides are synchronized before data flows.
+
+- title: "TCP — why random initial sequence numbers"
+  difficulty: medium
+  tags: ["networking", "TCP", "security"]
+  lesson: net-tcp-vs-udp
+  Front: |
+    **TCP Sequence Numbers** — Why does TCP use random initial sequence numbers instead of always starting at zero?
+  Back: |
+    Two reasons:
+
+    1. **Security:** Predictable sequence numbers allow attackers to forge packets and inject data into an existing connection (TCP sequence prediction attack).
+
+    2. **Stale packets:** Random numbers prevent confusion if delayed packets from a previous connection on the same port arrive after a new connection opens.
+
+- title: "TCP — ACKs and retransmission"
+  difficulty: easy
+  tags: ["networking", "TCP", "reliability"]
+  lesson: net-tcp-vs-udp
+  Front: |
+    **TCP Reliability** — How does TCP handle packet loss?
+  Back: |
+    The receiver sends an **ACK (acknowledgment)** for every segment received.
+
+    If the sender does not receive an ACK within a timeout window, it retransmits the segment.
+
+    This ensures delivery even on networks that drop packets, at the cost of latency when loss occurs.
+
+- title: "TCP — flow control vs congestion control"
+  difficulty: medium
+  tags: ["networking", "TCP", "flow control", "congestion control"]
+  lesson: net-tcp-vs-udp
+  Front: |
+    **TCP** — What is the difference between flow control and congestion control?
+  Back: |
+    **Flow control** protects the *receiver*: the receiver advertises a window size (how much data it can buffer). The sender never sends more than this window without receiving ACKs. Prevents a fast sender from overwhelming a slow receiver.
+
+    **Congestion control** protects the *network*: TCP monitors for signs of congestion (packet loss, latency) and reduces its sending rate. Algorithms: slow start, congestion avoidance, fast retransmit.
+
+    Flow control = receiver capacity. Congestion control = network capacity.
+
+- title: "TCP — connection teardown"
+  difficulty: medium
+  tags: ["networking", "TCP", "teardown", "FIN"]
+  lesson: net-tcp-vs-udp
+  Front: |
+    **TCP Connection Teardown** — Why does closing a TCP connection take four steps instead of three?
+  Back: |
+    Closing takes FIN, ACK, FIN, ACK because **each direction is closed independently**.
+
+    One side can finish sending (half-close with FIN) while the other still has data to transmit. The other side sends ACK to acknowledge the FIN, finishes sending its remaining data, then sends its own FIN, which the first side ACKs.
+
+- title: "UDP — header fields"
+  difficulty: easy
+  tags: ["networking", "UDP", "header"]
+  lesson: net-tcp-vs-udp
+  Front: |
+    **UDP Header** — How large is the UDP header, and what four fields does it contain?
+  Back: |
+    UDP header: **8 bytes** — the smallest transport-layer header.
+
+    1. Source port
+    2. Destination port
+    3. Length
+    4. Checksum (optional in IPv4, mandatory in IPv6)
+
+    No sequence numbers, no window sizes, no connection state. Compare to TCP's 20+ byte header with a dozen fields.
+
+- title: "UDP — when to choose UDP over TCP"
+  difficulty: easy
+  tags: ["networking", "UDP", "TCP", "trade-offs"]
+  lesson: net-tcp-vs-udp
+  Front: |
+    **TCP vs UDP** — When should you choose UDP over TCP?
+  Back: |
+    Choose UDP when:
+    - **Latency is critical** and occasional data loss is acceptable
+    - Data becomes stale before a retransmit arrives (video frames, game position updates)
+    - Request/response fits in a single packet (DNS, DHCP)
+    - You implement reliability yourself at the application layer (QUIC)
+
+    Default to TCP for everything else. UDP is a deliberate choice, not a default.
+
+- title: "TCP — head-of-line blocking"
+  difficulty: medium
+  tags: ["networking", "TCP", "head-of-line blocking", "HTTP/2"]
+  lesson: net-tcp-vs-udp
+  Front: |
+    **Head-of-Line Blocking** — What is TCP head-of-line blocking, and why does it affect HTTP/2?
+  Back: |
+    If TCP segment N is lost, all segments after N are held in the receive buffer until N is retransmitted. Even segments that arrived safely cannot be delivered to the application — one lost packet blocks everything behind it.
+
+    HTTP/2 multiplexes many requests over one TCP connection. A single lost packet stalls **all** multiplexed streams, not just the one that lost the packet. HTTP/3 (QUIC/UDP) was built to solve this by making each stream independently reliable.
+
+- title: "QUIC — why QUIC uses UDP"
+  difficulty: medium
+  tags: ["networking", "QUIC", "HTTP/3", "UDP"]
+  lesson: net-tcp-vs-udp
+  Front: |
+    **QUIC** — Why is QUIC built on UDP rather than TCP, given that QUIC provides reliable delivery?
+  Back: |
+    QUIC implements its own reliability at the application layer, but doing so over UDP instead of TCP gives it one crucial advantage: **each multiplexed stream is independently reliable**.
+
+    In TCP, the ordered byte stream means a single lost packet stalls all streams. QUIC's streams are separate — a lost packet in stream A does not block stream B.
+
+    Using UDP also allows QUIC to be deployed without OS-level changes, since UDP support is universal.
+
+# =============================================================================
+# Lesson 3: DNS (net-dns)
+# =============================================================================
+
+- title: "DNS — resolution hierarchy"
+  difficulty: easy
+  tags: ["networking", "DNS", "hierarchy"]
+  lesson: net-dns
+  Front: |
+    **DNS Hierarchy** — What are the three tiers of the DNS hierarchy, from top to bottom?
+  Back: |
+    ```
+    Root servers (.)
+      └── TLD servers (.com, .org, .io)
+            └── Authoritative nameservers (example.com)
+    ```
+
+    Root servers: know which TLD server to ask for any top-level domain.
+    TLD servers: know which authoritative server handles each registered domain.
+    Authoritative servers: hold the actual records (IP addresses, aliases, mail servers).
+
+- title: "DNS — recursive resolver role"
+  difficulty: medium
+  tags: ["networking", "DNS", "recursive resolver"]
+  lesson: net-dns
+  Front: |
+    **DNS Recursive Resolver** — What does it do, and why does it matter for performance?
+  Back: |
+    The recursive resolver (run by your ISP or public resolvers like 8.8.8.8) walks the DNS hierarchy on your behalf:
+
+    1. Queries root server → gets TLD server address
+    2. Queries TLD server → gets authoritative server address
+    3. Queries authoritative server → gets the final answer
+
+    Crucially, it **caches** each response for its TTL duration. Most DNS queries are served from cache in under 10ms. The full 3-hop chain only fires on a cache miss.
+
+- title: "DNS — A record"
+  difficulty: easy
+  tags: ["networking", "DNS", "A record", "IPv4"]
+  lesson: net-dns
+  Front: |
+    **DNS A Record** — What does it map, and give an example.
+  Back: |
+    An **A record** maps a domain name to an **IPv4 address**.
+
+    Example: `api.example.com → 93.184.216.34`
+
+    It is the most common record type and the final answer for most domain lookups.
+
+- title: "DNS — AAAA record"
+  difficulty: easy
+  tags: ["networking", "DNS", "AAAA record", "IPv6"]
+  lesson: net-dns
+  Front: |
+    **DNS AAAA Record** — How does it differ from an A record?
+  Back: |
+    An **AAAA record** (quad-A) maps a domain to an **IPv6 address** instead of IPv4.
+
+    Example: `api.example.com → 2606:2800:220:1::93`
+
+    Same purpose as an A record, different IP version. Modern deployments serve both an A and AAAA record for dual-stack support.
+
+- title: "DNS — CNAME record and its constraint"
+  difficulty: medium
+  tags: ["networking", "DNS", "CNAME"]
+  lesson: net-dns
+  Front: |
+    **DNS CNAME Record** — What does it do, and what is the key constraint on where it can be used?
+  Back: |
+    A **CNAME** (Canonical Name) is an alias: it maps one domain to another domain name.
+
+    Example: `blog.example.com → example.github.io`
+
+    **Constraint:** A CNAME cannot coexist with any other record on the same name. This means you cannot use a CNAME at the zone apex (`example.com`), only on subdomains — because the apex requires SOA and NS records.
+
+- title: "DNS — MX record"
+  difficulty: easy
+  tags: ["networking", "DNS", "MX record", "email"]
+  lesson: net-dns
+  Front: |
+    **DNS MX Record** — What does it specify, and what does the priority value control?
+  Back: |
+    An **MX record** specifies the mail server responsible for accepting email for a domain.
+
+    Example: `example.com → mail.example.com (priority 10)`
+
+    **Priority:** Lower numbers = higher priority. If priority 10 fails, try priority 20. This enables primary + fallback mail server configuration.
+
+    Without an MX record, the domain cannot receive email.
+
+- title: "DNS — TXT record uses"
+  difficulty: easy
+  tags: ["networking", "DNS", "TXT record"]
+  lesson: net-dns
+  Front: |
+    **DNS TXT Record** — What is it used for? Name three common use cases.
+  Back: |
+    TXT records store arbitrary text data. Common uses:
+
+    - **SPF:** Declares which IP addresses are authorized to send email for a domain
+    - **DKIM:** Publishes the public key used to verify email signatures
+    - **Domain verification:** Proves you own a domain to Google, AWS, GitHub, or other services
+
+    TXT records are where domain-level authentication and verification metadata lives.
+
+- title: "DNS — TTL definition"
+  difficulty: easy
+  tags: ["networking", "DNS", "TTL"]
+  lesson: net-dns
+  Front: |
+    **DNS TTL** — What does it stand for, and what does it control?
+  Back: |
+    **TTL = Time to Live** — a per-record value (in seconds) that tells recursive resolvers how long to cache the answer before re-querying the authoritative server.
+
+    - **High TTL** (86400 = 24h): fast for cached users, slow to propagate changes
+    - **Low TTL** (60s): changes propagate quickly, more load on authoritative server
+
+    TTL is a caching contract between the authoritative server and resolvers worldwide.
+
+- title: "DNS — pre-migration TTL strategy"
+  difficulty: medium
+  tags: ["networking", "DNS", "TTL", "deployment"]
+  lesson: net-dns
+  Front: |
+    **DNS Migration** — What is the correct TTL strategy before switching a domain to a new IP?
+  Back: |
+    1. **Days before migration:** Lower TTL to 60–300 seconds. Wait for the *old* high TTL to expire from all caches worldwide (up to 24 hours).
+    2. **At migration time:** Update the DNS record to the new IP. Low TTL means all resolvers pick up the change within minutes.
+    3. **After confirming health:** Raise TTL back to a normal value (3600–86400).
+
+    Lowering TTL at the last minute doesn't help — old caches may still hold the previous TTL value for hours.
+
+- title: "DNS — full resolution path (cache miss)"
+  difficulty: medium
+  tags: ["networking", "DNS", "resolution"]
+  lesson: net-dns
+  Front: |
+    **DNS Resolution** — Walk through the full path that resolves `api.example.com` on a complete cache miss.
+  Back: |
+    1. App → OS resolver (check local cache + /etc/hosts)
+    2. OS resolver → Recursive resolver (ISP or 8.8.8.8)
+    3. Recursive resolver → Root server: "which server handles .com?"
+    4. Recursive resolver → .com TLD server: "which server handles example.com?"
+    5. Recursive resolver → example.com authoritative server: "what is api.example.com?"
+    6. Recursive resolver caches the answer (for TTL seconds) and returns the IP to the app
+
+    In practice, steps 3–5 are cached at the recursive resolver. Most lookups are step 2 → cached answer in < 10ms.
+
+# =============================================================================
+# Lesson 4: HTTP (net-http)
+# =============================================================================
+
+- title: "HTTP — GET method"
+  difficulty: easy
+  tags: ["networking", "HTTP", "methods"]
+  lesson: net-http
+  Front: |
+    **HTTP GET** — What is it used for, and what are its safety and idempotency properties?
+  Back: |
+    GET retrieves a resource. It is:
+
+    - **Safe:** no side effects, does not modify server state
+    - **Idempotent:** calling it multiple times with the same request produces the same result
+
+    GET requests should never modify data. Browsers freely retry GET requests on failure.
+
+- title: "HTTP — POST method and idempotency"
+  difficulty: easy
+  tags: ["networking", "HTTP", "methods", "idempotency"]
+  lesson: net-http
+  Front: |
+    **HTTP POST** — Is it idempotent? What does that mean in practice for retry logic?
+  Back: |
+    POST is **not idempotent**. Sending the same POST request twice may create two resources or trigger two side effects.
+
+    For retry logic: retrying a failed POST risks creating duplicates. Solutions:
+    - **Idempotency keys:** client sends a unique ID with the request; server deduplicates
+    - **Application-level deduplication:** server checks if the operation already completed
+
+- title: "HTTP — PUT vs PATCH"
+  difficulty: medium
+  tags: ["networking", "HTTP", "methods"]
+  lesson: net-http
+  Front: |
+    **HTTP PUT vs PATCH** — What is the difference, and which is idempotent?
+  Back: |
+    **PUT** replaces a resource *entirely*. Idempotent — replacing with the same payload twice produces the same result.
+
+    **PATCH** partially updates a resource (only the specified fields). Not guaranteed to be idempotent — a PATCH that increments a counter is not idempotent.
+
+    Use PUT when the client sends the complete new representation. Use PATCH for partial updates.
+
+- title: "HTTP — DELETE idempotency"
+  difficulty: easy
+  tags: ["networking", "HTTP", "methods", "idempotency"]
+  lesson: net-http
+  Front: |
+    **HTTP DELETE** — Is it idempotent? Why?
+  Back: |
+    DELETE is **idempotent**. Deleting a resource twice still results in the resource being gone.
+
+    The second DELETE may return 404 (resource not found) instead of 200/204, but the server state is identical: the resource does not exist. The different status code does not violate idempotency — the outcome is the same.
+
+- title: "HTTP — idempotency definition"
+  difficulty: easy
+  tags: ["networking", "HTTP", "idempotency"]
+  lesson: net-http
+  Front: |
+    **Idempotency** — Define it in the context of HTTP methods.
+  Back: |
+    An operation is **idempotent** if calling it multiple times with the same input produces the same result as calling it once.
+
+    Idempotent HTTP methods: GET, PUT, DELETE, HEAD, OPTIONS
+
+    Non-idempotent: POST (typically), PATCH (sometimes)
+
+    Idempotency determines whether retrying a failed request is safe. Retrying an idempotent method is always safe. Retrying POST may cause duplicate effects.
+
+- title: "HTTP — status code ranges"
+  difficulty: easy
+  tags: ["networking", "HTTP", "status codes"]
+  lesson: net-http
+  Front: |
+    **HTTP Status Codes** — What do the five ranges (1xx–5xx) mean?
+  Back: |
+    - **1xx — Informational:** Request received, processing continues (`100 Continue`)
+    - **2xx — Success:** Request succeeded (`200 OK`, `201 Created`, `204 No Content`)
+    - **3xx — Redirection:** Client must take additional action (`301 Moved Permanently`, `304 Not Modified`)
+    - **4xx — Client error:** The request is wrong (`400 Bad Request`, `401 Unauthorized`, `403 Forbidden`, `404 Not Found`)
+    - **5xx — Server error:** The server failed (`500 Internal Server Error`, `502 Bad Gateway`, `503 Service Unavailable`)
+
+    4xx = client's fault. 5xx = server's fault.
+
+- title: "HTTP — 401 vs 403"
+  difficulty: easy
+  tags: ["networking", "HTTP", "status codes", "auth"]
+  lesson: net-http
+  Front: |
+    **HTTP Status Codes** — What is the difference between 401 and 403?
+  Back: |
+    **401 Unauthorized:** The request lacks valid authentication credentials. "Who are you? Please log in."
+
+    **403 Forbidden:** The server recognizes the identity but the client does not have permission. "I know who you are, but you are not allowed here."
+
+    Despite its name, 401 is really about authentication (not authorization). 403 is the true authorization failure.
+
+- title: "HTTP/2 — multiplexing"
+  difficulty: medium
+  tags: ["networking", "HTTP/2", "multiplexing"]
+  lesson: net-http
+  Front: |
+    **HTTP/2 Multiplexing** — What does it solve compared to HTTP/1.1?
+  Back: |
+    HTTP/1.1 allows one outstanding request per TCP connection. Browsers work around this by opening 6–8 parallel connections per domain.
+
+    HTTP/2 multiplexes multiple requests and responses over a **single** TCP connection, interleaved as binary frames. No more connection proliferation.
+
+    Additionally, HTTP/2 uses HPACK header compression — repeated headers (like Authorization) are indexed and sent once.
+
+- title: "HTTP/3 — what problem it solves"
+  difficulty: medium
+  tags: ["networking", "HTTP/3", "QUIC", "head-of-line blocking"]
+  lesson: net-http
+  Front: |
+    **HTTP/3** — What specific problem does it solve that HTTP/2 could not, and how?
+  Back: |
+    HTTP/2 still suffers from **TCP-level head-of-line blocking**: a single lost TCP packet stalls all multiplexed streams on that connection until retransmission.
+
+    HTTP/3 runs over **QUIC** (built on UDP). QUIC makes each stream independently reliable — a lost packet in stream A does not block stream B.
+
+    HTTP/3 also adds: built-in TLS 1.3, 0-RTT for returning clients, and connection migration (survives network switches).
+
+- title: "HTTP — Content-Type header"
+  difficulty: easy
+  tags: ["networking", "HTTP", "headers"]
+  lesson: net-http
+  Front: |
+    **HTTP Content-Type header** — What does it declare, and why is it required?
+  Back: |
+    `Content-Type` declares the **media type of the request or response body** so the recipient knows how to parse it.
+
+    Examples: `application/json`, `text/html`, `multipart/form-data`, `application/octet-stream`
+
+    Without it, the receiver must guess the format — which leads to parsing errors. It is required for any request or response with a body.
+
+    The related `Accept` header is what the *client* uses to declare which content types it can handle in the *response*.
+
+- title: "HTTP — keep-alive connections"
+  difficulty: easy
+  tags: ["networking", "HTTP", "keep-alive", "HTTP/1.1"]
+  lesson: net-http
+  Front: |
+    **HTTP Keep-Alive** — What does a persistent (keep-alive) connection achieve in HTTP/1.1?
+  Back: |
+    In early HTTP, each request opened a new TCP connection. TCP connections are expensive: each requires a three-way handshake before data can flow.
+
+    HTTP/1.1 introduced **persistent connections** (keep-alive): the TCP connection stays open after a response, allowing multiple requests to reuse it sequentially.
+
+    This reduced the connection overhead significantly, though HTTP/1.1 still allows only one outstanding request at a time per connection (head-of-line blocking). HTTP/2 solved this with multiplexing.
+
+# =============================================================================
+# Lesson 5: TLS and HTTPS (net-tls-and-https)
+# =============================================================================
+
+- title: "TLS — symmetric encryption"
+  difficulty: easy
+  tags: ["networking", "TLS", "encryption", "symmetric"]
+  lesson: net-tls-and-https
+  Front: |
+    **Symmetric Encryption** — What is it, and what is its performance characteristic?
+  Back: |
+    Symmetric encryption uses **one shared key** that both parties use to encrypt and decrypt data.
+
+    Examples: AES-256-GCM, ChaCha20
+
+    **Performance:** Very fast — gigabytes per second on modern hardware.
+
+    **The problem:** Both parties must have the same key. Distributing that key securely over an untrusted network is the challenge asymmetric encryption solves.
+
+- title: "TLS — asymmetric encryption"
+  difficulty: easy
+  tags: ["networking", "TLS", "encryption", "asymmetric"]
+  lesson: net-tls-and-https
+  Front: |
+    **Asymmetric Encryption** — How does it differ from symmetric, and what problem does it solve?
+  Back: |
+    Asymmetric encryption uses a **public/private key pair**: data encrypted with the public key can only be decrypted by the private key.
+
+    The public key can be shared openly. Only the holder of the private key can decrypt.
+
+    **Performance:** Slow — roughly 100–1000x slower than symmetric encryption.
+
+    **What it solves:** Key distribution. Two parties can agree on a shared secret over an untrusted network without an attacker learning it (Diffie-Hellman key exchange).
+
+- title: "TLS — hybrid approach"
+  difficulty: medium
+  tags: ["networking", "TLS", "encryption"]
+  lesson: net-tls-and-https
+  Front: |
+    **TLS Hybrid Encryption** — Why does TLS use both asymmetric and symmetric encryption?
+  Back: |
+    Asymmetric is slow (100–1000x) but solves key distribution. Symmetric is fast but requires a shared key.
+
+    TLS uses both:
+    1. **Asymmetric (ECDHE)** to establish a shared secret over the untrusted network
+    2. **Symmetric (AES-GCM or ChaCha20)** for all subsequent data using that shared secret
+
+    You get the security of asymmetric key exchange and the performance of symmetric encryption for bulk data.
+
+- title: "TLS 1.3 — handshake steps"
+  difficulty: hard
+  tags: ["networking", "TLS", "handshake"]
+  lesson: net-tls-and-https
+  Front: |
+    **TLS 1.3 Handshake** — What are the three messages exchanged, and what happens in each?
+  Back: |
+    ```
+    1. ClientHello  — client sends supported ciphers + key share (ECDHE public key)
+    2. ServerHello  — server picks cipher, sends its key share, certificate, Finished
+    3. Client Finished — client verifies certificate, computes shared session key, sends Finished
+    ```
+
+    After step 3, both sides have independently derived the same symmetric session key. All data is now encrypted.
+
+    TLS 1.3 achieves this in **1 round trip** (TLS 1.2 needed 2).
+
+- title: "TLS 1.3 — why one round trip instead of two"
+  difficulty: medium
+  tags: ["networking", "TLS", "TLS 1.3"]
+  lesson: net-tls-and-https
+  Front: |
+    **TLS 1.3 vs TLS 1.2** — What change allows TLS 1.3 to complete the handshake in one round trip instead of two?
+  Back: |
+    In TLS 1.2, the client waited for the server to announce its chosen cipher suite before sending its key share. This required two round trips.
+
+    In TLS 1.3, the client **guesses the cipher suite** (by sending a key share upfront in the ClientHello). If the server agrees, it can respond with its key share immediately. One round trip total.
+
+    TLS 1.3 also removed all legacy and insecure cipher suites, making the "guess" reliable in practice.
+
+- title: "HTTPS — three guarantees"
+  difficulty: easy
+  tags: ["networking", "HTTPS", "TLS", "security"]
+  lesson: net-tls-and-https
+  Front: |
+    **HTTPS** — What three security guarantees does it provide that plain HTTP lacks?
+  Back: |
+    1. **Confidentiality:** Traffic is encrypted. An attacker on the same network sees ciphertext, not content.
+
+    2. **Integrity:** A message authentication code (MAC) detects any modification in transit. Tampering breaks the connection.
+
+    3. **Authentication:** The server's certificate, signed by a trusted Certificate Authority, proves you are connected to the real server — not an impersonator.
+
+- title: "HTTPS — what it does not hide"
+  difficulty: medium
+  tags: ["networking", "HTTPS", "TLS", "SNI"]
+  lesson: net-tls-and-https
+  Front: |
+    **HTTPS** — What information about your connection is NOT encrypted and can be seen by a network observer?
+  Back: |
+    The **domain name** you are connecting to is sent in plaintext in the **SNI (Server Name Indication)** extension during the TLS handshake — before encryption is established.
+
+    A network observer (ISP, attacker on public Wi-Fi) can see which domains you connect to, just not what you send or receive.
+
+    **ECH (Encrypted Client Hello)** is an emerging extension that encrypts the SNI, but it is not yet widely deployed.
+
+- title: "TLS — Certificate Authority role"
+  difficulty: easy
+  tags: ["networking", "TLS", "certificates", "CA"]
+  lesson: net-tls-and-https
+  Front: |
+    **Certificate Authority (CA)** — What is its role in TLS, and how does trust work?
+  Back: |
+    A CA is a trusted third party that verifies domain ownership and **signs server certificates**.
+
+    **Trust chain:**
+    ```
+    Root CA (built into OS/browser trust store)
+      └── Intermediate CA
+            └── Server certificate
+    ```
+
+    When a server presents its certificate, the browser walks the chain up to a root CA in its trust store, verifying each signature. If the chain is valid, the server is authenticated.
+
+    Browsers ship with ~130 trusted root CA certificates.
+
+- title: "TLS — 0-RTT resumption and replay risk"
+  difficulty: hard
+  tags: ["networking", "TLS", "0-RTT", "security"]
+  lesson: net-tls-and-https
+  Front: |
+    **TLS 0-RTT Resumption** — What does it enable, and what security trade-off does it introduce?
+  Back: |
+    0-RTT lets a returning client send encrypted application data in the **very first packet**, before the handshake completes. This eliminates connection setup latency for repeat visitors.
+
+    **Trade-off:** 0-RTT data is vulnerable to **replay attacks**. An attacker who captures a 0-RTT packet can replay it to the server.
+
+    Safe to use for: idempotent reads (GET requests).
+    Unsafe for: any operation with side effects (POST, payment, state changes).
+
+- title: "TLS — DV vs EV certificates"
+  difficulty: easy
+  tags: ["networking", "TLS", "certificates"]
+  lesson: net-tls-and-https
+  Front: |
+    **TLS Certificates** — What is the difference between Domain Validated (DV) and Extended Validation (EV) certificates?
+  Back: |
+    **DV (Domain Validated):** The CA verifies that the requester controls the domain (via DNS or file challenge). No organizational identity is verified. Free and automated (Let's Encrypt). Used by most websites.
+
+    **EV (Extended Validation):** The CA verifies the legal identity of the organization behind the domain. More expensive, slower, requires paperwork.
+
+    Both encrypt traffic equally. EV provides stronger identity assurance but provides no additional encryption benefit.
+
+# =============================================================================
+# Lesson 6: APIs, Proxies, and Real-Time (net-apis-and-proxies)
+# =============================================================================
+
+- title: "Forward Proxy — definition"
+  difficulty: easy
+  tags: ["networking", "proxy", "forward proxy"]
+  lesson: net-apis-and-proxies
+  Front: |
+    **Forward Proxy** — What is it, and what does it hide?
+  Back: |
+    A forward proxy sits **in front of clients**. All outgoing requests go through the proxy, which forwards them to the internet.
+
+    The destination server sees the proxy's IP, not the client's. **It hides the client from servers.**
+
+    Use cases: corporate internet gateways (filtering, logging), bypassing geo-restrictions, anonymizing client traffic.
+
+- title: "Reverse Proxy — definition"
+  difficulty: easy
+  tags: ["networking", "proxy", "reverse proxy"]
+  lesson: net-apis-and-proxies
+  Front: |
+    **Reverse Proxy** — What is it, and what does it hide?
+  Back: |
+    A reverse proxy sits **in front of servers**. External clients send requests to the reverse proxy, which routes them to the appropriate backend.
+
+    Clients never know the backend servers' addresses. **It hides the servers from clients.**
+
+    Use cases: load balancing, TLS termination, caching, DDoS protection, A/B routing.
+
+    Examples: Nginx, HAProxy, Envoy, AWS ALB.
+
+- title: "Forward vs Reverse Proxy — key distinction"
+  difficulty: easy
+  tags: ["networking", "proxy", "forward proxy", "reverse proxy"]
+  lesson: net-apis-and-proxies
+  Front: |
+    **Proxy Direction** — In one sentence, what is the core distinction between a forward proxy and a reverse proxy?
+  Back: |
+    A **forward proxy** hides the client from servers. A **reverse proxy** hides the servers from the client.
+
+    Forward proxy: client-side, anonymizes outbound traffic.
+    Reverse proxy: server-side, handles inbound traffic, enables load balancing and TLS termination.
+
+- title: "REST — characteristics"
+  difficulty: easy
+  tags: ["networking", "REST", "API"]
+  lesson: net-apis-and-proxies
+  Front: |
+    **REST API** — What are its defining characteristics?
+  Back: |
+    - **Resource-oriented:** URLs are nouns (`/users/123`, `/orders/456`)
+    - **Stateless:** each request contains all needed context
+    - **HTTP methods express intent:** GET reads, POST creates, PUT replaces, DELETE removes
+    - **JSON payloads** (typically)
+    - **Human-readable:** debuggable with a browser or `curl`
+    - **Universal support:** every language and platform
+
+    REST is the default for public APIs and browser-consumed APIs.
+
+- title: "gRPC — characteristics"
+  difficulty: medium
+  tags: ["networking", "gRPC", "API", "Protocol Buffers"]
+  lesson: net-apis-and-proxies
+  Front: |
+    **gRPC** — What are its defining characteristics compared to REST?
+  Back: |
+    - **HTTP/2:** multiplexed, binary framing
+    - **Protocol Buffers:** compact binary serialization (2–10x smaller than JSON)
+    - **Method-oriented:** defined in `.proto` files (`GetUser`, `StreamEvents`)
+    - **Code generation:** client and server stubs generated automatically for any language
+    - **Four call types:** unary, server-streaming, client-streaming, bidirectional streaming
+    - **Harder to debug:** binary format, not readable with `curl`
+
+- title: "REST vs gRPC — when to choose each"
+  difficulty: medium
+  tags: ["networking", "REST", "gRPC", "API", "trade-offs"]
+  lesson: net-apis-and-proxies
+  Front: |
+    **REST vs gRPC** — When should you choose REST, and when should you choose gRPC?
+  Back: |
+    **Choose REST for:**
+    - Public APIs consumed by browser clients or third parties
+    - Simple CRUD services where debuggability matters
+    - Any scenario where curl, browsers, and broad tooling support are valuable
+
+    **Choose gRPC for:**
+    - Internal microservice communication where latency/throughput are critical
+    - Polyglot environments where generated stubs reduce integration bugs
+    - Streaming workloads (bidirectional streaming is native in gRPC)
+
+    Many organizations use REST externally and gRPC internally.
+
+- title: "WebSocket — definition and upgrade process"
+  difficulty: medium
+  tags: ["networking", "WebSocket", "real-time"]
+  lesson: net-apis-and-proxies
+  Front: |
+    **WebSocket** — What is it, and how is the connection established?
+  Back: |
+    WebSocket provides a persistent, **full-duplex TCP channel** between client and server. Either side can send messages at any time.
+
+    **Upgrade process:**
+    1. Client sends an HTTP request with `Upgrade: websocket` header
+    2. Server responds with `101 Switching Protocols`
+    3. The TCP connection is now a WebSocket channel
+
+    Per-message overhead: 2–14 bytes of framing (vs kilobytes for HTTP headers).
+
+    Does not auto-reconnect on failure. Requires WebSocket-aware proxies.
+
+- title: "Long-Polling — how it works"
+  difficulty: easy
+  tags: ["networking", "long-polling", "real-time"]
+  lesson: net-apis-and-proxies
+  Front: |
+    **HTTP Long-Polling** — How does it simulate real-time communication over standard HTTP?
+  Back: |
+    1. Client sends an HTTP request.
+    2. Server holds the request open until new data is available (or a timeout fires).
+    3. Server responds with the data.
+    4. Client immediately sends a new request.
+
+    **Advantages:** Works with any HTTP infrastructure.
+    **Disadvantages:** Full HTTP headers on every exchange, frequent reconnections, high overhead.
+
+    Use long-polling as a fallback when WebSocket or SSE are not available.
+
+- title: "SSE — definition and use case"
+  difficulty: medium
+  tags: ["networking", "SSE", "Server-Sent Events", "real-time"]
+  lesson: net-apis-and-proxies
+  Front: |
+    **Server-Sent Events (SSE)** — What is it, and when should you use it instead of WebSocket?
+  Back: |
+    SSE is a persistent HTTP connection where the server pushes text events to the client in a streaming format. Client-to-server communication still uses separate HTTP requests.
+
+    **Use SSE when:**
+    - You only need **server-to-client push** (dashboards, feeds, notifications)
+    - You want auto-reconnect (built into the browser EventSource API)
+    - You want standard HTTP/2 multiplexing without WebSocket infrastructure
+
+    **Use WebSocket when:** you need true bidirectional real-time communication (chat, gaming, collaborative editing).
+
+- title: "CORS — same-origin policy"
+  difficulty: easy
+  tags: ["networking", "CORS", "security", "browser"]
+  lesson: net-apis-and-proxies
+  Front: |
+    **Same-Origin Policy** — What does it prevent, and how is an origin defined?
+  Back: |
+    The same-origin policy prevents JavaScript on one origin from **reading HTTP responses from a different origin**.
+
+    An **origin** = scheme + host + port. All three must match:
+    - `https://app.example.com:443` ≠ `https://api.example.com:443` (different subdomain)
+    - `https://app.example.com:443` ≠ `http://app.example.com:80` (different scheme + port)
+
+    Without this policy, malicious pages could read your bank data using your stored session cookies.
+
+- title: "CORS — preflight request"
+  difficulty: medium
+  tags: ["networking", "CORS", "preflight", "OPTIONS"]
+  lesson: net-apis-and-proxies
+  Front: |
+    **CORS Preflight** — When does a browser send a preflight request, and what does it do?
+  Back: |
+    A browser sends a **preflight OPTIONS request** before any "complex" cross-origin request:
+
+    - Methods other than GET/POST
+    - Custom headers (e.g., `Authorization`)
+    - `Content-Type: application/json`
+
+    The server must respond with `Access-Control-Allow-Origin`, `Access-Control-Allow-Methods`, and other headers declaring the request is permitted. Only then does the browser send the actual request.
+
+    Preflight adds a round trip — design APIs to avoid unnecessary preflight for frequent calls.
+
+- title: "CORS — server enforcement vs browser enforcement"
+  difficulty: medium
+  tags: ["networking", "CORS", "security"]
+  lesson: net-apis-and-proxies
+  Front: |
+    **CORS** — Is CORS a server-side security control? Can `curl` bypass it?
+  Back: |
+    CORS is a **browser enforcement mechanism**, not a server-side security control.
+
+    `curl`, server-to-server HTTP calls, and non-browser clients **completely ignore CORS headers**. They can make any cross-origin request freely.
+
+    CORS only prevents browser-side JavaScript from reading cross-origin responses. It does not prevent non-browser clients from accessing your API. For server-side security, use authentication and authorization — not CORS.
+
+- title: "CORS — wildcard with credentials conflict"
+  difficulty: hard
+  tags: ["networking", "CORS", "security"]
+  lesson: net-apis-and-proxies
+  Front: |
+    **CORS** — Why can't you combine `Access-Control-Allow-Origin: *` with `Access-Control-Allow-Credentials: true`?
+  Back: |
+    Browsers **reject this combination** by design.
+
+    If both were allowed, any website in the world (`*`) could make credentialed requests to your API using the user's cookies or session tokens — completely undermining the same-origin policy.
+
+    To allow credentialed cross-origin requests, you must specify the exact origin:
+    `Access-Control-Allow-Origin: https://app.example.com`
+
+    Never use the wildcard when you need credentials.
