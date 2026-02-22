@@ -1,0 +1,56 @@
+title: "Storage and S3"
+lesson_slug: "aws-storage-and-s3"
+questions:
+  - question: "Your application needs to store archival data that is accessed at most once or twice a year but must be retrievable within milliseconds when needed. Which S3 storage class is the best fit?"
+    options:
+      - "S3 Standard"
+      - "S3 Standard-IA"
+      - "S3 Glacier Instant Retrieval"
+      - "S3 Glacier Deep Archive"
+    correct: 2
+    explanation: "S3 Glacier Instant Retrieval is designed for archival data that is rarely accessed but must be available in milliseconds. Standard and Standard-IA are for more frequent access. Deep Archive is cheapest but has 12-48 hour retrieval times, which violates the millisecond requirement."
+
+  - question: "What is S3's consistency model?"
+    options:
+      - "Eventual consistency for all operations -- reads may return stale data for a few seconds after a write"
+      - "Strong consistency for GETs but eventual consistency for LIST operations"
+      - "Strong read-after-write consistency for all operations -- PUTs, DELETEs, and LIST"
+      - "Strong consistency only if you use S3 versioning"
+    correct: 2
+    explanation: "Since December 2020, S3 provides strong read-after-write consistency for all operations including PUTs, DELETEs, and LIST. After a successful write, any subsequent read returns the latest version. Before 2020, overwrites and deletes had eventual consistency -- a significant gotcha that has been fixed."
+
+  - question: "What does an S3 lifecycle policy do?"
+    options:
+      - "It enforces access permissions on objects based on their age"
+      - "It automatically transitions objects to cheaper storage classes or expires them based on rules you define"
+      - "It monitors S3 usage and alerts when costs exceed a threshold"
+      - "It replicates objects to another AWS region as they age"
+    correct: 1
+    explanation: "A lifecycle policy automates storage class transitions (e.g., move to Standard-IA after 30 days, Glacier after 90 days) and object expiration (delete after 365 days). Without lifecycle policies, objects stay in their original class forever. This is the primary tool for S3 cost optimization."
+
+  - question: "Your application stores 1 TB of access logs in S3 Standard, but analysis shows the logs are queried within 3 days of creation and never accessed again. What is the cost-optimal storage strategy?"
+    options:
+      - "Keep all logs in S3 Standard for fast access at any time"
+      - "Use S3 Glacier Deep Archive for all logs from day one"
+      - "Use a lifecycle policy to keep logs in Standard for a few days, then transition to a cheaper class"
+      - "Delete logs after 3 days to minimize storage costs"
+    correct: 2
+    explanation: "A lifecycle policy matches the access pattern: Standard (or Standard-IA) for the first few days when logs are actively queried, then transition to Glacier Flexible or Deep Archive for long-term retention. This pays Standard pricing only when access speed matters, and Glacier pricing for the cold archive."
+
+  - question: "When would you choose EBS over S3 for storage?"
+    options:
+      - "When you need to store large binary files like images and videos"
+      - "When multiple EC2 instances need to access the same dataset simultaneously"
+      - "When an application needs block-level access to storage, such as a database writing to disk"
+      - "When you want the cheapest storage option for infrequently accessed data"
+    correct: 2
+    explanation: "EBS is block storage attached to an EC2 instance -- it behaves like a hard drive. Databases (PostgreSQL, MySQL) write at the block level and require EBS or a similar block storage device. S3 is object storage: whole objects are read and written via API, not via block-level disk I/O. For shared access across instances, use EFS (not EBS or S3)."
+
+  - question: "What does enabling S3 versioning provide?"
+    options:
+      - "Automatic encryption of all objects in the bucket"
+      - "Lower storage costs by deduplicating identical objects"
+      - "Retention of every version of every object, protecting against accidental overwrites and deletes"
+      - "Automatic replication of objects to a second AWS region"
+    correct: 2
+    explanation: "Versioning keeps a complete history of every object. Overwriting an object creates a new version while preserving the previous one. Deleting adds a delete marker but keeps all prior versions. You can restore any prior version. The trade-off: versioning increases storage costs because every version is stored."

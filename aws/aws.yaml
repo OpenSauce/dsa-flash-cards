@@ -1,0 +1,803 @@
+# =============================================================================
+# Lesson 1: Compute Fundamentals (10 cards)
+# =============================================================================
+
+- title: "What Is EC2?"
+  difficulty: "easy"
+  tags: ["aws", "compute", "EC2"]
+  lesson: aws-compute-fundamentals
+  Front: |
+    What is Amazon EC2?
+  Back: |
+    A virtual machine running on AWS hardware. You choose the OS (via AMI), instance type (CPU/memory/storage/networking), and network placement. AWS provisions the hardware; you manage everything from the OS upward.
+
+- title: "EC2 Instance Type Definition"
+  difficulty: "easy"
+  tags: ["aws", "compute", "EC2", "instance types"]
+  lesson: aws-compute-fundamentals
+  Front: |
+    What does an EC2 instance type define?
+  Back: |
+    The hardware profile: vCPU count, memory, storage options, and network bandwidth. The instance type family indicates what the instance is optimized for.
+
+- title: "EC2 Instance Family: Compute Optimized"
+  difficulty: "easy"
+  tags: ["aws", "compute", "EC2", "instance types"]
+  lesson: aws-compute-fundamentals
+  Front: |
+    What workload is the EC2 **c** (compute optimized) family designed for?
+  Back: |
+    CPU-bound workloads: batch processing, scientific modeling, video encoding. High CPU-to-memory ratio. Choose `c` when CPU is the bottleneck.
+
+- title: "EC2 Instance Family: Memory Optimized"
+  difficulty: "easy"
+  tags: ["aws", "compute", "EC2", "instance types"]
+  lesson: aws-compute-fundamentals
+  Front: |
+    What workload is the EC2 **r** (memory optimized) family designed for?
+  Back: |
+    Memory-bound workloads: in-memory caches, real-time analytics, large in-memory databases. High memory-to-CPU ratio. Choose `r` when RAM is the bottleneck.
+
+- title: "EC2 Instance Family: Burstable"
+  difficulty: "medium"
+  tags: ["aws", "compute", "EC2", "instance types"]
+  lesson: aws-compute-fundamentals
+  Front: |
+    How does the EC2 **t** (burstable) instance family work?
+  Back: |
+    `t` instances earn CPU credits when CPU usage is below baseline. Spend credits to burst above baseline during spikes. When credits run out, CPU throttles to baseline. Ideal for workloads with variable, spiky traffic. Not suitable for sustained high CPU.
+
+- title: "What Is an AMI?"
+  difficulty: "easy"
+  tags: ["aws", "compute", "EC2", "AMI"]
+  lesson: aws-compute-fundamentals
+  Front: |
+    What is an Amazon Machine Image (AMI)?
+  Back: |
+    A snapshot of a root volume plus launch metadata (block device mapping, architecture). Defines the OS, pre-installed software, and configuration. When you launch an EC2 instance, you select an AMI as the starting point.
+
+- title: "Auto Scaling Group Components"
+  difficulty: "medium"
+  tags: ["aws", "compute", "EC2", "auto scaling"]
+  lesson: aws-compute-fundamentals
+  Front: |
+    What are the three components of an EC2 Auto Scaling Group?
+  Back: |
+    1. **Launch template** -- what to scale: AMI, instance type, security groups
+    2. **Capacity settings** -- minimum, maximum, and desired instance count
+    3. **Scaling policy** -- when to scale: target tracking, step, or scheduled
+
+- title: "Target Tracking vs Step Scaling"
+  difficulty: "medium"
+  tags: ["aws", "compute", "auto scaling"]
+  lesson: aws-compute-fundamentals
+  Front: |
+    What is the difference between target tracking and step scaling policies in an Auto Scaling Group?
+  Back: |
+    **Target tracking**: maintain a metric at a target value (e.g., "keep average CPU at 60%"). The ASG adds or removes instances automatically.
+
+    **Step scaling**: add N instances when a metric crosses threshold X, add M more at threshold Y. Discrete steps triggered by alarm breaches.
+
+- title: "ASG Cooldown Period"
+  difficulty: "medium"
+  tags: ["aws", "compute", "auto scaling"]
+  lesson: aws-compute-fundamentals
+  Front: |
+    What is the cooldown period in an Auto Scaling Group and why does it exist?
+  Back: |
+    A wait period (default 300 seconds) after a scaling action before the ASG can scale again. Prevents thrashing: repeatedly adding and removing instances in response to a metric fluctuating around the threshold. Gives new instances time to start handling load before the metric is re-evaluated.
+
+- title: "Application Load Balancer vs Network Load Balancer"
+  difficulty: "medium"
+  tags: ["aws", "compute", "ELB", "load balancing"]
+  lesson: aws-compute-fundamentals
+  Front: |
+    When would you choose a Network Load Balancer (NLB) over an Application Load Balancer (ALB)?
+  Back: |
+    Choose NLB when you need ultra-low latency or extremely high throughput at Layer 4 (TCP/UDP) -- gaming servers, financial trading, protocols that aren't HTTP/HTTPS.
+
+    ALB operates at Layer 7 (HTTP/HTTPS) and supports path-based routing, host-based routing, and request-level metrics. It is the standard choice for web applications and APIs.
+
+# =============================================================================
+# Lesson 2: Serverless and Containers (9 cards)
+# =============================================================================
+
+- title: "What Is AWS Lambda?"
+  difficulty: "easy"
+  tags: ["aws", "serverless", "Lambda"]
+  lesson: aws-serverless-and-containers
+  Front: |
+    What is AWS Lambda?
+  Back: |
+    A serverless compute service that runs code in response to events. You upload a function; AWS handles execution, scaling, and infrastructure. No servers to provision or manage.
+
+- title: "Lambda Execution Time Limit"
+  difficulty: "easy"
+  tags: ["aws", "serverless", "Lambda"]
+  lesson: aws-serverless-and-containers
+  Front: |
+    What is Lambda's maximum execution duration per invocation?
+  Back: |
+    15 minutes. Lambda is not suitable for long-running processes. If a workload exceeds 15 minutes, use ECS/Fargate or EC2.
+
+- title: "Lambda Cold Start Cause"
+  difficulty: "medium"
+  tags: ["aws", "serverless", "Lambda", "cold start"]
+  lesson: aws-serverless-and-containers
+  Front: |
+    What causes a Lambda cold start?
+  Back: |
+    Lambda must create a new execution environment: download the deployment package, start the runtime, and run initialization code. Happens on the first invocation and when scaling to new concurrent instances.
+
+    Warm invocations reuse the existing environment with no startup overhead.
+
+- title: "Lambda Cold Start Duration by Runtime"
+  difficulty: "medium"
+  tags: ["aws", "serverless", "Lambda", "cold start"]
+  lesson: aws-serverless-and-containers
+  Front: |
+    How do cold start durations compare between Python/Node.js and Java/.NET in Lambda?
+  Back: |
+    **Python/Node.js**: 100–500ms cold start.
+    **Java/.NET**: 1–10 seconds (JVM and CLR startup is expensive).
+
+    Choose Python or Node.js for latency-sensitive Lambda functions.
+
+- title: "Lambda Provisioned Concurrency Trade-off"
+  difficulty: "medium"
+  tags: ["aws", "serverless", "Lambda", "cold start", "provisioned concurrency"]
+  lesson: aws-serverless-and-containers
+  Front: |
+    What does Lambda Provisioned Concurrency do, and what is its trade-off?
+  Back: |
+    Pre-warms a set number of execution environments so they are always ready. Eliminates cold starts for that provisioned capacity.
+
+    **Trade-off**: you pay per provisioned environment per hour, regardless of traffic. This undermines Lambda's pay-per-invocation pricing. Worth it for latency-sensitive user-facing paths; overkill for background processing.
+
+- title: "What Is Amazon ECS?"
+  difficulty: "easy"
+  tags: ["aws", "containers", "ECS"]
+  lesson: aws-serverless-and-containers
+  Front: |
+    What is Amazon ECS?
+  Back: |
+    A managed container orchestration service. You provide a task definition (Docker image, CPU, memory, environment variables, port mappings), and ECS schedules and runs containers. You choose the launch type: EC2 (you manage hosts) or Fargate (AWS manages hosts).
+
+- title: "ECS Fargate vs ECS on EC2"
+  difficulty: "medium"
+  tags: ["aws", "containers", "ECS", "Fargate"]
+  lesson: aws-serverless-and-containers
+  Front: |
+    What is the difference between running ECS on EC2 vs ECS on Fargate?
+  Back: |
+    **ECS on EC2**: containers run on EC2 instances you provision, patch, and scale. More control and lower per-unit cost (especially with Spot instances). You manage the host fleet.
+
+    **ECS on Fargate**: serverless containers. Define the task CPU/memory/image; AWS runs it with no host infrastructure to manage. Higher per-unit cost, zero infrastructure overhead.
+
+- title: "Lambda vs ECS vs EC2 Decision"
+  difficulty: "hard"
+  tags: ["aws", "compute", "Lambda", "ECS", "EC2"]
+  lesson: aws-serverless-and-containers
+  Front: |
+    Given a new workload, how do you decide between Lambda, ECS/Fargate, and EC2?
+  Back: |
+    - Execution > 15 min or needs persistent local state → EC2 or ECS
+    - Containerized, long-running service → ECS/Fargate
+    - Event-triggered, stateless, short-lived (< 15 min) → Lambda
+    - Traffic drops to zero for extended periods → Lambda (pay-per-invocation)
+    - Minimize operational overhead → Lambda or Fargate
+
+    Most architectures combine all three.
+
+- title: "Lambda Initialization Best Practice"
+  difficulty: "medium"
+  tags: ["aws", "serverless", "Lambda", "cold start"]
+  lesson: aws-serverless-and-containers
+  Front: |
+    Where should you initialize SDK clients and database connections in a Lambda function, and why?
+  Back: |
+    Outside the handler, at module level. Module-level code runs once per execution environment (on cold start), not on every invocation. SDK clients and connections are reused across warm invocations, reducing per-invocation latency and connection overhead.
+
+# =============================================================================
+# Lesson 3: Networking and VPC (12 cards)
+# =============================================================================
+
+- title: "What Is a VPC?"
+  difficulty: "easy"
+  tags: ["aws", "networking", "VPC"]
+  lesson: aws-networking-and-vpc
+  Front: |
+    What is an AWS VPC?
+  Back: |
+    Virtual Private Cloud. An isolated virtual network in your AWS account with a defined IP address range (CIDR block). All resources you launch into it get IP addresses from that range. Gives you full control over subnets, routing, and access control.
+
+- title: "What Makes a Subnet Public?"
+  difficulty: "easy"
+  tags: ["aws", "networking", "VPC", "subnets"]
+  lesson: aws-networking-and-vpc
+  Front: |
+    What makes a subnet **public** vs **private** in AWS?
+  Back: |
+    Whether its route table has a route to an internet gateway (`0.0.0.0/0 → igw-xxx`). With this route, resources can be assigned public IPs and receive internet traffic. Without it, the subnet is private -- resources can only be reached from within the VPC.
+
+- title: "What Is a Private Subnet?"
+  difficulty: "easy"
+  tags: ["aws", "networking", "VPC", "subnets"]
+  lesson: aws-networking-and-vpc
+  Front: |
+    What goes in a private subnet and how do resources there access the internet?
+  Back: |
+    Application servers and databases. No route to an internet gateway, so they are not reachable from the internet.
+
+    For outbound internet access (software updates, API calls), traffic routes through a **NAT gateway** in a public subnet.
+
+- title: "Internet Gateway Purpose"
+  difficulty: "easy"
+  tags: ["aws", "networking", "VPC", "internet gateway"]
+  lesson: aws-networking-and-vpc
+  Front: |
+    What does an internet gateway do in a VPC?
+  Back: |
+    Connects the VPC to the public internet. Allows bidirectional traffic: public subnet resources can send traffic out, and the internet can initiate connections to resources with public IP addresses.
+
+- title: "NAT Gateway Purpose"
+  difficulty: "easy"
+  tags: ["aws", "networking", "VPC", "NAT gateway"]
+  lesson: aws-networking-and-vpc
+  Front: |
+    What does a NAT gateway do and where does it live?
+  Back: |
+    Provides outbound-only internet access for private subnet resources. Private instances can reach external APIs and download updates; the internet cannot initiate connections to them.
+
+    NAT gateways live in a **public subnet** and are managed by AWS.
+
+- title: "Internet Gateway vs NAT Gateway"
+  difficulty: "medium"
+  tags: ["aws", "networking", "VPC"]
+  lesson: aws-networking-and-vpc
+  Front: |
+    What is the key difference between an internet gateway and a NAT gateway?
+  Back: |
+    **Internet gateway**: bidirectional. Public subnet resources can send and receive traffic from the internet.
+
+    **NAT gateway**: outbound-only. Private subnet resources can send traffic out; the internet cannot initiate connections in.
+
+- title: "Security Group: Stateful"
+  difficulty: "easy"
+  tags: ["aws", "networking", "security groups"]
+  lesson: aws-networking-and-vpc
+  Front: |
+    Why are security groups called **stateful** firewalls?
+  Back: |
+    If inbound traffic is allowed, the return (outbound) traffic is automatically allowed without a separate rule. You only write rules for one direction of each connection. Security groups track connection state.
+
+- title: "Security Group: Allow-Only Rules"
+  difficulty: "easy"
+  tags: ["aws", "networking", "security groups"]
+  lesson: aws-networking-and-vpc
+  Front: |
+    Can you write explicit **deny** rules in a security group?
+  Back: |
+    No. Security group rules are allow-only. Everything not explicitly allowed is implicitly denied. To block specific IPs or ranges, use a Network ACL (which supports explicit deny rules).
+
+- title: "NACL: Stateless"
+  difficulty: "medium"
+  tags: ["aws", "networking", "NACL"]
+  lesson: aws-networking-and-vpc
+  Front: |
+    Why are Network ACLs called **stateless** firewalls?
+  Back: |
+    NACLs evaluate inbound and outbound rules independently. If you allow inbound HTTP on port 80, you must also explicitly allow the return traffic (ephemeral ports 1024–65535 outbound). No automatic state tracking of connections.
+
+- title: "Security Group vs NACL"
+  difficulty: "medium"
+  tags: ["aws", "networking", "security groups", "NACL"]
+  lesson: aws-networking-and-vpc
+  Front: |
+    What are the key differences between a security group and a Network ACL?
+  Back: |
+    | | Security Group | NACL |
+    |---|---|---|
+    | Level | Resource (instance) | Subnet |
+    | State | Stateful | Stateless |
+    | Rules | Allow only | Allow and deny |
+    | Default | Deny all inbound | Allow all |
+
+- title: "Route Table Purpose"
+  difficulty: "easy"
+  tags: ["aws", "networking", "VPC", "route table"]
+  lesson: aws-networking-and-vpc
+  Front: |
+    What is a VPC route table?
+  Back: |
+    A set of rules controlling where network traffic is directed. Each subnet is associated with a route table. Routes specify: "traffic to this destination should go to this target." The most specific matching route wins.
+
+- title: "3-Tier AWS Architecture"
+  difficulty: "medium"
+  tags: ["aws", "networking", "architecture"]
+  lesson: aws-networking-and-vpc
+  Front: |
+    Describe the standard 3-tier AWS architecture. Where does each tier go and why?
+  Back: |
+    **Public subnets**: load balancer (internet-facing, accepts external traffic)
+    **Private subnets**: application servers (only reachable from the load balancer's security group)
+    **Private subnets**: databases (only reachable from application servers' security group)
+
+    Each security group references the tier above, enforcing least-privilege networking.
+
+# =============================================================================
+# Lesson 4: Security and IAM (10 cards)
+# =============================================================================
+
+- title: "What Is IAM?"
+  difficulty: "easy"
+  tags: ["aws", "security", "IAM"]
+  lesson: aws-security-and-iam
+  Front: |
+    What is AWS IAM?
+  Back: |
+    Identity and Access Management. Controls who can do what on which AWS resources. Every API call in AWS is authorized through IAM.
+
+- title: "IAM User vs IAM Role"
+  difficulty: "easy"
+  tags: ["aws", "security", "IAM"]
+  lesson: aws-security-and-iam
+  Front: |
+    What is the difference between an IAM user and an IAM role?
+  Back: |
+    **IAM user**: long-term identity with persistent credentials (password, access keys). For human operators.
+
+    **IAM role**: temporary identity assumed by AWS services or users. Issues short-lived STS credentials that expire automatically. For EC2 instances, Lambda functions, ECS tasks, and cross-account access.
+
+- title: "IAM Group Purpose"
+  difficulty: "easy"
+  tags: ["aws", "security", "IAM"]
+  lesson: aws-security-and-iam
+  Front: |
+    What is an IAM group?
+  Back: |
+    A collection of IAM users. Policies attached to the group apply to all users in it. Groups have no credentials of their own -- they are an organizational tool to avoid duplicate policy attachments across users.
+
+- title: "IAM Policy Document Structure"
+  difficulty: "medium"
+  tags: ["aws", "security", "IAM", "policy"]
+  lesson: aws-security-and-iam
+  Front: |
+    What are the three required fields in an IAM policy statement?
+  Back: |
+    - **Effect**: `Allow` or `Deny`
+    - **Action**: one or more AWS API actions (e.g., `s3:GetObject`, `ec2:*`)
+    - **Resource**: ARN(s) of the target resources, or `*` for all
+
+- title: "Principle of Least Privilege"
+  difficulty: "easy"
+  tags: ["aws", "security", "IAM"]
+  lesson: aws-security-and-iam
+  Front: |
+    What is the principle of least privilege in IAM?
+  Back: |
+    Grant only the minimum permissions required to perform a task, scoped to specific resources. A Lambda function that reads one S3 bucket should have `s3:GetObject` on that specific bucket ARN -- not `s3:*` on `*`.
+
+- title: "IAM: Explicit Deny Wins"
+  difficulty: "medium"
+  tags: ["aws", "security", "IAM", "policy"]
+  lesson: aws-security-and-iam
+  Front: |
+    In IAM policy evaluation, what happens when an explicit Deny and an explicit Allow both apply to the same action?
+  Back: |
+    The explicit Deny wins. Always. No Allow overrides an explicit Deny, regardless of how many Allow policies apply or which was created first. Default is implicit deny; explicit Deny is even stronger.
+
+- title: "IAM Roles vs Access Keys"
+  difficulty: "medium"
+  tags: ["aws", "security", "IAM"]
+  lesson: aws-security-and-iam
+  Front: |
+    Why are IAM roles preferred over IAM access keys for services running in AWS?
+  Back: |
+    Roles issue temporary STS credentials that expire automatically (typically 1 hour). Access keys are static and persistent -- if leaked, they provide ongoing access until manually deactivated. Roles eliminate the rotation burden and reduce the blast radius of credential compromise.
+
+- title: "IAM Instance Profile"
+  difficulty: "medium"
+  tags: ["aws", "security", "IAM", "EC2"]
+  lesson: aws-security-and-iam
+  Front: |
+    How does an EC2 instance authenticate with other AWS services?
+  Back: |
+    Via an **instance profile** -- a container that holds an IAM role. The instance metadata service (IMDS) provides temporary credentials for the attached role. Applications running on the instance use these credentials automatically via the AWS SDK.
+
+- title: "IAM Policy: Action Field"
+  difficulty: "easy"
+  tags: ["aws", "security", "IAM", "policy"]
+  lesson: aws-security-and-iam
+  Front: |
+    What format do IAM policy actions use, and what does `s3:GetObject` mean?
+  Back: |
+    Actions use the format `service:ApiCall`. `s3:GetObject` means the `GetObject` API operation on Amazon S3 (downloading an object). `s3:*` means all S3 API operations. Actions map directly to AWS API calls.
+
+- title: "When to Use Access Keys"
+  difficulty: "medium"
+  tags: ["aws", "security", "IAM"]
+  lesson: aws-security-and-iam
+  Front: |
+    In what scenarios are IAM access keys appropriate?
+  Back: |
+    Only for external systems that cannot assume a role because they are not running in AWS: a developer's local machine, an on-premises server, or a CI/CD system not in AWS.
+
+    Even here, OIDC-based role assumption (available for GitHub Actions, CircleCI, etc.) is preferred -- it eliminates static credentials entirely.
+
+# =============================================================================
+# Lesson 5: Storage and S3 (12 cards)
+# =============================================================================
+
+- title: "What Is Amazon S3?"
+  difficulty: "easy"
+  tags: ["aws", "storage", "S3"]
+  lesson: aws-storage-and-s3
+  Front: |
+    What is Amazon S3?
+  Back: |
+    An object store: a flat namespace where you store binary objects identified by a bucket + key. Not a filesystem or database. Objects are read and written as whole units via API. Designed for durability (11 nines) and virtually unlimited scale.
+
+- title: "S3 Bucket and Key Model"
+  difficulty: "easy"
+  tags: ["aws", "storage", "S3"]
+  lesson: aws-storage-and-s3
+  Front: |
+    How is an object identified in Amazon S3?
+  Back: |
+    By its **bucket** (globally unique container) and **key** (the object's name within the bucket). There are no real directories -- keys like `images/2025/photo.jpg` are flat strings. S3 has prefixes, not folders.
+
+- title: "S3 Standard Storage Class"
+  difficulty: "easy"
+  tags: ["aws", "storage", "S3", "storage classes"]
+  lesson: aws-storage-and-s3
+  Front: |
+    When should you use the **S3 Standard** storage class?
+  Back: |
+    For frequently accessed data. No retrieval fee, low latency, high throughput. Highest storage cost per GB. Use for active application data, website assets, and frequently read files.
+
+- title: "S3 Standard-IA Trade-off"
+  difficulty: "easy"
+  tags: ["aws", "storage", "S3", "storage classes"]
+  lesson: aws-storage-and-s3
+  Front: |
+    What is the trade-off of S3 Standard-IA vs S3 Standard?
+  Back: |
+    Standard-IA (Infrequent Access) has lower storage cost per GB but charges a **per-GB retrieval fee**. Cost-effective when data is accessed less than once a month. If you retrieve data constantly, the retrieval fees can make it more expensive than Standard.
+
+- title: "S3 Glacier Instant Retrieval"
+  difficulty: "easy"
+  tags: ["aws", "storage", "S3", "storage classes"]
+  lesson: aws-storage-and-s3
+  Front: |
+    What is the S3 Glacier Instant Retrieval storage class designed for?
+  Back: |
+    Archival data that is rarely accessed (once a quarter or less) but must be retrieved in **milliseconds** when needed. Cheaper storage than Standard or Standard-IA, with a retrieval fee. The distinguishing feature: immediate retrieval despite archive-level storage pricing.
+
+- title: "S3 Glacier Deep Archive"
+  difficulty: "easy"
+  tags: ["aws", "storage", "S3", "storage classes"]
+  lesson: aws-storage-and-s3
+  Front: |
+    When is S3 Glacier Deep Archive the right choice?
+  Back: |
+    Long-term archival where retrieval can take **12–48 hours**. The cheapest S3 storage class. Use for regulatory compliance archives, legal holds, or backups you may never need to access.
+
+- title: "S3 Lifecycle Policy"
+  difficulty: "medium"
+  tags: ["aws", "storage", "S3"]
+  lesson: aws-storage-and-s3
+  Front: |
+    What does an S3 lifecycle policy do?
+  Back: |
+    Automates transitions between storage classes and object expiration based on rules you define. Example: move to Standard-IA after 30 days, Glacier Flexible after 90 days, expire after 365 days. Applied to all objects in a bucket or those matching a prefix.
+
+- title: "S3 Strong Consistency"
+  difficulty: "medium"
+  tags: ["aws", "storage", "S3", "consistency"]
+  lesson: aws-storage-and-s3
+  Front: |
+    What is S3's consistency model?
+  Back: |
+    **Strong read-after-write consistency** for all operations (PUTs, DELETEs, LIST) since December 2020. After a successful write, any subsequent read returns the latest version. Before 2020, S3 had eventual consistency for overwrites and deletes.
+
+- title: "S3 Versioning"
+  difficulty: "easy"
+  tags: ["aws", "storage", "S3", "versioning"]
+  lesson: aws-storage-and-s3
+  Front: |
+    What does enabling S3 versioning provide?
+  Back: |
+    Every version of every object is retained. Overwriting creates a new version; deleting adds a delete marker (previous versions survive). Protects against accidental overwrites and deletes. Trade-off: higher storage costs because all versions are stored.
+
+- title: "What Is EBS?"
+  difficulty: "easy"
+  tags: ["aws", "storage", "EBS"]
+  lesson: aws-storage-and-s3
+  Front: |
+    What is Amazon EBS?
+  Back: |
+    Elastic Block Store. Persistent block storage volumes attached to EC2 instances -- behaves like a hard drive. Data persists after the instance stops (unless configured otherwise). Use for databases, application state requiring block-level access, and boot volumes.
+
+- title: "EBS vs S3 Use Cases"
+  difficulty: "medium"
+  tags: ["aws", "storage", "EBS", "S3"]
+  lesson: aws-storage-and-s3
+  Front: |
+    When should you use EBS vs S3?
+  Back: |
+    **EBS**: block storage for one EC2 instance. Use for databases (PostgreSQL, MySQL), application state requiring random byte-level reads/writes.
+
+    **S3**: object storage accessed via API. Use for files, images, backups, logs, datasets -- anything read/written as whole objects.
+
+- title: "What Is EFS?"
+  difficulty: "easy"
+  tags: ["aws", "storage", "EFS"]
+  lesson: aws-storage-and-s3
+  Front: |
+    What is Amazon EFS and when would you use it over EBS?
+  Back: |
+    Elastic File System. Managed NFS filesystem that can be mounted by **multiple EC2 instances simultaneously**. Auto-scales storage, charges per GB stored.
+
+    Use EFS when multiple instances need shared access to the same files: shared content directories, CI build caches, ML training data across a fleet. EBS is single-instance only.
+
+# =============================================================================
+# Lesson 6: Databases (12 cards)
+# =============================================================================
+
+- title: "What Is Amazon RDS?"
+  difficulty: "easy"
+  tags: ["aws", "databases", "RDS"]
+  lesson: aws-databases
+  Front: |
+    What is Amazon RDS?
+  Back: |
+    Relational Database Service. A managed service running familiar SQL engines (PostgreSQL, MySQL, MariaDB, Oracle, SQL Server). AWS handles hardware, OS patching, backups, and software updates. You manage schema, queries, and indexes.
+
+- title: "Aurora vs RDS: Storage Architecture"
+  difficulty: "medium"
+  tags: ["aws", "databases", "Aurora", "RDS"]
+  lesson: aws-databases
+  Front: |
+    How does Aurora's storage architecture differ from standard RDS?
+  Back: |
+    Aurora separates compute from storage. Its distributed storage auto-scales up to 128 TB, replicates data 6 ways across 3 AZs automatically, and provides sub-10ms replication lag to read replicas.
+
+    RDS uses EBS volumes with fixed capacity you must manually resize. Aurora's storage is fundamentally more capable for high-availability workloads.
+
+- title: "Aurora vs RDS: Failover Speed"
+  difficulty: "medium"
+  tags: ["aws", "databases", "Aurora", "RDS"]
+  lesson: aws-databases
+  Front: |
+    How does Aurora's failover speed compare to RDS Multi-AZ?
+  Back: |
+    Aurora failover: ~30 seconds. RDS Multi-AZ failover: 1–2 minutes. Aurora's faster failover is a result of its distributed storage architecture -- there is no need to synchronize a separate standby before promoting.
+
+- title: "What Is DynamoDB?"
+  difficulty: "easy"
+  tags: ["aws", "databases", "DynamoDB"]
+  lesson: aws-databases
+  Front: |
+    What is Amazon DynamoDB?
+  Back: |
+    A fully managed, serverless NoSQL key-value and document store. Provides single-digit millisecond latency at any scale. Pay per read/write request (or reserve capacity). No cluster to provision or manage.
+
+- title: "DynamoDB Access Pattern Constraint"
+  difficulty: "hard"
+  tags: ["aws", "databases", "DynamoDB"]
+  lesson: aws-databases
+  Front: |
+    What is DynamoDB's fundamental data modeling constraint?
+  Back: |
+    Every query must target the partition key (or a Global Secondary Index). There is no flexible SQL WHERE clause. Access patterns must be designed upfront -- adding new access patterns later requires adding GSIs or restructuring the table. RDS is more flexible; DynamoDB is more scalable.
+
+- title: "DynamoDB vs RDS Decision"
+  difficulty: "medium"
+  tags: ["aws", "databases", "DynamoDB", "RDS"]
+  lesson: aws-databases
+  Front: |
+    When should you choose DynamoDB over RDS?
+  Back: |
+    Choose DynamoDB when:
+    - Access patterns are simple and known (get/query by key)
+    - You need massive horizontal scale without operational overhead
+    - Serverless pricing (scale to zero) matters
+    - Workload is key-value: sessions, user preferences, IoT state, shopping carts
+
+    Choose RDS when you need SQL, complex joins, or flexible evolving queries.
+
+- title: "What Is ElastiCache?"
+  difficulty: "easy"
+  tags: ["aws", "databases", "ElastiCache", "caching"]
+  lesson: aws-databases
+  Front: |
+    What is Amazon ElastiCache?
+  Back: |
+    A managed in-memory data store supporting Redis and Memcached. Sits in front of your database, serving frequently accessed data from memory in microseconds instead of from disk in milliseconds.
+
+- title: "ElastiCache Caching Pattern"
+  difficulty: "medium"
+  tags: ["aws", "databases", "ElastiCache", "caching"]
+  lesson: aws-databases
+  Front: |
+    Describe the basic caching pattern with ElastiCache.
+  Back: |
+    1. Application checks the cache for the requested data
+    2. **Cache hit**: return immediately from memory
+    3. **Cache miss**: query the database, store result in cache with a TTL, return result
+
+    Subsequent requests for the same data are served from cache until TTL expires.
+
+- title: "Cache Invalidation Challenge"
+  difficulty: "hard"
+  tags: ["aws", "databases", "caching"]
+  lesson: aws-databases
+  Front: |
+    What is the hardest problem with caching, and what are the common strategies?
+  Back: |
+    **Cache invalidation**: keeping the cache consistent with the database when underlying data changes.
+
+    Strategies:
+    - **TTL expiration**: cache entries expire after a set time. Simple but serves stale data until expiry.
+    - **Explicit invalidation**: application deletes/updates cache entries when it updates the database.
+    - **Write-through**: writes update the cache and database simultaneously. Cache is always current but adds write latency.
+
+- title: "Redis vs Memcached"
+  difficulty: "medium"
+  tags: ["aws", "databases", "ElastiCache", "Redis"]
+  lesson: aws-databases
+  Front: |
+    When would you choose Redis over Memcached in ElastiCache?
+  Back: |
+    Choose Redis when you need: persistence (data survives restarts), replication and failover, advanced data structures (lists, sorted sets, pub/sub), or Lua scripting. Redis also supports atomic operations for use cases like rate limiting counters.
+
+    Memcached is simpler and multi-threaded. In practice, Redis is almost always the right choice.
+
+- title: "Read Replicas Purpose"
+  difficulty: "easy"
+  tags: ["aws", "databases", "RDS", "read replicas"]
+  lesson: aws-databases
+  Front: |
+    What is the purpose of read replicas in RDS or Aurora?
+  Back: |
+    Read replicas are copies of the primary database that serve read traffic, reducing load on the primary for read-heavy workloads. Write traffic still goes to the primary. Replica lag means reads may not reflect the very latest writes.
+
+- title: "Multi-AZ vs Read Replicas"
+  difficulty: "medium"
+  tags: ["aws", "databases", "RDS", "Multi-AZ"]
+  lesson: aws-databases
+  Front: |
+    What is the difference between RDS Multi-AZ and read replicas?
+  Back: |
+    **Multi-AZ**: synchronous standby in a different AZ. Handles no traffic normally. Provides automatic failover if the primary fails. This is a **high availability** feature.
+
+    **Read replicas**: asynchronous copies that serve read queries. Reduce load on the primary. This is a **read scaling** feature.
+
+    Production databases often need both.
+
+# =============================================================================
+# Lesson 7: Messaging, Events, and Global Distribution (12 cards)
+# =============================================================================
+
+- title: "What Is Amazon SQS?"
+  difficulty: "easy"
+  tags: ["aws", "messaging", "SQS"]
+  lesson: aws-messaging-and-events
+  Front: |
+    What is Amazon SQS?
+  Back: |
+    Simple Queue Service. A durable message queue where producers send messages and consumers poll and process them. Each message is delivered to exactly one consumer. Messages persist up to 14 days. Decouples producers from consumers.
+
+- title: "SQS Standard vs FIFO"
+  difficulty: "medium"
+  tags: ["aws", "messaging", "SQS", "FIFO"]
+  lesson: aws-messaging-and-events
+  Front: |
+    What are the key differences between SQS Standard and SQS FIFO queues?
+  Back: |
+    | | Standard | FIFO |
+    |---|---|---|
+    | Ordering | Best-effort | Guaranteed |
+    | Delivery | At-least-once | Exactly-once |
+    | Throughput | Unlimited | 300 msg/s (3,000 batched) |
+
+    Choose Standard by default. Use FIFO only when ordering or exactly-once processing is required (financial transactions, sequential workflows).
+
+- title: "SQS At-Least-Once Delivery"
+  difficulty: "medium"
+  tags: ["aws", "messaging", "SQS"]
+  lesson: aws-messaging-and-events
+  Front: |
+    What does SQS Standard's at-least-once delivery guarantee require of consumers?
+  Back: |
+    Consumers must be **idempotent**: processing the same message twice produces the same result as processing it once. SQS Standard may deliver duplicate messages, so the consumer must handle them safely (e.g., by checking if the action has already been taken before acting).
+
+- title: "Dead-Letter Queue Purpose"
+  difficulty: "easy"
+  tags: ["aws", "messaging", "SQS", "DLQ"]
+  lesson: aws-messaging-and-events
+  Front: |
+    What is an SQS dead-letter queue (DLQ)?
+  Back: |
+    A separate SQS queue that receives messages that have failed processing more than `maxReceiveCount` times. Isolates poison messages from the main queue, enables alerting (CloudWatch alarm on DLQ depth), and allows reprocessing after the bug is fixed.
+
+- title: "DLQ Configuration"
+  difficulty: "medium"
+  tags: ["aws", "messaging", "SQS", "DLQ"]
+  lesson: aws-messaging-and-events
+  Front: |
+    How does a dead-letter queue work mechanically in SQS?
+  Back: |
+    You set `maxReceiveCount` on the source queue (e.g., 5). When a consumer receives a message and fails to delete it (because processing failed), the receive count increments. After 5 failed receipts, SQS automatically moves the message to the DLQ.
+
+- title: "What Is Amazon SNS?"
+  difficulty: "easy"
+  tags: ["aws", "messaging", "SNS"]
+  lesson: aws-messaging-and-events
+  Front: |
+    What is Amazon SNS?
+  Back: |
+    Simple Notification Service. A pub/sub messaging service. One publisher sends a message to an SNS topic, and all subscribers receive a copy simultaneously (push-based fan-out). Subscribers can be SQS queues, Lambda functions, HTTP endpoints, email, or SMS.
+
+- title: "SNS vs SQS: Push vs Pull"
+  difficulty: "medium"
+  tags: ["aws", "messaging", "SNS", "SQS"]
+  lesson: aws-messaging-and-events
+  Front: |
+    How does SNS's delivery model differ from SQS's?
+  Back: |
+    **SNS**: push-based. AWS pushes messages to all subscribers simultaneously. No retention -- if a subscriber is down, messages are lost (unless the subscriber is an SQS queue).
+
+    **SQS**: pull-based. Consumers poll the queue at their own pace. Messages persist up to 14 days.
+
+- title: "SNS + SQS Fan-Out Pattern"
+  difficulty: "medium"
+  tags: ["aws", "messaging", "SNS", "SQS", "architecture"]
+  lesson: aws-messaging-and-events
+  Front: |
+    Describe the SNS + SQS fan-out pattern and when you'd use it.
+  Back: |
+    An SNS topic publishes to multiple SQS queues simultaneously. Each queue is consumed independently by a different service.
+
+    Use when one event must trigger multiple independent downstream actions (e.g., "order placed" → inventory queue + email queue + analytics queue). Each consumer gets durability, retry semantics, and independent DLQ. Adding a new consumer = new queue + new SNS subscription; producer never changes.
+
+- title: "What Is Amazon EventBridge?"
+  difficulty: "medium"
+  tags: ["aws", "messaging", "EventBridge"]
+  lesson: aws-messaging-and-events
+  Front: |
+    What is Amazon EventBridge?
+  Back: |
+    A serverless event bus for routing events between AWS services, SaaS integrations, and your own services. Supports content-based routing (matching on event payload fields), 90+ native AWS event sources, event archive and replay, and a schema registry.
+
+- title: "EventBridge vs SNS"
+  difficulty: "hard"
+  tags: ["aws", "messaging", "EventBridge", "SNS"]
+  lesson: aws-messaging-and-events
+  Front: |
+    When should you choose EventBridge over SNS?
+  Back: |
+    Choose EventBridge when you need: content-based routing (match on payload fields), native AWS service event sources without custom code, event replay for debugging or new consumer bootstrap, or schema registry for event contracts.
+
+    Choose SNS for simple fan-out where filtering is based on message attributes (not payload content) and you don't need replay.
+
+- title: "What Is CloudFront?"
+  difficulty: "easy"
+  tags: ["aws", "CDN", "CloudFront"]
+  lesson: aws-messaging-and-events
+  Front: |
+    What is Amazon CloudFront?
+  Back: |
+    AWS's Content Delivery Network with 400+ edge locations. Caches and serves content from the location nearest to the user. On a cache hit, the edge returns content immediately without contacting the origin. Reduces latency for global users and load on the origin.
+
+- title: "Route 53 Routing Policies"
+  difficulty: "medium"
+  tags: ["aws", "DNS", "Route 53"]
+  lesson: aws-messaging-and-events
+  Front: |
+    Which Route 53 routing policy is used for multi-region deployments where users should be sent to the fastest region?
+  Back: |
+    **Latency-based routing**. Route 53 measures latency from each region and routes users to the region with the lowest measured latency.
+
+    Pair with **failover routing** (or health checks) to automatically redirect traffic if a region goes unhealthy. This is the standard multi-region Route 53 answer.

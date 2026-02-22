@@ -1,0 +1,56 @@
+title: "Messaging, Events, and Global Distribution"
+lesson_slug: "aws-messaging-and-events"
+questions:
+  - question: "Which SQS queue type guarantees that messages are delivered in exactly the order they were sent?"
+    options:
+      - "SQS Standard"
+      - "SQS FIFO"
+      - "Both types guarantee ordering"
+      - "Neither type guarantees ordering -- ordering must be managed by the consumer"
+    correct: 1
+    explanation: "SQS FIFO (First-In-First-Out) guarantees ordering and exactly-once processing within a 5-minute deduplication window. SQS Standard offers best-effort ordering -- messages may arrive out of order. Standard has near-unlimited throughput; FIFO is limited to 300 msg/s (3,000 with batching). Choose Standard by default unless ordering is a hard requirement."
+
+  - question: "What is the purpose of an SQS dead-letter queue?"
+    options:
+      - "It stores messages that have been successfully processed for audit purposes"
+      - "It receives messages that have failed processing after exceeding the maximum receive count, isolating failures for debugging and alerting"
+      - "It automatically retries failed messages on a scheduled basis"
+      - "It permanently archives messages that have exceeded the retention period"
+    correct: 1
+    explanation: "A DLQ receives messages that have been received (and failed) more than maxReceiveCount times. It isolates poison messages from the main queue, provides visibility via CloudWatch alarms on DLQ depth, and enables reprocessing after the bug is fixed. Every production SQS queue should have a DLQ."
+
+  - question: "How does SNS differ from SQS in its delivery model?"
+    options:
+      - "SNS pulls messages from a queue; SQS pushes messages to subscribers"
+      - "SNS pushes messages to all subscribers simultaneously (pub/sub); SQS holds messages until a consumer polls (queue)"
+      - "SNS guarantees message ordering; SQS does not"
+      - "SNS retains messages for up to 14 days; SQS messages are delivered immediately or dropped"
+    correct: 1
+    explanation: "SNS is push-based pub/sub: one message to one topic is delivered simultaneously to all subscribers. SQS is pull-based queue: consumers poll the queue, and each message is processed by exactly one consumer. SNS doesn't retain messages -- for durability, subscribe SQS queues to SNS topics."
+
+  - question: "You need to route events to different Lambda functions based on the value of a field inside the event payload. Which service is designed for this?"
+    options:
+      - "SQS with message filtering"
+      - "SNS with attribute-based filtering"
+      - "EventBridge with content-based routing rules"
+      - "CloudWatch Events with metric filters"
+    correct: 2
+    explanation: "EventBridge supports content-based routing -- rules that match on fields inside the event payload (e.g., 'route events where detail.status == failed to the fraud Lambda'). SNS can filter on message attributes but not on arbitrary payload content. EventBridge is the right choice when routing logic depends on event payload fields."
+
+  - question: "What is the SNS + SQS fan-out pattern and why is it used?"
+    options:
+      - "An SNS topic receives messages from multiple SQS queues and aggregates them for processing"
+      - "An SNS topic publishes to multiple SQS queues simultaneously, so each downstream service gets its own durable queue with independent retry semantics"
+      - "SNS and SQS are used together to implement request-response patterns between microservices"
+      - "SNS is used to encrypt messages before they are stored in SQS"
+    correct: 1
+    explanation: "An SNS topic fans out a single event to multiple SQS queues -- one per downstream consumer. Each queue provides independent message retention, retry semantics, DLQ configuration, and consumer-controlled processing pace. Adding a new consumer means subscribing a new queue to SNS; the producer never changes."
+
+  - question: "What does CloudFront Origin Shield do?"
+    options:
+      - "It encrypts traffic between CloudFront edge locations and your origin server"
+      - "It blocks direct access to your origin by requiring all traffic to go through CloudFront"
+      - "It adds a centralized caching layer between regional edge caches and your origin, reducing the number of origin fetches on cache misses"
+      - "It monitors origin health and automatically switches to a backup origin if the primary fails"
+    correct: 2
+    explanation: "Without Origin Shield, each regional edge cache independently fetches from your origin on a cache miss -- if content is missed in 10 regions, your origin gets 10 requests. Origin Shield adds one centralized cache between all regional edges and the origin. A cache miss in any region first checks Origin Shield; only one request reaches the origin. It reduces origin load for globally accessed content."
