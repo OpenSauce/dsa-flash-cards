@@ -1,0 +1,56 @@
+title: "Balanced Trees"
+lesson_slug: "ads-balanced-trees"
+questions:
+  - question: "Why does inserting keys 1, 2, 3, 4, 5 into an unbalanced BST degrade search to O(n)?"
+    options:
+      - "The tree exceeds its maximum allowed height"
+      - "Each key is larger than the previous, so every insert goes right, forming a linked list"
+      - "The BST invariant is violated after three consecutive inserts"
+      - "Keys must be inserted in random order to maintain O(log n) search"
+    correct: 1
+    explanation: "A BST always inserts to the left if the new key is smaller, right if larger. Inserting in sorted ascending order puts every new node as the rightmost leaf, creating a right-skewed chain. This is effectively a linked list with O(n) search."
+
+  - question: "Why are new nodes inserted as RED in a red-black tree, not BLACK?"
+    options:
+      - "Red nodes are cheaper to allocate than black nodes"
+      - "Inserting a black node would change the black-height of every path through it, requiring a full rebalance"
+      - "Red nodes can be converted to black nodes without rotations"
+      - "The root is always black, so all inserted nodes must start as red to maintain the invariant"
+    correct: 1
+    explanation: "Invariant 5 requires equal black-height on every root-to-leaf path. Adding a black node increases the black-height of all paths through it, a violation that cannot be fixed locally. A red insertion might only violate the 'no consecutive red nodes' rule (invariant 4), which is fixable with at most 2 local rotations and recoloring."
+
+  - question: "What is the maximum height guarantee of a red-black tree with n nodes?"
+    options:
+      - "log₂(n)"
+      - "1.44 × log₂(n)"
+      - "2 × log₂(n)"
+      - "n / 2"
+    correct: 2
+    explanation: "The five red-black invariants together ensure no path from root to leaf is more than twice the length of the shortest path. This bounds the height at 2 × log₂(n). AVL trees give a tighter bound of 1.44 × log₂(n), but require more rotations on insert."
+
+  - question: "Compared to AVL trees, how many rotations does a red-black tree require per insert?"
+    options:
+      - "At most 2 rotations"
+      - "At most log n rotations"
+      - "At most n rotations"
+      - "No rotations — only recoloring"
+    correct: 0
+    explanation: "A red-black tree fix-up requires at most 2 rotations per insert. AVL trees may need O(log n) rotations to restore balance after an insert. This makes red-black trees preferred in write-heavy workloads."
+
+  - question: "What makes a skip list probabilistic rather than deterministic?"
+    options:
+      - "The comparison function uses a random hash instead of lexicographic order"
+      - "Each new element is assigned a random height, determining how many express-lane levels it participates in"
+      - "The structure randomly chooses between BST and linked list behavior"
+      - "Elements are inserted at random positions and sorted lazily"
+    correct: 1
+    explanation: "When inserting a new element, its level (height) is determined by repeated coin flips: add another level with probability p (typically 0.5) until the flip fails. This random height assignment gives O(log n) expected performance without deterministic rebalancing."
+
+  - question: "Where are skip lists used in production systems, and why not a balanced BST instead?"
+    options:
+      - "In file systems, because skip lists use less disk space than BSTs"
+      - "In Redis sorted sets and Java ConcurrentSkipListMap, because skip lists are easier to implement in a lock-free, concurrent manner"
+      - "In SQL databases as the primary index structure, because skip lists guarantee O(1) lookup"
+      - "In compilers for symbol tables, because skip lists have better cache locality than BSTs"
+    correct: 1
+    explanation: "Skip list insertions only modify local forward pointers, not ancestor nodes. This makes lock-free concurrent implementations straightforward. Balanced BSTs (like red-black trees) require walking up and modifying the path from the inserted node to the root, which is harder to make thread-safe without locking."
