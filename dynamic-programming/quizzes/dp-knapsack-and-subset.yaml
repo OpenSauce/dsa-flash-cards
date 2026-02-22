@@ -1,0 +1,56 @@
+title: "Knapsack and Subset Problems"
+lesson_slug: "dp-knapsack-and-subset"
+questions:
+  - question: "In the 1D space-optimized 0/1 knapsack, why must you iterate capacity right-to-left (from W down to weight[i])?"
+    options:
+      - "Right-to-left is faster due to better cache access patterns"
+      - "Left-to-right would skip items with large weights"
+      - "Right-to-left ensures dp[w - weight[i]] still reflects the state before item i was processed, so item i is counted at most once"
+      - "The order doesn't matter -- both directions give correct results"
+    correct: 2
+    explanation: "When computing dp[w] for the current item, dp[w - weight[i]] must be from the *previous* pass (without this item). Iterating right-to-left ensures smaller capacities haven't been updated yet in the current pass. Left-to-right would use an already-updated dp[w - weight[i]], effectively allowing item i to be used more than once -- turning 0/1 into unbounded knapsack."
+
+  - question: "How does unbounded knapsack differ from 0/1 knapsack in iteration direction, and why?"
+    options:
+      - "Unbounded knapsack iterates right-to-left; 0/1 iterates left-to-right"
+      - "Unbounded knapsack iterates left-to-right, allowing dp[w - weight[i]] to already include the current item (enabling reuse); 0/1 iterates right-to-left to prevent reuse"
+      - "Both iterate left-to-right but unbounded uses a 2D table"
+      - "Unbounded knapsack doesn't use DP -- it uses a greedy fractional approach"
+    correct: 1
+    explanation: "Left-to-right iteration means dp[w - weight[i]] may already have been updated in this pass to include item i. That is exactly what you want for unbounded knapsack -- item i can be added again. For 0/1, you want to prevent that by iterating right-to-left."
+
+  - question: "In coin change, what is the difference between 'minimum number of coins' and 'number of combinations'?"
+    options:
+      - "They use the same recurrence but different base cases"
+      - "Minimum coins uses min() over coin options with +1 for each coin; combinations uses addition (+= dp[a - coin]) -- completely different recurrences and semantics"
+      - "Minimum coins requires a sorted coin array; combinations does not"
+      - "They are equivalent -- every minimum-coins solution corresponds to exactly one combination"
+    correct: 1
+    explanation: "Minimum coins: dp[a] = min(dp[a - coin] + 1) -- optimization. Combinations: dp[a] += dp[a - coin] -- counting. For combinations, iterating coins in the outer loop and amounts in the inner loop ensures each combination is counted once (not each permutation)."
+
+  - question: "How do you reduce 'partition equal subset sum' to a knapsack problem?"
+    options:
+      - "Sort the array and apply 0/1 knapsack directly"
+      - "If total sum is odd, return false. Otherwise, find a subset that sums to total/2 -- this is a boolean 0/1 knapsack feasibility check"
+      - "Apply unbounded knapsack with each element as a coin denomination"
+      - "Use greedy: always pick the largest element that doesn't exceed total/2"
+    correct: 1
+    explanation: "The reduction chain: odd total -> impossible (return false). Even total -> need subset summing to total/2. Finding a subset with exact sum is subset sum. Subset sum is boolean 0/1 knapsack where dp[j] = true if some subset sums to j. Right-to-left iteration (no reuse)."
+
+  - question: "Which of these problems is NOT a knapsack variant?"
+    options:
+      - "Subset sum: does any subset of integers sum to target T?"
+      - "Partition equal subset sum: can the array be split into two equal-sum subsets?"
+      - "Longest common subsequence: find the longest subsequence in both strings"
+      - "Coin change: minimum coins to make a target amount"
+    correct: 2
+    explanation: "LCS is a two-string DP problem with a 2D state (i, j) indexed into both strings. It does not fit the knapsack pattern of items + capacity constraint. Subset sum, partition equal subset sum, and coin change all follow the items-with-capacity structure of knapsack."
+
+  - question: "In the subset sum DP table, what does each cell dp[j] represent?"
+    options:
+      - "The number of subsets that sum to exactly j"
+      - "True if some subset of the processed items sums to exactly j, false otherwise"
+      - "The minimum number of elements needed to sum to j"
+      - "The maximum sum achievable without exceeding j"
+    correct: 1
+    explanation: "Subset sum uses a boolean DP: dp[j] = true/false answering 'can I make exactly sum j from items processed so far?' The recurrence is dp[j] = dp[j] || dp[j - num]. This is 0/1 knapsack replacing value optimization with feasibility."

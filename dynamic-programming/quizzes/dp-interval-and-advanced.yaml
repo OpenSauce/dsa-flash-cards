@@ -1,0 +1,56 @@
+title: "Interval DP and Advanced Patterns"
+lesson_slug: "dp-interval-and-advanced"
+questions:
+  - question: "In interval DP, why must you iterate by subrange length (outer loop) rather than by left endpoint?"
+    options:
+      - "Iterating by length is faster due to better cache access"
+      - "Iterating by left endpoint gives the same result but takes more memory"
+      - "When computing dp[left][right], you need dp[left][split] and dp[split+1][right] for all splits -- these are shorter intervals. Iterating by length guarantees all shorter intervals are fully computed before any longer interval"
+      - "The left endpoint is fixed, so there is no meaningful way to iterate over it"
+    correct: 2
+    explanation: "dp[left][right] depends on dp[left][split] and dp[split+1][right] -- both strictly shorter intervals. If you iterate by left endpoint, when you reach (left, right), some sub-intervals may not be computed yet. Iterating by length ensures length k-1 intervals are all done before you compute any length k interval."
+
+  - question: "In matrix chain multiplication, what does dp[i][j] represent?"
+    options:
+      - "The dimensions of the result matrix when multiplying matrices i through j"
+      - "The minimum number of scalar multiplications to compute the product of matrices i through j"
+      - "Whether matrices i and j are compatible for multiplication"
+      - "The optimal split point k for multiplying matrices i through j"
+    correct: 1
+    explanation: "dp[i][j] is the minimum cost (scalar multiplications) to compute the product of the chain from matrix i to matrix j. The split point k represents the last multiplication: (M_i ... M_k) * (M_{k+1} ... M_j). The cost is dp[i][k] + dp[k+1][j] + (cost of the final multiplication)."
+
+  - question: "In the patience sorting approach to LIS, how does maintaining the 'tails' array achieve O(n log n)?"
+    options:
+      - "It sorts the array first and then applies a linear scan"
+      - "For each element, binary search finds its position in the tails array in O(log n) -- either extending tails or replacing a value. Processing all n elements gives O(n log n) total"
+      - "It groups elements by value and processes each group in constant time"
+      - "It uses a segment tree to answer range minimum queries"
+    correct: 1
+    explanation: "tails[k] is the smallest tail of any increasing subsequence of length k+1. For each new element, binary search (O(log n)) finds the leftmost position to replace or append. This maintains the greedy invariant: smallest possible tails maximize future extensibility. n elements * O(log n) per element = O(n log n) total."
+
+  - question: "In stock trading with cooldown (state machine DP), what does each 'state' represent?"
+    options:
+      - "The current stock price relative to the purchase price"
+      - "A distinct mode you can be in: 'held' (currently own stock), 'sold' (just sold today, must rest tomorrow), or 'rest' (not holding, can act freely)"
+      - "The number of transactions remaining"
+      - "The day of the week (cooldowns only apply on weekdays)"
+    correct: 1
+    explanation: "State machine DP models the problem as discrete modes. Each state captures what actions are currently available: 'held' allows selling but not buying; 'sold' forces a rest day; 'rest' allows buying. Transitions define what happens when you act. The state encodes all relevant history -- you don't need to track the full sequence of past decisions."
+
+  - question: "How do you recognize whether a new problem is interval DP vs a knapsack problem?"
+    options:
+      - "Interval DP problems are always O(n^3); knapsack is always O(n^2)"
+      - "Interval DP involves making choices over a contiguous subrange of a sequence (trying all split points within [left, right]); knapsack involves selecting items from a collection with a capacity constraint"
+      - "If the input is a string, it's interval DP; if it's an array, it's knapsack"
+      - "Interval DP requires two loops; knapsack requires three loops"
+    correct: 1
+    explanation: "Interval DP: the state is a subrange [left, right] and you try all split points inside it. Examples: matrix chain (split the chain), burst balloons (last balloon in range). Knapsack: you process items one by one, deciding whether to include each given a remaining capacity. Examples: subset sum, coin change. The structural question is whether you're splitting a contiguous range or selecting from a collection."
+
+  - question: "What does the bitmask encode in bitmask DP?"
+    options:
+      - "The binary representation of the current optimal value"
+      - "The index of the last item processed"
+      - "Which items or nodes are currently in the active set (subset) -- each bit position corresponds to one item; bit = 1 means included"
+      - "The direction of traversal (left-to-right vs right-to-left)"
+    correct: 2
+    explanation: "A bitmask of n bits represents all 2^n subsets of n items. Bit k is 1 if item k is included in the current set. This allows tracking which cities have been visited (TSP), which people are assigned (assignment problem), or which items have been chosen. State transitions set, clear, or test individual bits with bitwise operations."

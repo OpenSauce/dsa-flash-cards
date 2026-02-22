@@ -1,0 +1,56 @@
+title: "Linear DP and Counting"
+lesson_slug: "dp-linear-and-counting"
+questions:
+  - question: "In Kadane's algorithm, what decision is made at each index i?"
+    options:
+      - "Whether to include index i in the global maximum or skip it"
+      - "Whether to extend the subarray ending at i-1 by including arr[i], or start a new subarray beginning at arr[i]"
+      - "Whether to use the element at i as the start or the end of the subarray"
+      - "Whether the maximum subarray is to the left or right of index i"
+    correct: 1
+    explanation: "At each index, dp[i] = max(arr[i], dp[i-1] + arr[i]). If dp[i-1] is negative, starting fresh at arr[i] is better. If dp[i-1] is positive, extending it adds to the sum. The global answer is max over all dp[i]."
+
+  - question: "In the house robber problem, why doesn't a greedy strategy (e.g., always rob the highest-valued adjacent-free house) always work?"
+    options:
+      - "Because greedy algorithms never work on DP problems"
+      - "Because the greedy choice ignores how current decisions constrain future choices -- a moderately valued house now might block a much more valuable house next door"
+      - "Because greedy requires sorting the houses first, changing their order"
+      - "Because greedy only works when all house values are positive"
+    correct: 1
+    explanation: "Consider [2, 10, 3, 1, 9]. Greedy picks 10 first, then must skip 3 and 9 because of adjacency. But robbing 2, 3, 9 = 14 beats 10. Local maximum choices interact non-locally -- DP evaluates all consistent subsets."
+
+  - question: "What distinguishes a counting DP problem from an optimization DP problem?"
+    options:
+      - "Counting DP uses 2D tables; optimization DP uses 1D tables"
+      - "Counting DP combines subproblem answers with addition (total number of ways); optimization DP combines with max or min (best value)"
+      - "Counting DP always has more states than optimization DP"
+      - "Counting DP requires memoization; optimization DP requires tabulation"
+    correct: 1
+    explanation: "In optimization DP, you take max or min of alternatives. In counting DP, you add up alternatives -- each valid path contributes independently to the total count. The recurrence structure is similar, but the combining operation and base case values differ (count: base = 1; optimization: base = 0 or infinity)."
+
+  - question: "When can a 1D DP that uses an O(n) array be reduced to O(1) space?"
+    options:
+      - "Only when the answer is the last element of the array"
+      - "Whenever the recurrence uses only max or min (never addition)"
+      - "When dp[i] depends on only a constant number of previous entries"
+      - "When the input array is sorted"
+    correct: 2
+    explanation: "If dp[i] only needs dp[i-1] and dp[i-2], you can replace the array with two variables. The window of required previous values is bounded. Both Kadane's (one variable) and house robber (two variables) reduce to O(1) space this way."
+
+  - question: "In the decode ways problem, what makes handling the digit '0' critical?"
+    options:
+      - "'0' represents the letter Z, which decodes differently"
+      - "'0' alone is not a valid letter (letters are 1-26), so a standalone '0' contributes 0 ways; only a two-digit group ending in '0' (10 or 20) is valid"
+      - "'0' must always be paired with the digit before it"
+      - "'0' resets the DP table to its base case value"
+    correct: 1
+    explanation: "Letters map to 1-26. '0' has no valid single-digit decoding. If s[i] == '0', dp[i] += 0 from the single-digit branch. Only the two-digit branch (10 or 20) is valid. A '0' that can't be part of a valid two-digit group makes dp[i] = 0 (no valid decodings from this prefix)."
+
+  - question: "In Kadane's algorithm, when should you restart the subarray (set curr_max = arr[i]) instead of extending it?"
+    options:
+      - "When arr[i] is negative"
+      - "When arr[i] is zero"
+      - "When curr_max + arr[i] < arr[i], which simplifies to curr_max < 0"
+      - "When arr[i] is smaller than the previous element"
+    correct: 2
+    explanation: "Restart when curr_max < 0. Adding a negative running sum to arr[i] produces a result smaller than arr[i] alone. Restarting means: the best subarray ending at this index is just [arr[i]] itself. Even if arr[i] is negative, starting fresh here is better than carrying a more-negative prefix."
