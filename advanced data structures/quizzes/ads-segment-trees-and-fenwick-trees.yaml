@@ -1,0 +1,56 @@
+title: "Segment Trees and Fenwick Trees"
+lesson_slug: "ads-segment-trees-and-fenwick-trees"
+questions:
+  - question: "What does each node in a segment tree represent?"
+    options:
+      - "A single element of the original array"
+      - "An interval (subarray) of the original array, storing the aggregated value for that interval"
+      - "A comparison result between two adjacent elements"
+      - "A pointer to the next level of the binary tree"
+    correct: 1
+    explanation: "Each segment tree node covers an interval [l, r] of the array and stores the aggregate (sum, min, max, etc.) of all elements in that range. The root covers the entire array; leaves cover individual elements."
+
+  - question: "What is the time complexity of building a segment tree from an array of n elements?"
+    options:
+      - "O(n log n)"
+      - "O(n²)"
+      - "O(n)"
+      - "O(log n)"
+    correct: 2
+    explanation: "Building bottom-up processes each of the 2n nodes exactly once — n leaves are set from the array, and n-1 internal nodes are computed from their two children. Total work is O(n)."
+
+  - question: "Which structure handles arbitrary range queries (min, max, GCD) in addition to range sum?"
+    options:
+      - "Fenwick tree, because it supports any associative operation"
+      - "Segment tree, because each node can store any aggregated value for its interval"
+      - "Both support arbitrary aggregations equally well"
+      - "Neither — both are limited to range sum queries"
+    correct: 1
+    explanation: "A segment tree node stores the aggregate of its interval using any associative function (sum, min, max, GCD, XOR, etc.). You just change what each node stores and how internal nodes combine their children. A Fenwick tree is fundamentally a prefix-sum structure and does not generalize to min/max natively."
+
+  - question: "What does the expression i & -i compute, and why is it used in a Fenwick tree?"
+    options:
+      - "It computes the integer square root of i, used to find the midpoint of a range"
+      - "It isolates the lowest set bit of i, determining the size of the range that index i is responsible for"
+      - "It flips all bits of i, producing the complement index in the Fenwick array"
+      - "It checks if i is even or odd, routing queries to the left or right subtree"
+    correct: 1
+    explanation: "In two's complement, -i is the bitwise NOT of i plus one. `i & -i` zeros out all bits except the lowest set bit. In a Fenwick tree, this value determines how many array elements index i is responsible for, enabling efficient navigation between parent and child ranges."
+
+  - question: "When is a Fenwick tree a better choice than a segment tree?"
+    options:
+      - "When you need range min or range max queries"
+      - "When you need lazy propagation for range updates"
+      - "When you only need prefix queries (or range queries expressible as two prefix queries) and want simpler code"
+      - "When the array is too large to fit in O(n) space"
+    correct: 2
+    explanation: "A Fenwick tree supports prefix queries and point updates in O(log n) with O(n) space and about 10 lines of code. When your problem reduces to prefix sums (or differences of two prefix sums for range queries), a Fenwick tree is faster to implement and has smaller constants than a segment tree."
+
+  - question: "What problem does lazy propagation solve in a segment tree?"
+    options:
+      - "It prevents the tree from becoming unbalanced after many updates"
+      - "It allows range updates (e.g., add 5 to all elements in [l, r]) to remain O(log n) instead of O(n)"
+      - "It reduces the build time from O(n) to O(log n)"
+      - "It enables the segment tree to answer both prefix and suffix queries simultaneously"
+    correct: 1
+    explanation: "Without lazy propagation, updating every element in a range requires touching each element individually — O(n) per range update. Lazy propagation stores a pending update at each node and pushes it to children only when that node is visited, keeping range updates at O(log n)."

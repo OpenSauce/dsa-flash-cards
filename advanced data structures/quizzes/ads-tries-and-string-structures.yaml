@@ -1,0 +1,56 @@
+title: "Tries and String Structures"
+lesson_slug: "ads-tries-and-string-structures"
+questions:
+  - question: "What is the time complexity of inserting a word into a trie?"
+    options:
+      - "O(n), where n is the number of words already in the trie"
+      - "O(k), where k is the length of the word being inserted"
+      - "O(log n), where n is the number of nodes in the trie"
+      - "O(n × k), where n is the number of words and k is average word length"
+    correct: 1
+    explanation: "Trie insert traverses one edge per character. The time is proportional to the length of the word being inserted (k), regardless of how many words are already in the trie."
+
+  - question: "A trie stores the words 'app' and 'apple'. Without an isEnd flag, what problem occurs when searching for 'app'?"
+    options:
+      - "The search returns false because the path for 'app' does not exist"
+      - "The search returns true incorrectly when 'app' was never inserted, only 'apple'"
+      - "The trie cannot store both words simultaneously"
+      - "The search takes O(n) time instead of O(k)"
+    correct: 1
+    explanation: "Without isEnd, any traversal that successfully reaches the last character returns true. Searching for 'app' reaches the 'p' node shared by 'apple' and returns true even if 'app' was never inserted. The isEnd flag distinguishes complete words from internal prefixes."
+
+  - question: "What is the main space trade-off of a trie compared to a hash map?"
+    options:
+      - "A trie uses less memory because it shares common prefixes"
+      - "A trie uses more memory, especially with large alphabets, because each node reserves space for every possible child"
+      - "A trie and a hash map use equivalent memory for the same set of strings"
+      - "A trie uses more memory only when the strings have no common prefixes"
+    correct: 1
+    explanation: "Each trie node must store a reference for every character in the alphabet. With ASCII (128) or Unicode alphabets, a node can consume hundreds of bytes even when most child slots are empty. Using a hash map of children instead of a fixed array reduces this overhead."
+
+  - question: "What does a suffix array store?"
+    options:
+      - "All substrings of a string, sorted alphabetically"
+      - "The starting indices of all suffixes of a string, sorted in lexicographic order"
+      - "A compressed representation of all prefixes of a string"
+      - "The frequency count of each character in the string"
+    correct: 1
+    explanation: "A suffix array is an array of integer indices, where each index is the starting position of a suffix of the original string, and the indices are sorted so the corresponding suffixes are in lexicographic order."
+
+  - question: "A suffix array enables substring search in O(m log n) time. What do m and n represent?"
+    options:
+      - "m is the string length; n is the number of occurrences of the pattern"
+      - "m is the pattern length; n is the length of the original string"
+      - "m is the alphabet size; n is the string length"
+      - "m and n are both the string length — the complexity is O(n log n)"
+    correct: 1
+    explanation: "Substring search uses binary search over the sorted suffix array. Each binary search step compares the pattern (length m) against a suffix. There are O(log n) steps, giving O(m log n) total."
+
+  - question: "When should you prefer a trie over a hash map for storing strings?"
+    options:
+      - "When you only need exact-match lookups and memory is plentiful"
+      - "When you need prefix search, autocomplete, or sorted iteration over keys"
+      - "When the strings have no common prefixes"
+      - "When the alphabet has more than 26 characters"
+    correct: 1
+    explanation: "A hash map gives O(k) exact lookup, matching a trie. But tries support prefix operations (autocomplete, 'all words starting with X') and return keys in lexicographic order naturally. For exact lookup only, a hash map is simpler and more memory-efficient."
