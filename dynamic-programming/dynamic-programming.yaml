@@ -159,7 +159,8 @@
 
 - title: "Skip-or-Take Pattern"
   difficulty: "easy"
-  tags: ["dynamic programming", "house robber", "pattern", "adjacency constraint"]
+  tags:
+    ["dynamic programming", "house robber", "pattern", "adjacency constraint"]
   lesson: dp-linear-and-counting
   Front: |
     What is the "skip-or-take" DP pattern, and which classic problem exemplifies it?
@@ -257,7 +258,8 @@
 
 - title: "0/1 Knapsack Right-to-Left Trick"
   difficulty: "medium"
-  tags: ["dynamic programming", "knapsack", "space optimization", "iteration order"]
+  tags:
+    ["dynamic programming", "knapsack", "space optimization", "iteration order"]
   lesson: dp-knapsack-and-subset
   Front: |
     In the 1D (space-optimized) 0/1 knapsack, why must capacity be iterated right-to-left?
@@ -270,7 +272,8 @@
 
 - title: "Unbounded vs 0/1 Knapsack -- Iteration Direction"
   difficulty: "medium"
-  tags: ["dynamic programming", "knapsack", "unbounded knapsack", "iteration order"]
+  tags:
+    ["dynamic programming", "knapsack", "unbounded knapsack", "iteration order"]
   lesson: dp-knapsack-and-subset
   Front: |
     What distinguishes unbounded knapsack from 0/1 knapsack in the 1D space-optimized implementation?
@@ -720,7 +723,8 @@
 
 - title: "Interval DP vs Knapsack -- Key Distinction"
   difficulty: "medium"
-  tags: ["dynamic programming", "interval DP", "knapsack", "pattern recognition"]
+  tags:
+    ["dynamic programming", "interval DP", "knapsack", "pattern recognition"]
   lesson: dp-interval-and-advanced
   Front: |
     What is the structural difference between interval DP and knapsack that helps you distinguish them?
