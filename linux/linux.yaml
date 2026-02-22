@@ -341,7 +341,7 @@
     What signals do **Ctrl+C** and **Ctrl+Z** send to the foreground process?
   Back: |
     - **Ctrl+C** → SIGINT (2): requests the process to terminate. Most programs exit immediately; some (like Python's interactive shell) catch it.
-    - **Ctrl+Z** → SIGTSTP (20): suspends the process (state T -- stopped). The shell regains the prompt. Resume with `fg` (foreground) or `bg` (background in the background).
+    - **Ctrl+Z** → SIGTSTP (20): suspends the process (state T -- stopped). The shell regains the prompt. Resume with `fg` (foreground) or `bg` (resume in the background).
 
 # =============================================================================
 # Lesson 4: Shell, Pipes, and I/O Redirection (9 cards)
