@@ -1,0 +1,823 @@
+# =============================================================================
+# Lesson 1: Kubernetes Architecture (11 cards)
+# =============================================================================
+
+- title: "What Is Kubernetes?"
+  difficulty: "easy"
+  tags: ["kubernetes", "orchestration", "declarative"]
+  lesson: k8s-architecture
+  Front: |
+    What is Kubernetes and what problem does it solve?
+  Back: |
+    A container orchestration platform that automates deployment, scaling, and management of containerized applications across a cluster of nodes.
+
+    It solves the problem of running containers reliably at scale: scheduling workloads onto healthy nodes, restarting failed containers, scaling up under load, and rolling out updates without downtime.
+
+- title: "The Declarative Model"
+  difficulty: "easy"
+  tags: ["kubernetes", "declarative", "desired state", "reconciliation"]
+  lesson: k8s-architecture
+  Front: |
+    What does it mean that Kubernetes uses a declarative model?
+  Back: |
+    You declare the desired state in a YAML manifest (e.g., "3 replicas of this container"). Kubernetes continuously compares the actual state to the desired state and takes corrective action to close any gap. You do not issue imperative commands like "start this container on that node."
+
+- title: "The Reconciliation Loop"
+  difficulty: "medium"
+  tags: ["kubernetes", "reconciliation", "controllers", "desired state"]
+  lesson: k8s-architecture
+  Front: |
+    What is a reconciliation loop in Kubernetes?
+  Back: |
+    A continuous observe-compare-act cycle run by a controller:
+    1. Observe actual state (e.g., 2 replicas running)
+    2. Compare to desired state (3 replicas declared)
+    3. Act to close the gap (create 1 more Pod)
+
+    The cluster self-heals because these loops run constantly and independently.
+
+- title: "API Server Role"
+  difficulty: "easy"
+  tags: ["kubernetes", "api server", "control plane"]
+  lesson: k8s-architecture
+  Front: |
+    What is the role of the Kubernetes API server (kube-apiserver)?
+  Back: |
+    The front door to the cluster. It validates and processes all RESTful requests, handles authentication and authorization, and is the only component that communicates with etcd directly. Every interaction -- kubectl commands, kubelet heartbeats, controller reconciliation -- flows through the API server.
+
+- title: "etcd Role"
+  difficulty: "easy"
+  tags: ["kubernetes", "etcd", "control plane", "state"]
+  lesson: k8s-architecture
+  Front: |
+    What does etcd store in a Kubernetes cluster?
+  Back: |
+    All cluster state: every Pod, Service, ConfigMap, Secret, and Deployment definition. It is a distributed key-value store using Raft consensus for consistency. Loss of etcd without a backup means total loss of cluster state.
+
+- title: "Scheduler Role"
+  difficulty: "easy"
+  tags: ["kubernetes", "scheduler", "control plane", "pods"]
+  lesson: k8s-architecture
+  Front: |
+    What does the Kubernetes scheduler (kube-scheduler) do?
+  Back: |
+    Watches for newly created Pods with no assigned node and selects the best node for each one. The decision considers resource requests, affinity/anti-affinity rules, taints, and topology spread constraints. It does not start containers -- it only assigns Pods to nodes.
+
+- title: "Controller Manager Role"
+  difficulty: "medium"
+  tags: ["kubernetes", "controller manager", "control plane", "reconciliation"]
+  lesson: k8s-architecture
+  Front: |
+    What does the controller manager (kube-controller-manager) do?
+  Back: |
+    Runs reconciliation loops for all built-in Kubernetes controllers: ReplicaSet, Deployment, Node, Job, DaemonSet, and more. Each loop independently monitors actual state vs desired state and corrects drift. The controller manager is why Kubernetes self-heals.
+
+- title: "API Server Exclusive etcd Access"
+  difficulty: "medium"
+  tags: ["kubernetes", "api server", "etcd", "control plane"]
+  lesson: k8s-architecture
+  Front: |
+    Which control plane component is the ONLY one that talks to etcd directly?
+  Back: |
+    The API server (kube-apiserver). All other components -- scheduler, controller manager, kubelet -- read and write cluster state through the API server, never by querying etcd directly. This centralizes access control, validation, and auditing in one place.
+
+- title: "Kubelet Role"
+  difficulty: "easy"
+  tags: ["kubernetes", "kubelet", "worker node"]
+  lesson: k8s-architecture
+  Front: |
+    What does the kubelet do on a worker node?
+  Back: |
+    The node agent. It watches for Pod assignments to this node, pulls container images, starts and stops containers via the container runtime, executes health probes, mounts volumes, and sends heartbeats to the API server every 10 seconds.
+
+- title: "kube-proxy Role"
+  difficulty: "easy"
+  tags: ["kubernetes", "kube-proxy", "worker node", "networking"]
+  lesson: k8s-architecture
+  Front: |
+    What does kube-proxy do on a worker node?
+  Back: |
+    Manages iptables or IPVS rules that route traffic from Service virtual IPs (ClusterIPs) to the actual Pod IPs behind them. When a Pod sends traffic to a Service's ClusterIP, kube-proxy's rules transparently redirect it to a healthy backend Pod.
+
+- title: "Container Runtime"
+  difficulty: "easy"
+  tags: ["kubernetes", "container runtime", "containerd", "CRI"]
+  lesson: k8s-architecture
+  Front: |
+    What is the container runtime in Kubernetes, and what is the most common one?
+  Back: |
+    The software that actually executes containers. Kubernetes communicates with it via the Container Runtime Interface (CRI). The most common runtime is **containerd** -- lightweight and purpose-built. Docker was removed as a Kubernetes runtime in v1.24 (Docker-built images still run fine since they follow the OCI image format).
+
+# =============================================================================
+# Lesson 2: Pods and Workloads (10 cards)
+# =============================================================================
+
+- title: "What Is a Pod?"
+  difficulty: "easy"
+  tags: ["kubernetes", "pods", "containers"]
+  lesson: k8s-pods-and-workloads
+  Front: |
+    What is a Kubernetes Pod?
+  Back: |
+    A group of one or more containers that are always scheduled and run together on the same node. Pods are the smallest unit Kubernetes can schedule. Containers in a Pod share a network namespace (same IP, communicate via localhost) and can share volumes.
+
+- title: "What Containers in a Pod Share"
+  difficulty: "easy"
+  tags: ["kubernetes", "pods", "network namespace"]
+  lesson: k8s-pods-and-workloads
+  Front: |
+    What do containers in the same Pod share?
+  Back: |
+    - **Network namespace:** Same IP address and port space. They communicate with each other via `localhost`.
+    - **Volumes:** Any volumes declared in the Pod spec are accessible to all containers.
+
+    They do NOT share filesystems (each has its own root fs) or process namespaces by default.
+
+- title: "Why Pods Exist as an Abstraction"
+  difficulty: "medium"
+  tags: ["kubernetes", "pods", "scheduling"]
+  lesson: k8s-pods-and-workloads
+  Front: |
+    Why does Kubernetes use Pods instead of scheduling containers directly?
+  Back: |
+    Tightly coupled containers that must share a network namespace or volumes need to always run on the same node. That co-location requirement must be expressible at the scheduler level. The Pod encodes that relationship -- "these containers always run together" -- as a single schedulable unit.
+
+- title: "The Sidecar Pattern"
+  difficulty: "medium"
+  tags: ["kubernetes", "sidecar", "multi-container pod"]
+  lesson: k8s-pods-and-workloads
+  Front: |
+    What is the sidecar pattern in Kubernetes?
+  Back: |
+    A second container in the same Pod that handles a cross-cutting concern for the main container, using their shared network namespace or volumes. Common sidecars: log shippers (read from shared volume, ship to centralized storage), service mesh proxies (intercept all network traffic via localhost), secret injectors (write secrets to shared volume).
+
+    The main container requires no changes -- it uses localhost for communication or reads files from a shared volume.
+
+- title: "Bare Pod Antipattern"
+  difficulty: "easy"
+  tags: ["kubernetes", "pods", "deployments", "controllers"]
+  lesson: k8s-pods-and-workloads
+  Front: |
+    Why should you never create bare Pods directly in production?
+  Back: |
+    Bare Pods (created without a controller) are not rescheduled when they fail. If the container crashes past the restart backoff, the Pod stays in CrashLoopBackOff. If the node fails, the Pod is gone permanently. Always use a controller: Deployment, StatefulSet, Job, or DaemonSet.
+
+- title: "Pod Lifecycle Phases"
+  difficulty: "easy"
+  tags: ["kubernetes", "pods", "lifecycle"]
+  lesson: k8s-pods-and-workloads
+  Front: |
+    What are the five Pod lifecycle phases?
+  Back: |
+    | Phase | Meaning |
+    |---|---|
+    | **Pending** | Accepted by cluster, not yet running (scheduling, image pull) |
+    | **Running** | Bound to node, at least one container running |
+    | **Succeeded** | All containers exited with code 0 (terminal) |
+    | **Failed** | At least one container exited non-zero (terminal) |
+    | **Unknown** | Node communication failure |
+
+- title: "Namespaces: Purpose"
+  difficulty: "easy"
+  tags: ["kubernetes", "namespaces", "isolation"]
+  lesson: k8s-pods-and-workloads
+  Front: |
+    What do Kubernetes Namespaces provide?
+  Back: |
+    Logical partitioning of resources within a cluster. Resources in one Namespace are separate from those in another. Namespaces scope RBAC policies, resource quotas, and DNS names. They are organizational and access-control boundaries.
+
+- title: "Namespaces: What They Do NOT Provide"
+  difficulty: "medium"
+  tags: ["kubernetes", "namespaces", "network isolation"]
+  lesson: k8s-pods-and-workloads
+  Front: |
+    What network isolation do Namespaces provide by default?
+  Back: |
+    None. By default, Pods in any Namespace can communicate freely with Pods in any other Namespace. Namespaces are not network boundaries. Network isolation requires explicit NetworkPolicies.
+
+- title: "Default Namespaces"
+  difficulty: "easy"
+  tags: ["kubernetes", "namespaces"]
+  lesson: k8s-pods-and-workloads
+  Front: |
+    What are the three default Namespaces in every Kubernetes cluster?
+  Back: |
+    - **`default`** -- where resources go if no Namespace is specified
+    - **`kube-system`** -- Kubernetes system components (CoreDNS, kube-proxy, metrics server)
+    - **`kube-public`** -- cluster-wide configuration readable by all users
+
+- title: "Controller Types"
+  difficulty: "easy"
+  tags: ["kubernetes", "controllers", "deployments", "statefulsets", "daemonsets"]
+  lesson: k8s-pods-and-workloads
+  Front: |
+    When should you use a Deployment vs StatefulSet vs DaemonSet vs Job?
+  Back: |
+    | Controller | Use when |
+    |---|---|
+    | **Deployment** | Stateless workloads (web servers, APIs) -- Pods are interchangeable |
+    | **StatefulSet** | Stateful workloads needing stable identity and per-Pod storage (databases) |
+    | **DaemonSet** | Per-node agents (logging, monitoring, networking plugins) |
+    | **Job** | Batch workloads that run to completion (migrations, one-time imports) |
+
+# =============================================================================
+# Lesson 3: Services and Networking (12 cards)
+# =============================================================================
+
+- title: "Kubernetes Flat Network Model"
+  difficulty: "medium"
+  tags: ["kubernetes", "networking", "flat network", "pods"]
+  lesson: k8s-services-and-networking
+  Front: |
+    What are the three rules of the Kubernetes flat network model?
+  Back: |
+    1. Every Pod gets its own unique IP address.
+    2. All Pods can communicate with all other Pods directly, without NAT, regardless of which node they are on.
+    3. Node agents (kubelet, kube-proxy) can communicate with all Pods on their node.
+
+    From any Pod's perspective, every other Pod is reachable by its IP -- no port mapping, no NAT.
+
+- title: "CNI Plugins"
+  difficulty: "medium"
+  tags: ["kubernetes", "CNI", "networking", "plugins"]
+  lesson: k8s-services-and-networking
+  Front: |
+    What is a CNI plugin and what is it responsible for?
+  Back: |
+    A CNI (Container Network Interface) plugin assigns IP addresses to Pods and implements the flat network rules so Pods on any node can reach Pods on any other node. Kubernetes does not implement networking itself -- it delegates to CNI plugins.
+
+    Common plugins: Calico (BGP + policy), Cilium (eBPF + policy), Flannel (overlay, no policy), AWS VPC CNI (native VPC IPs).
+
+- title: "Why Services Exist"
+  difficulty: "easy"
+  tags: ["kubernetes", "services", "networking", "pods"]
+  lesson: k8s-services-and-networking
+  Front: |
+    Why do Services exist? What problem do they solve?
+  Back: |
+    Pods are ephemeral -- they get new IP addresses when recreated. If services hard-coded Pod IPs, every restart or rolling update would break connections.
+
+    A Service provides a stable virtual IP and DNS name that never changes. It uses label selectors to route traffic to the current set of healthy Pods automatically.
+
+- title: "Service Type: ClusterIP"
+  difficulty: "easy"
+  tags: ["kubernetes", "services", "ClusterIP", "networking"]
+  lesson: k8s-services-and-networking
+  Front: |
+    What is a ClusterIP Service and when do you use it?
+  Back: |
+    The default Service type. Creates a virtual IP reachable only within the cluster. Used for service-to-service communication: the backend that only the frontend talks to, the database that only the backend reaches. Not accessible from outside the cluster.
+
+- title: "Service Type: NodePort"
+  difficulty: "easy"
+  tags: ["kubernetes", "services", "NodePort", "networking"]
+  lesson: k8s-services-and-networking
+  Front: |
+    What is a NodePort Service and when do you use it?
+  Back: |
+    Exposes the Service on a static port on every node's IP address. Traffic to `<any-node-IP>:<NodePort>` is forwarded to the Service. Accessible from outside the cluster without a cloud load balancer. Used for development/on-prem environments. Not ideal for production (requires knowing node IPs, no automatic failover if a node goes down).
+
+- title: "Service Type: LoadBalancer"
+  difficulty: "easy"
+  tags: ["kubernetes", "services", "LoadBalancer", "networking"]
+  lesson: k8s-services-and-networking
+  Front: |
+    What is a LoadBalancer Service and when do you use it?
+  Back: |
+    Provisions an external cloud load balancer (AWS ELB, GCP LB) that routes traffic to the Service. The load balancer gets a stable public IP. The standard way to expose a single HTTP or TCP service to the internet in a cloud environment.
+
+- title: "Service Discovery via DNS"
+  difficulty: "easy"
+  tags: ["kubernetes", "services", "DNS", "CoreDNS"]
+  lesson: k8s-services-and-networking
+  Front: |
+    How do Pods discover Services within a Kubernetes cluster?
+  Back: |
+    Via DNS. CoreDNS automatically creates a DNS record for every Service: `service-name.namespace.svc.cluster.local`. Pods resolve the Service name to its ClusterIP. Short form `service-name` works within the same Namespace.
+
+- title: "Ingress vs Service"
+  difficulty: "medium"
+  tags: ["kubernetes", "Ingress", "services", "L7", "L4"]
+  lesson: k8s-services-and-networking
+  Front: |
+    What does an Ingress provide that a Service cannot?
+  Back: |
+    L7 (HTTP/HTTPS) routing based on hostname, URL path, and headers. A Service provides L4 (TCP/UDP) routing by IP and port only.
+
+    Ingress enables: host-based routing (`api.example.com` → API Service), path-based routing (`/api/*` → backend), TLS termination, and a single external entry point for multiple HTTP applications.
+
+- title: "Ingress Requires a Controller"
+  difficulty: "medium"
+  tags: ["kubernetes", "Ingress", "ingress controller"]
+  lesson: k8s-services-and-networking
+  Front: |
+    Why doesn't an Ingress resource alone have any effect?
+  Back: |
+    An Ingress is a routing configuration object. It requires an **Ingress controller** -- separate software that reads Ingress resources and programs a reverse proxy or load balancer to implement the rules. Without a controller installed, Ingress resources are ignored.
+
+    Common controllers: NGINX Ingress Controller, Traefik, AWS ALB Ingress Controller.
+
+- title: "NetworkPolicy Default Behavior"
+  difficulty: "medium"
+  tags: ["kubernetes", "NetworkPolicy", "security", "networking"]
+  lesson: k8s-services-and-networking
+  Front: |
+    What is the default network behavior in Kubernetes, and how does a NetworkPolicy change it?
+  Back: |
+    By default, all Pods can communicate with all other Pods freely (default-allow). A NetworkPolicy selects Pods via label selectors and defines allowed ingress and egress rules. Once any NetworkPolicy selects a Pod, all traffic not explicitly allowed by a policy is **denied** for that Pod. Pods with no NetworkPolicy remain fully open.
+
+- title: "NetworkPolicy CNI Requirement"
+  difficulty: "medium"
+  tags: ["kubernetes", "NetworkPolicy", "CNI", "Flannel", "Calico"]
+  lesson: k8s-services-and-networking
+  Front: |
+    Can all CNI plugins enforce NetworkPolicies?
+  Back: |
+    No. NetworkPolicy enforcement is implemented by the CNI plugin, and not all CNI plugins support it. Flannel (basic overlay) does not enforce NetworkPolicies -- policies are silently ignored. Calico and Cilium both enforce NetworkPolicies.
+
+- title: "NetworkPolicy Default-Deny Pattern"
+  difficulty: "hard"
+  tags: ["kubernetes", "NetworkPolicy", "security", "least privilege"]
+  lesson: k8s-services-and-networking
+  Front: |
+    How do you implement least-privilege networking in Kubernetes?
+  Back: |
+    Apply a default-deny NetworkPolicy to each Namespace that selects all Pods with an empty `podSelector`:
+
+    ```yaml
+    spec:
+      podSelector: {}
+      policyTypes: ["Ingress"]
+    ```
+
+    Then add specific allow-rules for each legitimate communication path. This ensures any new Pod is isolated by default and must be explicitly permitted.
+
+# =============================================================================
+# Lesson 4: Deployments and Scaling (13 cards)
+# =============================================================================
+
+- title: "What Is a ReplicaSet?"
+  difficulty: "easy"
+  tags: ["kubernetes", "ReplicaSet", "pods", "scaling"]
+  lesson: k8s-deployments-and-scaling
+  Front: |
+    What is a ReplicaSet?
+  Back: |
+    A controller that ensures a specified number of identical Pod replicas are running at all times. It uses label selectors to find its Pods and continuously reconciles actual count vs desired count. If a Pod crashes, the ReplicaSet creates a replacement.
+
+- title: "Deployment vs ReplicaSet"
+  difficulty: "medium"
+  tags: ["kubernetes", "Deployment", "ReplicaSet"]
+  lesson: k8s-deployments-and-scaling
+  Front: |
+    How does a Deployment differ from a ReplicaSet?
+  Back: |
+    A ReplicaSet manages Pod count only. A Deployment manages ReplicaSets and adds:
+    - **Rolling updates** (creates new RS, scales up/down)
+    - **Rollback** (keeps old RS at zero replicas, scales back up on undo)
+    - **Revision history**
+
+    In practice, you create Deployments and never touch ReplicaSets directly.
+
+- title: "Rolling Update Mechanics"
+  difficulty: "medium"
+  tags: ["kubernetes", "Deployment", "rolling update", "ReplicaSet"]
+  lesson: k8s-deployments-and-scaling
+  Front: |
+    How does a Deployment perform a rolling update?
+  Back: |
+    1. Creates a new ReplicaSet with the updated Pod template
+    2. Scales the new RS up incrementally
+    3. Scales the old RS down at the same rate
+    4. Continues until new RS is at full desired count, old RS is at zero
+
+    The old RS is kept (zero replicas) for rollback. Parameters `maxSurge` and `maxUnavailable` control the pace.
+
+- title: "maxSurge"
+  difficulty: "medium"
+  tags: ["kubernetes", "Deployment", "rolling update", "maxSurge"]
+  lesson: k8s-deployments-and-scaling
+  Front: |
+    What does `maxSurge` control in a Deployment rolling update?
+  Back: |
+    The maximum number of Pods that can exist above the desired replica count during an update. Default: 25%. With 4 replicas and `maxSurge: 25%`, up to 5 Pods may run simultaneously during the update.
+
+    Setting `maxSurge: 0` prevents any extra Pods (update requires removing before adding), useful when cluster capacity is tight.
+
+- title: "maxUnavailable"
+  difficulty: "medium"
+  tags: ["kubernetes", "Deployment", "rolling update", "maxUnavailable"]
+  lesson: k8s-deployments-and-scaling
+  Front: |
+    What does `maxUnavailable` control in a Deployment rolling update?
+  Back: |
+    The maximum number of Pods that can be below the desired count during an update. Default: 25%. With 4 replicas and `maxUnavailable: 25%`, at least 3 Pods must be running at all times during the update.
+
+    Setting `maxUnavailable: 0` guarantees zero-downtime updates -- no Pod is removed before a replacement is ready.
+
+- title: "Deployment Rollback"
+  difficulty: "easy"
+  tags: ["kubernetes", "Deployment", "rollback"]
+  lesson: k8s-deployments-and-scaling
+  Front: |
+    How does Deployment rollback work, and why is it fast?
+  Back: |
+    `kubectl rollout undo` scales up the previous ReplicaSet and scales down the current one. It is fast because the old ReplicaSet is retained at zero replicas -- no rebuild, no new image push. Revision history length is configurable via `revisionHistoryLimit` (default 10).
+
+- title: "StatefulSet: Stable Identity"
+  difficulty: "medium"
+  tags: ["kubernetes", "StatefulSet", "identity", "databases"]
+  lesson: k8s-deployments-and-scaling
+  Front: |
+    What stable identity does a StatefulSet give each Pod?
+  Back: |
+    Each Pod gets a predictable, persistent hostname: `pod-0`, `pod-1`, `pod-2`. When a Pod is rescheduled to a different node, it keeps the same name and DNS hostname. Deployments assign random suffixes -- `pod-a8f3d`, `pod-b1c2e` -- which change on restart.
+
+- title: "StatefulSet: Ordered Deployment"
+  difficulty: "medium"
+  tags: ["kubernetes", "StatefulSet", "ordered deployment"]
+  lesson: k8s-deployments-and-scaling
+  Front: |
+    In what order does a StatefulSet create and delete Pods?
+  Back: |
+    **Creation:** Sequential and ascending -- pod-0 must be Running and Ready before pod-1 is created, pod-1 before pod-2. **Deletion:** Sequential and descending -- pod-2 is terminated before pod-1, pod-1 before pod-0. This order matters for databases requiring leader election or sequential initialization.
+
+- title: "StatefulSet: Per-Pod Storage"
+  difficulty: "medium"
+  tags: ["kubernetes", "StatefulSet", "PVC", "storage"]
+  lesson: k8s-deployments-and-scaling
+  Front: |
+    How does a StatefulSet give each Pod its own persistent storage?
+  Back: |
+    Via `volumeClaimTemplates`. The StatefulSet creates a separate PVC for each Pod (e.g., `data-pod-0`, `data-pod-1`). When pod-1 is rescheduled, it reattaches to `data-pod-1` -- same volume, same data. Deployments cannot give each Pod its own PVC.
+
+- title: "DaemonSet"
+  difficulty: "easy"
+  tags: ["kubernetes", "DaemonSet", "nodes", "monitoring"]
+  lesson: k8s-deployments-and-scaling
+  Front: |
+    What does a DaemonSet guarantee, and what are its common use cases?
+  Back: |
+    Guarantees exactly one Pod runs on every node (or every matching node). When a node joins the cluster, a Pod is automatically scheduled on it. When a node is removed, the Pod is garbage collected.
+
+    Common uses: log collectors (Fluentd, Filebeat), monitoring agents (Prometheus node-exporter, Datadog), CNI plugins, kube-proxy.
+
+- title: "HPA Scaling Formula"
+  difficulty: "medium"
+  tags: ["kubernetes", "HPA", "autoscaling"]
+  lesson: k8s-deployments-and-scaling
+  Front: |
+    What is the Horizontal Pod Autoscaler scaling formula?
+  Back: |
+    `desired replicas = ceil(current replicas × (current metric / target metric))`
+
+    Example: 3 replicas, current CPU 80%, target 50% → ceil(3 × 80/50) = ceil(4.8) = 5 replicas.
+
+    The HPA polls every 15 seconds. A stabilization window (5 minutes for scale-down by default) prevents flapping.
+
+- title: "HPA Metrics"
+  difficulty: "medium"
+  tags: ["kubernetes", "HPA", "autoscaling", "metrics"]
+  lesson: k8s-deployments-and-scaling
+  Front: |
+    What metrics can the Horizontal Pod Autoscaler use?
+  Back: |
+    - **CPU utilization** -- most common; target percentage of resource request
+    - **Memory utilization** -- useful but tricky (many apps don't release memory after load drops)
+    - **Custom metrics** -- application-specific via the Metrics API (request rate, queue depth)
+    - **External metrics** -- outside the cluster (SQS queue length, Pub/Sub backlog)
+
+    HPA requires the Metrics Server to be installed. Without it, HPA has no data source.
+
+- title: "HPA Requires Metrics Server"
+  difficulty: "easy"
+  tags: ["kubernetes", "HPA", "metrics server"]
+  lesson: k8s-deployments-and-scaling
+  Front: |
+    What must be installed in the cluster for the HPA to function?
+  Back: |
+    The Metrics Server. It collects resource metrics (CPU, memory) from the kubelet on each node and exposes them via the Kubernetes Metrics API. Without it, the HPA cannot read current utilization and has no basis for scaling decisions.
+
+# =============================================================================
+# Lesson 5: Configuration and Secrets (10 cards)
+# =============================================================================
+
+- title: "ConfigMap Purpose"
+  difficulty: "easy"
+  tags: ["kubernetes", "ConfigMap", "configuration"]
+  lesson: k8s-configuration-and-secrets
+  Front: |
+    What is a ConfigMap used for?
+  Back: |
+    Storing non-sensitive configuration as key-value pairs that can be injected into Pods at runtime. Examples: database hostnames, feature flags, log levels, config file contents. Stored as plaintext in etcd. Not suitable for passwords or secrets.
+
+- title: "Secret Purpose and Storage"
+  difficulty: "easy"
+  tags: ["kubernetes", "Secret", "configuration", "base64"]
+  lesson: k8s-configuration-and-secrets
+  Front: |
+    What is a Kubernetes Secret, and how is it stored?
+  Back: |
+    A resource for storing sensitive data (passwords, API keys, TLS certificates). Stored as **base64-encoded** values in etcd. Base64 is encoding, not encryption -- anyone with etcd or RBAC access can decode it instantly. Not truly secret without additional measures.
+
+- title: "Secrets Are Not Encrypted by Default"
+  difficulty: "medium"
+  tags: ["kubernetes", "Secret", "security", "base64"]
+  lesson: k8s-configuration-and-secrets
+  Front: |
+    Why are Kubernetes Secrets considered insecure by default?
+  Back: |
+    They are stored as base64-encoded values in etcd -- base64 is trivially reversible. Anyone with RBAC access to the Secret or direct etcd access can read the plaintext value.
+
+    Production security requires: enabling etcd encryption at rest, and/or using external secret managers (HashiCorp Vault, AWS Secrets Manager, External Secrets Operator).
+
+- title: "Consuming ConfigMaps as Env Vars"
+  difficulty: "easy"
+  tags: ["kubernetes", "ConfigMap", "environment variables"]
+  lesson: k8s-configuration-and-secrets
+  Front: |
+    How do you consume a ConfigMap key as an environment variable in a Pod?
+  Back: |
+    ```yaml
+    env:
+      - name: DATABASE_HOST
+        valueFrom:
+          configMapKeyRef:
+            name: app-config
+            key: DATABASE_HOST
+    ```
+
+    The env var is set when the container starts. If the ConfigMap is updated later, the running container does not see the change -- a restart is required.
+
+- title: "Consuming ConfigMaps as Volume Mounts"
+  difficulty: "easy"
+  tags: ["kubernetes", "ConfigMap", "volume mounts"]
+  lesson: k8s-configuration-and-secrets
+  Front: |
+    What is the advantage of consuming a ConfigMap as a volume mount vs environment variables?
+  Back: |
+    Volume-mounted ConfigMaps update automatically when the ConfigMap changes (with a short propagation delay). Environment variables are set once at container start and require a restart to pick up changes.
+
+    Use volume mounts when the application supports configuration hot-reload.
+
+- title: "Resource Requests"
+  difficulty: "easy"
+  tags: ["kubernetes", "resources", "requests", "scheduling"]
+  lesson: k8s-configuration-and-secrets
+  Front: |
+    What is the purpose of resource `requests` in a container spec?
+  Back: |
+    The guaranteed minimum the container needs. The scheduler uses requests to decide which node has sufficient capacity. A Pod requesting 256Mi of memory is only placed on a node with at least 256Mi available. The container is guaranteed at least the requested amount.
+
+- title: "Resource Limits"
+  difficulty: "easy"
+  tags: ["kubernetes", "resources", "limits", "OOMKill"]
+  lesson: k8s-configuration-and-secrets
+  Front: |
+    What is the purpose of resource `limits` in a container spec?
+  Back: |
+    The hard ceiling a container cannot exceed. Exceeding memory limits → OOMKill (container killed and restarted). Exceeding CPU limits → throttling (container slows but continues running). Limits prevent one runaway container from starving other containers on the same node.
+
+- title: "OOMKill vs CPU Throttle"
+  difficulty: "medium"
+  tags: ["kubernetes", "OOMKill", "CPU throttle", "resources"]
+  lesson: k8s-configuration-and-secrets
+  Front: |
+    What is the difference between a container exceeding its memory limit vs its CPU limit?
+  Back: |
+    **Memory limit exceeded:** The kernel OOMKills the container -- immediate, no cleanup, no graceful shutdown. Kubernetes restarts it. Repeated OOMKills cause CrashLoopBackOff with exponential backoff.
+
+    **CPU limit exceeded:** The container is throttled -- the kernel reduces its scheduled CPU time. The process slows but is not killed.
+
+    The asymmetry: unused CPU can be redistributed; unused memory cannot be easily reclaimed from a running process.
+
+- title: "Guaranteed QoS Class"
+  difficulty: "medium"
+  tags: ["kubernetes", "QoS", "resources", "requests", "limits"]
+  lesson: k8s-configuration-and-secrets
+  Front: |
+    What happens when you set resource requests equal to limits?
+  Back: |
+    The Pod gets **Guaranteed QoS** class. The node reserves exactly that much capacity exclusively for the container. The container always gets what it requested -- predictable performance, never throttled or OOMKilled due to noisy neighbors.
+
+    Trade-off: reserved capacity cannot be used by other Pods even when idle, reducing cluster utilization efficiency.
+
+- title: "External Secret Managers"
+  difficulty: "medium"
+  tags: ["kubernetes", "secrets", "Vault", "security"]
+  lesson: k8s-configuration-and-secrets
+  Front: |
+    What is an external secret manager in the context of Kubernetes, and why use one?
+  Back: |
+    A system outside the cluster (HashiCorp Vault, AWS Secrets Manager) that stores secrets with proper encryption and access control. Integrations like the External Secrets Operator or Vault Agent sidecar fetch secrets at runtime and inject them into Pods -- keeping plaintext secrets out of etcd entirely. Production-grade alternative to native Kubernetes Secrets.
+
+# =============================================================================
+# Lesson 6: Storage (8 cards)
+# =============================================================================
+
+- title: "Ephemeral Container Storage"
+  difficulty: "easy"
+  tags: ["kubernetes", "storage", "ephemeral"]
+  lesson: k8s-storage
+  Front: |
+    What happens to data a container writes to its local filesystem when the container is replaced?
+  Back: |
+    The data is lost. Container filesystems are ephemeral by default -- a new container starts with a fresh filesystem from the image. For data that must survive container restarts or Pod termination, use a PersistentVolumeClaim.
+
+- title: "emptyDir Volume"
+  difficulty: "easy"
+  tags: ["kubernetes", "storage", "emptyDir"]
+  lesson: k8s-storage
+  Front: |
+    What is an `emptyDir` volume and when is it useful?
+  Back: |
+    Ephemeral shared storage within a Pod. Created when the Pod starts, deleted when the Pod is removed from the node. All containers in the Pod can read and write it.
+
+    Useful for: sidecar data sharing (main container writes, log shipper reads), temporary scratch space for multi-step processing. Not for data that must survive Pod termination.
+
+- title: "PersistentVolume (PV)"
+  difficulty: "easy"
+  tags: ["kubernetes", "PersistentVolume", "storage"]
+  lesson: k8s-storage
+  Front: |
+    What is a PersistentVolume (PV)?
+  Back: |
+    A piece of storage provisioned in the cluster -- an AWS EBS volume, GCP Persistent Disk, NFS share, or any CSI-backed storage. It is a cluster-level resource with a defined capacity, access mode, and reclaim policy. Its lifecycle is independent of any Pod.
+
+- title: "PersistentVolumeClaim (PVC)"
+  difficulty: "easy"
+  tags: ["kubernetes", "PersistentVolumeClaim", "storage"]
+  lesson: k8s-storage
+  Front: |
+    What is a PersistentVolumeClaim (PVC)?
+  Back: |
+    A Pod's request for storage. It specifies how much capacity is needed, the access mode, and optionally the StorageClass. Kubernetes binds the PVC to a matching PV. Once bound, that PV is reserved exclusively for this PVC.
+
+- title: "Dynamic Provisioning"
+  difficulty: "medium"
+  tags: ["kubernetes", "StorageClass", "dynamic provisioning"]
+  lesson: k8s-storage
+  Front: |
+    What is dynamic provisioning and what enables it?
+  Back: |
+    When a PVC is created, a CSI driver automatically creates a new PV (provisions a cloud volume) and binds it -- no admin needs to pre-create PVs. Enabled by **StorageClasses**, which specify the provisioner and parameters (e.g., EBS volume type `gp3`).
+
+    Dynamic provisioning is the standard in cloud environments. Static PV management does not scale.
+
+- title: "Access Modes"
+  difficulty: "medium"
+  tags: ["kubernetes", "storage", "access modes", "RWO", "RWX"]
+  lesson: k8s-storage
+  Front: |
+    What are the three PersistentVolume access modes?
+  Back: |
+    | Mode | Abbreviation | Meaning |
+    |---|---|---|
+    | ReadWriteOnce | RWO | One node, read-write. Used for block storage (EBS). Most common. |
+    | ReadOnlyMany | ROX | Many nodes, read-only. |
+    | ReadWriteMany | RWX | Many nodes, read-write. Requires network filesystem (NFS, EFS, CephFS). |
+
+    Block storage (EBS, GCP Persistent Disk) does not support RWX.
+
+- title: "Reclaim Policies"
+  difficulty: "medium"
+  tags: ["kubernetes", "storage", "reclaim policy", "Retain", "Delete"]
+  lesson: k8s-storage
+  Front: |
+    What is the difference between Retain and Delete reclaim policies?
+  Back: |
+    **Retain:** When the PVC is deleted, the PV moves to Released state. Data is preserved. An admin must manually clean up or reprovision it. Use for production databases where losing data is catastrophic.
+
+    **Delete:** When the PVC is deleted, the PV and the underlying cloud storage (EBS volume, GCP disk) are automatically deleted. Convenient but permanent.
+
+- title: "StatefulSet volumeClaimTemplates"
+  difficulty: "medium"
+  tags: ["kubernetes", "StatefulSet", "PVC", "storage"]
+  lesson: k8s-storage
+  Front: |
+    What is `volumeClaimTemplates` in a StatefulSet?
+  Back: |
+    A template that instantiates a separate PVC for each Pod in the StatefulSet. If the StatefulSet has 3 Pods, three PVCs are created: `data-pod-0`, `data-pod-1`, `data-pod-2`. Each Pod mounts only its own PVC. When a Pod is rescheduled, it reattaches to its own PVC with the same data.
+
+# =============================================================================
+# Lesson 7: Operations (11 cards)
+# =============================================================================
+
+- title: "Liveness Probe"
+  difficulty: "easy"
+  tags: ["kubernetes", "liveness probe", "health checks"]
+  lesson: k8s-operations
+  Front: |
+    What does a liveness probe do, and what triggers a restart?
+  Back: |
+    Checks "Is this container alive?" On failure (after the configured threshold), Kubernetes kills and restarts the container. Use it to detect deadlocks, infinite loops, or processes that are running but stuck. A single failure does not trigger a restart -- `failureThreshold` consecutive failures are required.
+
+- title: "Readiness Probe"
+  difficulty: "easy"
+  tags: ["kubernetes", "readiness probe", "health checks"]
+  lesson: k8s-operations
+  Front: |
+    What does a readiness probe do when it fails?
+  Back: |
+    Removes the Pod from Service endpoints -- new requests stop being routed to it. The container is not restarted. Use it for slow-starting applications (warming caches, loading data) or temporarily overloaded services. When the readiness probe passes again, the Pod is re-added to Service endpoints.
+
+- title: "Startup Probe"
+  difficulty: "medium"
+  tags: ["kubernetes", "startup probe", "health checks"]
+  lesson: k8s-operations
+  Front: |
+    When do you need a startup probe, and what does it do?
+  Back: |
+    Use it when a container has a long or variable startup time. The startup probe disables liveness and readiness probes until it succeeds, giving the container time to finish initialization without being killed prematurely by an aggressive liveness probe. Once the startup probe passes, normal liveness and readiness checking begins.
+
+- title: "Probe Types"
+  difficulty: "easy"
+  tags: ["kubernetes", "probes", "health checks", "HTTP", "TCP", "exec"]
+  lesson: k8s-operations
+  Front: |
+    What are the three types of Kubernetes health probes?
+  Back: |
+    | Type | How it works | Success condition |
+    |---|---|---|
+    | **HTTP GET** | HTTP request to path:port | Status 200-399 |
+    | **TCP socket** | TCP connection to port | Connection succeeds |
+    | **Exec** | Command inside the container | Exit code 0 |
+
+- title: "Liveness Probe Common Mistake"
+  difficulty: "medium"
+  tags: ["kubernetes", "liveness probe", "anti-pattern"]
+  lesson: k8s-operations
+  Front: |
+    Why should you NOT point a liveness probe at an external dependency (e.g., database)?
+  Back: |
+    If the liveness probe checks a database connection and the database goes temporarily unavailable, the probe fails for all application Pods simultaneously. Kubernetes restarts all of them -- amplifying the outage and potentially making recovery harder. Liveness probes should check only internal container health (memory state, goroutine deadlocks, internal queues).
+
+- title: "Kubernetes Job"
+  difficulty: "easy"
+  tags: ["kubernetes", "Job", "batch"]
+  lesson: k8s-operations
+  Front: |
+    What is a Kubernetes Job?
+  Back: |
+    A controller that runs one or more Pods to completion **once** and tracks successful completions. If a Pod fails, the Job retries it up to `backoffLimit` times (default 6). When the required number of successful completions is reached, the Job is complete. Use for database migrations, one-time imports, batch processing.
+
+- title: "CronJob"
+  difficulty: "easy"
+  tags: ["kubernetes", "CronJob", "scheduling", "batch"]
+  lesson: k8s-operations
+  Front: |
+    What is a CronJob and how does it differ from a Job?
+  Back: |
+    A Job factory that creates Jobs on a recurring cron schedule. At each scheduled time, it creates a new Job object, which creates Pods that run to completion. The CronJob itself does not run Pods. Use for nightly backups, hourly report generation, periodic cache warming.
+
+- title: "CronJob concurrencyPolicy"
+  difficulty: "medium"
+  tags: ["kubernetes", "CronJob", "concurrencyPolicy"]
+  lesson: k8s-operations
+  Front: |
+    What does `concurrencyPolicy` control in a CronJob?
+  Back: |
+    What happens if a scheduled Job run is still running when the next one is due:
+    - **Allow** -- start the new run even if the previous is still running
+    - **Forbid** -- skip the new run (previous takes priority)
+    - **Replace** -- kill the current run and start a new one
+
+- title: "Taint Effects"
+  difficulty: "medium"
+  tags: ["kubernetes", "taints", "tolerations", "scheduling"]
+  lesson: k8s-operations
+  Front: |
+    What are the three taint effects and what does each do?
+  Back: |
+    | Effect | Behavior |
+    |---|---|
+    | **NoSchedule** | New Pods without a matching toleration are not scheduled on this node |
+    | **PreferNoSchedule** | Scheduler avoids the node but will use it if no alternatives exist |
+    | **NoExecute** | New Pods not scheduled, existing Pods without a toleration are evicted |
+
+    Use `NoExecute` for node draining, GPU node dedication, or isolating critical workloads.
+
+- title: "Node Failure Timeline"
+  difficulty: "hard"
+  tags: ["kubernetes", "node failure", "eviction", "rescheduling"]
+  lesson: k8s-operations
+  Front: |
+    What is the default timeline from node failure to Pod rescheduling?
+  Back: |
+    1. Kubelet heartbeat stops (heartbeat interval: 10s)
+    2. After 40s (node-monitor-grace-period): node marked `NotReady`
+    3. After additional 5 minutes (pod-eviction-timeout): Pods evicted
+    4. Controller-managed Pods rescheduled on healthy nodes; bare Pods are not
+
+    **Total: ~5-6 minutes.** The delay prevents mass eviction during transient network partitions.
+
+- title: "Pod Disruption Budget"
+  difficulty: "medium"
+  tags: ["kubernetes", "PDB", "availability", "disruptions"]
+  lesson: k8s-operations
+  Front: |
+    What does a Pod Disruption Budget (PDB) protect against?
+  Back: |
+    Voluntary disruptions: node drains, cluster upgrades, manual evictions. A PDB specifies `minAvailable` or `maxUnavailable` for a set of Pods. If a drain would violate the budget, the operation blocks until it can proceed safely.
+
+    PDBs do NOT protect against involuntary disruptions (node failures, OOMKills). They are a guardrail for planned maintenance.

@@ -1,0 +1,56 @@
+title: "Deployments and Scaling"
+lesson_slug: "k8s-deployments-and-scaling"
+questions:
+  - question: "During a Deployment rolling update, what happens to the old ReplicaSet?"
+    options:
+      - "It is deleted immediately when the new ReplicaSet is created"
+      - "It is scaled down to zero and retained so rollback is instant"
+      - "It continues running at full capacity until the new ReplicaSet is fully healthy"
+      - "It is converted into the new ReplicaSet in place"
+    correct: 1
+    explanation: "The old ReplicaSet is scaled down to zero replicas but not deleted. Kubernetes retains it with revision history. Rolling back (`kubectl rollout undo`) scales the old ReplicaSet back up and scales the new one down -- no rebuild, no new image push."
+
+  - question: "What does `maxUnavailable: 0` in a Deployment's update strategy mean?"
+    options:
+      - "No new Pods can be created during the update"
+      - "The Deployment will not start the update until all current Pods are stopped"
+      - "No Pod will be removed before a replacement is healthy -- zero-downtime update at the cost of extra capacity"
+      - "The update will fail if any Pod is unavailable"
+    correct: 2
+    explanation: "maxUnavailable controls how many Pods can be below the desired count during the update. Setting it to 0 forces Kubernetes to bring a replacement Pod to Running before removing an existing one. This guarantees zero-downtime but requires the cluster to have capacity for maxSurge additional Pods."
+
+  - question: "When should you use a StatefulSet instead of a Deployment?"
+    options:
+      - "When you need more than 10 replicas"
+      - "When Pods need stable network identities, ordered deployment, and per-Pod persistent storage"
+      - "When Pods need access to ConfigMaps and Secrets"
+      - "When you need to run a Deployment on a specific set of nodes"
+    correct: 1
+    explanation: "StatefulSets are for workloads where Pods are not interchangeable: each Pod has a predictable name (pod-0, pod-1), is created/terminated in order, and owns its own PVC. Databases (PostgreSQL, Kafka) require this. Stateless apps (web servers, APIs) use Deployments -- the Pods are identical and interchangeable."
+
+  - question: "What does a DaemonSet guarantee about Pod placement?"
+    options:
+      - "Exactly N replicas spread evenly across all nodes"
+      - "At least one Pod on every node that matches a label selector"
+      - "Exactly one Pod on every node (or matching node subset), automatically maintained as nodes join and leave"
+      - "One Pod per Namespace per node"
+    correct: 2
+    explanation: "A DaemonSet ensures exactly one Pod runs on each node that matches its optional node selector. When a new node joins, the DaemonSet controller automatically schedules a Pod on it. When a node is removed, the Pod is garbage collected. There is no `replicas` field -- the count equals the number of matching nodes."
+
+  - question: "What is the HPA scaling formula?"
+    options:
+      - "desired replicas = target metric / current metric"
+      - "desired replicas = current replicas + (current metric - target metric)"
+      - "desired replicas = ceil(current replicas × (current metric / target metric))"
+      - "desired replicas = max replicas × (current metric / 100)"
+    correct: 2
+    explanation: "The HPA uses: desired = ceil(current replicas × (currentMetricValue / targetMetricValue)). Example: 4 replicas, current CPU 80%, target 50% → ceil(4 × 80/50) = ceil(6.4) = 7 replicas. The HPA polls every 15 seconds and uses a stabilization window to prevent rapid scale-in/scale-out flapping."
+
+  - question: "What is the distinction between a ReplicaSet and a Deployment?"
+    options:
+      - "A ReplicaSet supports rolling updates; a Deployment does not"
+      - "A ReplicaSet manages Pods; a Deployment manages ReplicaSets, adding update orchestration and rollback history"
+      - "A ReplicaSet works across multiple Namespaces; a Deployment is Namespace-scoped"
+      - "A ReplicaSet uses label selectors; a Deployment uses annotations to find Pods"
+    correct: 1
+    explanation: "A ReplicaSet's only job is ensuring N identical Pods are running. A Deployment manages a set of ReplicaSets and adds: rolling update strategy (create new RS, scale up/down), rollback (keep old RS at zero, scale back up on undo), and update pause/resume. You almost never create ReplicaSets directly."
