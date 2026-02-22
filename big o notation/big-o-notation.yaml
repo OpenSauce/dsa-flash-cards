@@ -1,0 +1,637 @@
+# =============================================================================
+# Lesson 1: Asymptotic Notation (10 cards)
+# =============================================================================
+
+- title: "What Big O Notation Describes"
+  difficulty: "easy"
+  tags: ["big-o", "asymptotic", "fundamentals"]
+  lesson: bigo-asymptotic-notation
+  Front: |
+    What does Big O notation describe?
+  Back: |
+    An upper bound on an algorithm's growth rate as input size n approaches infinity. It characterizes how resource use (time or space) scales, not the exact operation count.
+
+    Big O strips away machine-specific constants and focuses on the growth shape.
+
+- title: "Big O Is Not Worst Case"
+  difficulty: "medium"
+  tags: ["big-o", "asymptotic", "misconception"]
+  lesson: bigo-asymptotic-notation
+  Front: |
+    Is Big O the same as worst-case complexity? Explain the distinction.
+  Back: |
+    No. They are independent concepts.
+
+    - **Big O** is an asymptotic bound on *growth rate*. It applies to a specific case (best, average, or worst).
+    - **Worst case** is the input that maximizes the algorithm's cost.
+
+    An algorithm can be O(n) in its best case and O(n²) in its worst case. Saying "this algorithm is O(n)" always refers to a specific case — usually worst-case by convention, but not always.
+
+- title: "Dropping Constants in Big O"
+  difficulty: "easy"
+  tags: ["big-o", "asymptotic", "simplification"]
+  lesson: bigo-asymptotic-notation
+  Front: |
+    Simplify: T(n) = 4n² + 7n + 50. What is its Big O?
+  Back: |
+    **O(n²)**
+
+    Rule: drop constants and lower-order terms.
+    - 4n² → n² (drop the constant 4)
+    - 7n drops (lower-order than n²)
+    - 50 drops (constant)
+
+    At large n, the n² term dominates completely. The multiplier 4 and the additive terms become irrelevant to the growth shape.
+
+- title: "Omega Notation"
+  difficulty: "medium"
+  tags: ["big-o", "asymptotic", "omega", "lower-bound"]
+  lesson: bigo-asymptotic-notation
+  Front: |
+    What does Ω(f(n)) (Omega notation) express?
+  Back: |
+    A **lower bound** on growth rate. An algorithm is Ω(f(n)) if its resource use is at least c · f(n) for some constant c and all sufficiently large n.
+
+    Example: any comparison-based sort is Ω(n log n) — it cannot do better than n log n comparisons in the worst case.
+
+- title: "Theta Notation"
+  difficulty: "medium"
+  tags: ["big-o", "asymptotic", "theta", "tight-bound"]
+  lesson: bigo-asymptotic-notation
+  Front: |
+    What does Θ(f(n)) (Theta notation) express, and how does it differ from O(f(n))?
+  Back: |
+    Θ is a **tight bound**: growth is exactly f(n) — both an upper bound (O) and lower bound (Ω).
+
+    - O(n²) means "at most n² growth" — the actual growth could be faster (e.g., O(n))
+    - Θ(n²) means "exactly n² growth" — it cannot be faster or slower
+
+    When engineers say O(n) and mean the algorithm is exactly linear, they are informally using O to mean Θ.
+
+- title: "Best, Average, Worst Case"
+  difficulty: "easy"
+  tags: ["big-o", "asymptotic", "best-case", "worst-case"]
+  lesson: bigo-asymptotic-notation
+  Front: |
+    What is the difference between best case, average case, and worst case in algorithm analysis?
+  Back: |
+    They describe **which input** is being analyzed:
+
+    - **Best case:** the most favorable input (e.g., already-sorted array for insertion sort)
+    - **Average case:** expected cost over a distribution of inputs
+    - **Worst case:** the most expensive possible input
+
+    These are orthogonal to Big O. You can apply O, Ω, or Θ notation to any case. "Worst-case O(n²)" is a complete statement.
+
+- title: "Why Asymptotic Analysis Ignores Small n"
+  difficulty: "medium"
+  tags: ["big-o", "asymptotic", "practical"]
+  lesson: bigo-asymptotic-notation
+  Front: |
+    An O(n²) algorithm with a tiny constant might outperform an O(n log n) algorithm for small n. Why is asymptotic analysis still useful?
+  Back: |
+    Asymptotic analysis captures **scalability** — how performance degrades as n grows. At small n, constants dominate. At large n, growth rate dominates.
+
+    The crossover point varies, but for inputs common in production systems (n = 10,000+), the asymptotically better algorithm almost always wins. Constants can be optimized; growth rate cannot.
+
+- title: "Asymptotic Meaning of 'n → ∞'"
+  difficulty: "easy"
+  tags: ["big-o", "asymptotic", "fundamentals"]
+  lesson: bigo-asymptotic-notation
+  Front: |
+    What does "asymptotic" mean in the context of algorithm analysis?
+  Back: |
+    It means we analyze behavior as input size n grows toward infinity. We care about the long-term growth trend, not the value at any specific n.
+
+    This is why constants drop out: at n → ∞, whether the multiplier is 3 or 3,000 is irrelevant compared to whether the function grows linearly or quadratically.
+
+- title: "Simplify Sequential Complexity"
+  difficulty: "easy"
+  tags: ["big-o", "asymptotic", "simplification"]
+  lesson: bigo-asymptotic-notation
+  Front: |
+    An algorithm has two sequential phases: O(n log n) then O(n²). What is the overall Big O?
+  Back: |
+    **O(n²)**
+
+    Sequential phases add: O(n log n) + O(n²). Drop the lower-order term (n log n grows slower than n²). The dominant term is O(n²).
+
+- title: "Big O of a Constant-Time Operation"
+  difficulty: "easy"
+  tags: ["big-o", "asymptotic", "O(1)"]
+  lesson: bigo-asymptotic-notation
+  Front: |
+    An operation always takes 500 steps regardless of input size. What is its Big O?
+  Back: |
+    **O(1)** — constant time.
+
+    500 is a constant. Big O drops constants. Whether it's 1 step or 1,000 steps, if the count doesn't grow with n, it's O(1).
+
+# =============================================================================
+# Lesson 2: Common Complexity Classes (20 cards)
+# =============================================================================
+
+- title: "The Seven Complexity Classes"
+  difficulty: "easy"
+  tags: ["big-o", "complexity-classes", "reference"]
+  lesson: bigo-common-complexities
+  Front: |
+    Name the seven common complexity classes from fastest to slowest growth.
+  Back: |
+    O(1) < O(log n) < O(n) < O(n log n) < O(n²) < O(2ⁿ) < O(n!)
+
+    Mnemonic: **1, log, n, n·log, n², 2ⁿ, n-factorial**
+
+- title: "What Is O(log n)?"
+  difficulty: "easy"
+  tags: ["big-o", "logarithmic", "O(log n)"]
+  lesson: bigo-common-complexities
+  Front: |
+    What does O(log n) complexity mean intuitively?
+  Back: |
+    The algorithm adds one step each time the input doubles. If it takes 10 steps for n=1,000, it takes 11 steps for n=2,000.
+
+    This occurs when an algorithm repeatedly halves (or reduces by a constant fraction) the remaining work. Binary search is the canonical example.
+
+- title: "O(1) Operations on Data Structures"
+  difficulty: "easy"
+  tags: ["big-o", "O(1)", "data-structures"]
+  lesson: bigo-common-complexities
+  Front: |
+    Give three examples of O(1) operations on data structures.
+  Back: |
+    - **Array index access:** `arr[i]` — contiguous memory, direct offset calculation
+    - **Hash map lookup by key** (average case) — hash function maps directly to a bucket
+    - **Stack push/pop** — operates only on the top element
+    - **Heap peek** (min or max) — root is always the extreme value
+
+- title: "Why Array Index Access Is O(1)"
+  difficulty: "easy"
+  tags: ["big-o", "array", "O(1)", "memory"]
+  lesson: bigo-common-complexities
+  Front: |
+    Why is array access by index O(1)?
+  Back: |
+    Arrays store elements in contiguous memory. To access index i, the processor computes: `base_address + i × element_size`. This is a single arithmetic operation and memory read, regardless of array size.
+
+    No traversal required — direct address calculation gives O(1) access.
+
+- title: "Why Array Search Is O(n)"
+  difficulty: "easy"
+  tags: ["big-o", "array", "O(n)", "search"]
+  lesson: bigo-common-complexities
+  Front: |
+    Why is searching an unsorted array for a value O(n)?
+  Back: |
+    With no ordering to exploit, the algorithm must inspect every element until it finds the target — or confirms it's absent. In the worst case (target not present or at the last position), all n elements are checked.
+
+    This is linear scan: O(n).
+
+- title: "Array Insert at Beginning: Complexity"
+  difficulty: "easy"
+  tags: ["big-o", "array", "insert", "O(n)"]
+  lesson: bigo-common-complexities
+  Front: |
+    What is the time complexity of inserting at the beginning of an array, and why?
+  Back: |
+    **O(n)** — every existing element must shift one position right to make room at index 0.
+
+    Shifting n elements is a linear operation. This applies to any insert at an arbitrary position, not just the beginning.
+
+- title: "Dynamic Array Append: Amortized Complexity"
+  difficulty: "medium"
+  tags: ["big-o", "array", "amortized", "O(1)"]
+  lesson: bigo-common-complexities
+  Front: |
+    What is the time complexity of appending to the end of a dynamic array, and what does "amortized" mean here?
+  Back: |
+    **O(1) amortized**
+
+    Most appends add to existing capacity: O(1). Occasional appends trigger a resize (allocate 2x capacity, copy all elements): O(n). But resizes happen exponentially rarely. Totaling the copy work over n appends: 1+2+4+...+n ≈ 2n steps. Spread across n operations: O(1) average per append.
+
+    "Amortized O(1)" means the per-operation average is O(1), not that every individual call is O(1).
+
+- title: "Linked List Insert at Head: Complexity"
+  difficulty: "easy"
+  tags: ["big-o", "linked-list", "insert", "O(1)"]
+  lesson: bigo-common-complexities
+  Front: |
+    What is the time complexity of inserting at the head of a singly linked list, and why?
+  Back: |
+    **O(1)** — create the new node, point its `next` to the current head, update the head pointer. Three pointer operations, regardless of list size.
+
+    No traversal needed. This is in contrast to insertion at an arbitrary position, which requires O(n) traversal to find the location.
+
+- title: "Singly Linked List: Insert/Delete at Tail"
+  difficulty: "medium"
+  tags: ["big-o", "linked-list", "tail", "O(n)"]
+  lesson: bigo-common-complexities
+  Front: |
+    What is the time complexity of inserting at the tail of a singly linked list without a tail pointer?
+  Back: |
+    **O(n)** — must traverse from head to the last node, which takes n steps.
+
+    With a tail pointer (common optimization), insertion at the tail is O(1). Deletion at the tail remains O(n) even with a tail pointer — you need the second-to-last node to update its `next`, and finding it requires traversal.
+
+- title: "Doubly Linked List: Tail Insert and Delete"
+  difficulty: "medium"
+  tags: ["big-o", "linked-list", "doubly", "O(1)"]
+  lesson: bigo-common-complexities
+  Front: |
+    How does a doubly linked list with a tail pointer differ from a singly linked list for tail operations?
+  Back: |
+    - **Singly with tail pointer:** tail insert O(1), tail delete O(n) (need predecessor)
+    - **Doubly with tail pointer:** tail insert O(1), tail delete O(1) (prev pointer gives direct access to predecessor)
+
+    The `prev` pointer is what makes doubly linked list tail deletion O(1).
+
+- title: "Stack Operations Complexity"
+  difficulty: "easy"
+  tags: ["big-o", "stack", "O(1)"]
+  lesson: bigo-common-complexities
+  Front: |
+    What are the time complexities for push, pop, and peek on a stack?
+  Back: |
+    All three are **O(1)**:
+
+    - **Push:** add to top — no traversal, just a pointer update
+    - **Pop:** remove from top — no traversal
+    - **Peek:** read top without removing — direct access
+
+    Search on a stack is O(n) — must pop through elements to find a value.
+
+- title: "Queue Operations Complexity"
+  difficulty: "easy"
+  tags: ["big-o", "queue", "O(1)"]
+  lesson: bigo-common-complexities
+  Front: |
+    What are the time complexities for enqueue, dequeue, and peek on a queue?
+  Back: |
+    All three are **O(1)** when the queue maintains both a front and back pointer:
+
+    - **Enqueue:** add to back — O(1) with back pointer
+    - **Dequeue:** remove from front — O(1) with front pointer
+    - **Peek:** read front without removing — O(1)
+
+    Search is O(n) — must scan through elements.
+
+- title: "Hash Map: Average vs Worst Case"
+  difficulty: "medium"
+  tags: ["big-o", "hash-map", "O(1)", "collision"]
+  lesson: bigo-common-complexities
+  Front: |
+    Why is hash map lookup O(1) average but O(n) worst case?
+  Back: |
+    **Average case O(1):** the hash function distributes keys evenly across buckets. Each bucket holds O(1) keys on average. Lookup computes the hash and checks one bucket.
+
+    **Worst case O(n):** all n keys collide into the same bucket (e.g., if using a bad hash function or adversarial input). Lookup degrades to scanning a linked list of n entries.
+
+    Good hash functions and load factor management (resize at ~0.75 load) keep average case dominant in practice.
+
+- title: "Balanced BST Operations Complexity"
+  difficulty: "medium"
+  tags: ["big-o", "bst", "balanced", "O(log n)"]
+  lesson: bigo-common-complexities
+  Front: |
+    What are the time complexities for search, insert, and delete in a balanced BST?
+  Back: |
+    All three are **O(log n)**:
+
+    - **Search:** at each node, go left or right — halves the search space each step
+    - **Insert:** search for the insertion point (O(log n)), then insert at a leaf
+    - **Delete:** find the node (O(log n)), restructure (O(log n) rebalancing)
+
+    "Balanced" is the key word. The guarantee is that tree height = O(log n). An unbalanced BST degrades to O(n) in the worst case.
+
+- title: "Unbalanced BST Worst Case"
+  difficulty: "medium"
+  tags: ["big-o", "bst", "unbalanced", "O(n)"]
+  lesson: bigo-common-complexities
+  Front: |
+    What is the worst-case time complexity for search in an unbalanced BST, and when does this occur?
+  Back: |
+    **O(n)** — when the tree degenerates into a linked list.
+
+    This happens when elements are inserted in sorted (or reverse-sorted) order. Each new element becomes the rightmost (or leftmost) node. The tree's height equals n, eliminating the halving property of BST search.
+
+    Self-balancing trees (AVL, red-black) prevent this by restructuring on insert/delete.
+
+- title: "Binary Heap: Insert and Delete-Min Complexity"
+  difficulty: "medium"
+  tags: ["big-o", "heap", "O(log n)"]
+  lesson: bigo-common-complexities
+  Front: |
+    What is the time complexity for insert and delete-min on a binary heap, and why O(log n)?
+  Back: |
+    Both are **O(log n)**:
+
+    - **Insert:** add the new element at the end (O(1)), then bubble it up to restore the heap property. The heap has log n levels, so at most log n swaps.
+    - **Delete-min:** remove the root (O(1)), move the last element to root (O(1)), then sift it down. Again, at most log n levels to traverse.
+
+    The O(log n) bound comes from the tree's height, which is always ⌊log₂(n)⌋ for a complete binary tree.
+
+- title: "Trie Operation Complexity"
+  difficulty: "medium"
+  tags: ["big-o", "trie", "O(k)"]
+  lesson: bigo-common-complexities
+  Front: |
+    What is the time complexity for insert and search in a trie, where k is the key length?
+  Back: |
+    **O(k)** — proportional to the key length, not the number of stored keys.
+
+    - **Insert:** traverse one node per character, creating nodes as needed. k characters = k steps.
+    - **Search:** follow edges character by character. If any edge is missing, the key is absent. k characters = k steps.
+
+    Tries are unique: complexity depends on key length, not dataset size. Searching 1 million words takes the same number of steps as searching 10, as long as the key length is the same.
+
+- title: "Graph BFS/DFS Complexity"
+  difficulty: "medium"
+  tags: ["big-o", "graph", "bfs", "dfs", "O(V+E)"]
+  lesson: bigo-common-complexities
+  Front: |
+    What is the time complexity of BFS and DFS on a graph with V vertices and E edges?
+  Back: |
+    **O(V + E)**
+
+    Both algorithms visit every vertex (V) and traverse every edge (E) at most once. The "+E" term accounts for following edges to discover neighbors.
+
+    In a sparse graph (E ≈ V), this is O(V). In a dense graph (E ≈ V²), this approaches O(V²).
+
+- title: "Graph Adjacency Matrix vs List: Add Vertex"
+  difficulty: "medium"
+  tags: ["big-o", "graph", "adjacency-matrix", "adjacency-list"]
+  lesson: bigo-common-complexities
+  Front: |
+    Adjacency list vs adjacency matrix: what is the time complexity of adding a vertex, and why do they differ?
+  Back: |
+    - **Adjacency list:** O(1) — append a new empty list. No existing data changes.
+    - **Adjacency matrix:** O(V²) — must allocate a new V×V matrix (or expand the existing one by adding a row and column for the new vertex).
+
+    The matrix's fixed 2D structure makes it expensive to resize. Lists only need to add a new entry.
+
+- title: "Merge Sort Complexity"
+  difficulty: "medium"
+  tags: ["big-o", "sorting", "merge-sort", "O(n log n)"]
+  lesson: bigo-common-complexities
+  Front: |
+    What is the time complexity of merge sort, and why is it O(n log n)?
+  Back: |
+    **O(n log n)** time, **O(n)** space.
+
+    - There are log n levels of recursion (each level halves the problem).
+    - Each level does O(n) total merge work across all subproblems.
+    - Total: O(n) per level × O(log n) levels = O(n log n).
+
+    Unlike quicksort, merge sort guarantees O(n log n) in the worst case. The cost is O(n) auxiliary space for the merge step.
+
+# =============================================================================
+# Lesson 3: Analyzing Code Complexity (10 cards)
+# =============================================================================
+
+- title: "Rule: Sequential Operations"
+  difficulty: "easy"
+  tags: ["big-o", "analysis", "sequential"]
+  lesson: bigo-analyzing-code
+  Front: |
+    Two code blocks run sequentially: Block A is O(n²), Block B is O(n). What is the total complexity?
+  Back: |
+    **O(n²)** — add complexities, then drop lower-order terms.
+
+    O(n²) + O(n) = O(n² + n). Since n² dominates as n grows, drop the n. Result: O(n²).
+
+    Never make the mistake of multiplying sequential (non-nested) code blocks.
+
+- title: "Rule: Nested Loops"
+  difficulty: "easy"
+  tags: ["big-o", "analysis", "nested-loops"]
+  lesson: bigo-analyzing-code
+  Front: |
+    What is the complexity rule for nested loops?
+  Back: |
+    **Multiply** the complexities of the outer and inner loops.
+
+    ```
+    for i in range(n):       # O(n)
+        for j in range(n):   # O(n)
+            work()           # O(1)
+    ```
+
+    Total: O(n) × O(n) × O(1) = **O(n²)**
+
+    If the inner loop runs m times (independent of outer): O(n × m).
+
+- title: "Analyzing a Triangular Loop"
+  difficulty: "medium"
+  tags: ["big-o", "analysis", "triangular", "O(n²)"]
+  lesson: bigo-analyzing-code
+  Front: |
+    What is the time complexity of this pattern, and how do you derive it?\n\n```\nfor i in range(n):\n    for j in range(i):\n        work()\n```
+  Back: |
+    **O(n²)**
+
+    The inner loop runs 0, 1, 2, ..., n−1 iterations. Total work: sum from 0 to n−1 = n(n−1)/2 ≈ n²/2. Drop the constant: O(n²).
+
+    This triangular pattern appears in "compare all pairs" algorithms (e.g., checking for duplicates naively, bubble sort's comparison step).
+
+- title: "Recognizing O(log n) in Code"
+  difficulty: "medium"
+  tags: ["big-o", "analysis", "O(log n)", "halving"]
+  lesson: bigo-analyzing-code
+  Front: |
+    How do you recognize an O(log n) pattern in code?
+  Back: |
+    Look for a loop or recursion where the variable controlling termination is **halved** (or divided by a constant) each iteration:
+
+    ```
+    n = input_size
+    while n > 1:
+        n = n // 2
+        work()
+    ```
+
+    How many times can you halve n before reaching 1? log₂(n) times. Each iteration is O(1) → **O(log n) total**.
+
+    Any "divide the search space in half" pattern (binary search, balanced tree traversal, heap sift) fits this model.
+
+- title: "Linear Recursion Complexity"
+  difficulty: "medium"
+  tags: ["big-o", "recursion", "O(n)"]
+  lesson: bigo-analyzing-code
+  Front: |
+    A recursive function calls itself once with n−1 and does O(1) work per call. What is its time complexity?
+  Back: |
+    **O(n)**
+
+    The recursion goes n levels deep before reaching the base case. Each level does O(1) work. Total: n × O(1) = O(n).
+
+    Examples: factorial, linked list traversal, summing an array recursively. These all make exactly one recursive call that reduces the problem by 1.
+
+- title: "Divide-and-Conquer Recursion Complexity"
+  difficulty: "hard"
+  tags: ["big-o", "recursion", "divide-and-conquer", "O(n log n)"]
+  lesson: bigo-analyzing-code
+  Front: |
+    A recursive function splits the input in half, recurses on both halves, then merges in O(n). What is its time complexity?
+  Back: |
+    **O(n log n)**
+
+    The recursion tree has log n levels. At each level, the total work across all subproblems is O(n) (the merge step). The same n elements are processed at every level.
+
+    Total: O(n) per level × log n levels = **O(n log n)**.
+
+    Merge sort is the canonical example. The recurrence is T(n) = 2T(n/2) + O(n).
+
+- title: "Exponential Recursion Complexity"
+  difficulty: "medium"
+  tags: ["big-o", "recursion", "O(2^n)", "fibonacci"]
+  lesson: bigo-analyzing-code
+  Front: |
+    Why is naive recursive Fibonacci O(2ⁿ)?
+  Back: |
+    Each call to `fib(n)` spawns two calls: `fib(n-1)` and `fib(n-2)`. The call tree is a binary tree of depth approximately n.
+
+    Number of calls: roughly 2⁰ + 2¹ + 2² + ... + 2ⁿ = 2ⁿ⁺¹ − 1 = **O(2ⁿ)**.
+
+    Memoization stores each result after computing it. With n unique inputs, total work drops to O(n). The exponential call tree collapses to a linear pass.
+
+- title: "Amortized O(1): Definition"
+  difficulty: "medium"
+  tags: ["big-o", "amortized", "O(1)"]
+  lesson: bigo-analyzing-code
+  Front: |
+    What does "amortized O(1)" mean?
+  Back: |
+    An operation is amortized O(1) when most calls are O(1) but occasional calls are expensive — and when you average the cost across many calls, the per-call cost is O(1).
+
+    The expensive calls are "paid for" by the many cheap calls that preceded them. Dynamic array append is the canonical case: occasional O(n) resizes are averaged across n appends, giving O(1) amortized.
+
+- title: "Inner Loop Depends on Outer Variable"
+  difficulty: "medium"
+  tags: ["big-o", "analysis", "nested-loops"]
+  lesson: bigo-analyzing-code
+  Front: |
+    What is the time complexity if the inner loop runs `n - i` times for outer variable `i` from 0 to n?\n\n```\nfor i in range(n):\n    for j in range(n - i):\n        work()\n```
+  Back: |
+    **O(n²)**
+
+    Total iterations: n + (n−1) + (n−2) + ... + 1 + 0 = n(n+1)/2. Dominant term: n²/2. Drop constant: O(n²).
+
+    Same triangular sum as the `range(i)` variant. Whether the inner loop runs 0 to i or n−i to 0, if it always sums to n(n−1)/2 total iterations, the result is O(n²).
+
+- title: "Recognizing O(n log n) in Sorting Context"
+  difficulty: "easy"
+  tags: ["big-o", "sorting", "O(n log n)"]
+  lesson: bigo-analyzing-code
+  Front: |
+    What algorithmic pattern typically produces O(n log n) complexity?
+  Back: |
+    **Divide and conquer** with O(n) merge/combine work:
+
+    - Split problem in half: log n levels of recursion
+    - Each level does O(n) work combining the halves
+    - Total: O(n log n)
+
+    Efficient sorting algorithms (merge sort, heap sort, average-case quicksort) all fall into this class. O(n log n) is also the theoretical minimum for comparison-based sorting.
+
+# =============================================================================
+# Lesson 4: Space Complexity (8 cards)
+# =============================================================================
+
+- title: "Auxiliary Space vs Total Space"
+  difficulty: "easy"
+  tags: ["big-o", "space", "auxiliary"]
+  lesson: bigo-space-complexity
+  Front: |
+    What is the difference between auxiliary space and total space complexity?
+  Back: |
+    - **Auxiliary space:** extra memory allocated by the algorithm, *excluding* the input
+    - **Total space:** all memory used, including the input itself
+
+    Most algorithm analysis uses auxiliary space. When a problem says "solve in O(1) extra space," it means auxiliary space = O(1) — the input is already in memory and doesn't count.
+
+- title: "What In-Place Means"
+  difficulty: "easy"
+  tags: ["big-o", "space", "in-place", "O(1)"]
+  lesson: bigo-space-complexity
+  Front: |
+    What does it mean for an algorithm to be "in-place"?
+  Back: |
+    **O(1) auxiliary space** — the algorithm uses a constant amount of extra memory regardless of input size.
+
+    A few index variables, swap buffers, or pointers are fine. The algorithm may or may not modify the input — in-place says nothing about mutation, only about extra memory allocation.
+
+    Examples: in-place swap using a temp variable, bubble sort (only needs two index variables), two-pointer on an array.
+
+- title: "Recursive Algorithm Call Stack Space"
+  difficulty: "medium"
+  tags: ["big-o", "space", "recursion", "call-stack"]
+  lesson: bigo-space-complexity
+  Front: |
+    A recursive function reaches a maximum depth of d before hitting the base case. What is its call stack space complexity?
+  Back: |
+    **O(d)** — each recursive call pushes one frame onto the call stack, and at most d frames are live simultaneously.
+
+    For linear recursion (depth n): O(n) space.
+    For divide-and-conquer (depth log n): O(log n) space.
+
+    This space is consumed even if the function allocates no other data structures. Recursive algorithms that appear "in-place" still use stack space.
+
+- title: "Why Recursive Binary Search Uses O(log n) Space"
+  difficulty: "medium"
+  tags: ["big-o", "space", "recursion", "binary-search", "O(log n)"]
+  lesson: bigo-space-complexity
+  Front: |
+    Recursive binary search does not allocate any arrays. Why does it still use O(log n) auxiliary space?
+  Back: |
+    Each recursive call pushes a stack frame. Binary search halves the search space each call, so the maximum recursion depth is log₂(n). At most log₂(n) frames are on the stack simultaneously.
+
+    Even without explicit data structures, the call stack itself uses O(log n) space.
+
+    The iterative version with `while low <= high` uses O(1) space — no stack frames beyond the single function call.
+
+- title: "Space Complexity of Creating an Array Copy"
+  difficulty: "easy"
+  tags: ["big-o", "space", "array", "O(n)"]
+  lesson: bigo-space-complexity
+  Front: |
+    An algorithm copies an n-element array into a new array, processes the copy, and returns. What is its auxiliary space complexity?
+  Back: |
+    **O(n)** — the copy requires n new memory allocations, proportional to input size.
+
+    The original array is not counted (it's the input). The copy is auxiliary space. Even if the copy is temporary and freed before return, its peak memory use is O(n).
+
+- title: "Time-Space Trade-Off: Hash Set for Duplicates"
+  difficulty: "medium"
+  tags: ["big-o", "space", "trade-off", "hash-set"]
+  lesson: bigo-space-complexity
+  Front: |
+    You want to find duplicates in an array. What trade-off do you make when using a hash set versus a nested loop?
+  Back: |
+    - **Nested loop:** O(n²) time, O(1) auxiliary space — compare every pair
+    - **Hash set:** O(n) time, O(n) auxiliary space — O(1) lookup per element
+
+    Spending O(n) extra memory buys an O(n) speed improvement. This is the canonical time-space trade-off: paying with memory to avoid repeated work.
+
+- title: "Memoization Space Cost"
+  difficulty: "medium"
+  tags: ["big-o", "space", "memoization", "dynamic-programming"]
+  lesson: bigo-space-complexity
+  Front: |
+    Memoizing a function with input n reduces its time complexity from O(2ⁿ) to O(n). What is the space cost?
+  Back: |
+    **O(n) auxiliary space** — the memo table stores one result per unique input value. If inputs range from 0 to n, the table has n entries.
+
+    This is the standard time-space trade-off for dynamic programming: exponential time collapses to polynomial by trading O(n) or O(n²) space to store intermediate results.
+
+- title: "Space Complexity of Merge Sort"
+  difficulty: "medium"
+  tags: ["big-o", "space", "merge-sort", "O(n)"]
+  lesson: bigo-space-complexity
+  Front: |
+    Merge sort is O(n log n) time. What is its auxiliary space complexity, and where does it come from?
+  Back: |
+    **O(n) auxiliary space**
+
+    The merge step combines two sorted halves into a sorted result. It requires a temporary array to hold the merged output before writing back. This temporary array is at most size n.
+
+    Although the recursion stack uses O(log n) space, O(n) dominates. The O(n) cost comes from the merge step, not the recursion depth.
