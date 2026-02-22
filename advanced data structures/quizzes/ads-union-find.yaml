@@ -1,0 +1,56 @@
+title: "Union-Find (Disjoint Sets)"
+lesson_slug: "ads-union-find"
+questions:
+  - question: "In union-find, how do you determine if two elements a and b are in the same set?"
+    options:
+      - "Check if a and b are adjacent in the parent array"
+      - "Check if find(a) == find(b) — their roots are the same"
+      - "Call union(a, b) and check if it returns true"
+      - "Check if rank[a] == rank[b]"
+    correct: 1
+    explanation: "find(x) returns the root representative of x's set. Two elements are in the same set if and only if they share the same root. Checking find(a) == find(b) is the standard connectivity test."
+
+  - question: "What does path compression do during a find operation?"
+    options:
+      - "It deletes intermediate nodes to reduce memory usage"
+      - "It rearranges elements in sorted order to speed up future finds"
+      - "It points every node visited on the path directly to the root, flattening the tree"
+      - "It compresses the rank array by removing duplicate values"
+    correct: 2
+    explanation: "After finding the root recursively, path compression sets parent[x] = root for every node x visited on the path. Future find operations on those nodes skip directly to the root in one step instead of walking the chain again."
+
+  - question: "What does union by rank prevent?"
+    options:
+      - "It prevents two elements from being merged into the same set twice"
+      - "It prevents tall chains from forming by always attaching the shorter tree under the taller one"
+      - "It prevents the root from being changed during a union operation"
+      - "It prevents path compression from flattening the tree too aggressively"
+    correct: 1
+    explanation: "Without union by rank, repeated unions might always attach one root as a deep child of another, creating an O(n) tall chain. Union by rank ensures the shorter tree (lower rank) is always merged under the taller one, keeping height at O(log n) without path compression alone."
+
+  - question: "With both path compression and union by rank, what is the amortized time per union-find operation?"
+    options:
+      - "O(log n)"
+      - "O(log log n)"
+      - "O(α(n)), the inverse Ackermann function — practically constant for all real inputs"
+      - "O(1) exactly — operations are always constant time"
+    correct: 2
+    explanation: "The amortized cost per operation is O(α(n)), where α is the inverse Ackermann function. For any n ≤ 10^80, α(n) ≤ 4. It is practically indistinguishable from O(1), but not exactly O(1) — it grows, just astronomically slowly."
+
+  - question: "Which graph algorithm is a classic direct application of union-find?"
+    options:
+      - "Dijkstra's shortest path algorithm"
+      - "Topological sort"
+      - "Kruskal's minimum spanning tree algorithm"
+      - "Depth-first search"
+    correct: 2
+    explanation: "Kruskal's MST adds edges in increasing weight order, skipping any edge that would create a cycle. The cycle check is: does find(u) == find(v)? If yes, skip. If no, call union(u, v) and add the edge. Union-find makes this check O(α(n)) per edge."
+
+  - question: "What can union-find NOT do, that limits its use in some problems?"
+    options:
+      - "It cannot find the root of a set in O(1) time"
+      - "It cannot handle sets larger than log n elements"
+      - "It cannot split a merged set back apart (no undo of union)"
+      - "It cannot be used with non-integer element types"
+    correct: 2
+    explanation: "Once two sets are merged, they cannot be un-merged. Union-find has no delete or split operation. Problems requiring 'undo connectivity' (e.g., removing an edge and restoring previous components) need a different approach, such as offline processing in reverse or link-cut trees."
