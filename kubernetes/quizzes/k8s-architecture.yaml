@@ -1,0 +1,56 @@
+title: "Kubernetes Architecture"
+lesson_slug: "k8s-architecture"
+questions:
+  - question: "Which control plane component is the ONLY one that communicates with etcd directly?"
+    options:
+      - "kube-scheduler"
+      - "kube-controller-manager"
+      - "kube-apiserver"
+      - "kubelet"
+    correct: 2
+    explanation: "The API server is the sole gateway to etcd. All other components -- the scheduler, controller manager, and kubelet -- communicate through the API server. This centralizes access control and validation in one place."
+
+  - question: "What does the kube-scheduler decide?"
+    options:
+      - "Which containers to restart after a crash"
+      - "Which node a newly created Pod should run on"
+      - "How many replicas a Deployment should maintain"
+      - "Which networking rules to apply to a Pod"
+    correct: 1
+    explanation: "The scheduler watches for Pods with no assigned node (status: Pending) and selects the best node based on resource requests, affinity rules, taints, and topology constraints. It does not manage container restarts or replica counts -- those are controller manager responsibilities."
+
+  - question: "What is the primary job of the kube-controller-manager?"
+    options:
+      - "Routing external traffic into the cluster"
+      - "Storing all cluster state in a distributed key-value store"
+      - "Running reconciliation loops that continuously drive actual state toward desired state"
+      - "Authenticating and authorizing all API requests"
+    correct: 2
+    explanation: "The controller manager runs many controllers (ReplicaSet, Deployment, Node, Job) in a loop. Each one compares desired state with actual state and takes corrective action. Authentication/authorization belongs to the API server. State storage belongs to etcd."
+
+  - question: "What does the kubelet do on a worker node?"
+    options:
+      - "Routes traffic between Service IPs and Pod IPs"
+      - "Schedules new Pods onto available nodes"
+      - "Watches for Pod assignments to this node and ensures containers are running and healthy"
+      - "Maintains iptables rules for Service load balancing"
+    correct: 2
+    explanation: "The kubelet is the node agent. It registers the node with the API server, pulls container images, starts containers, executes health probes, and reports node status. Routing between Service IPs and Pod IPs is handled by kube-proxy, not the kubelet."
+
+  - question: "In the declarative model, what does 'reconciliation' mean?"
+    options:
+      - "Comparing container image versions between environments"
+      - "Merging YAML manifests from multiple sources"
+      - "Continuously comparing desired state with actual state and correcting any drift"
+      - "Synchronizing etcd data between control plane replicas"
+    correct: 2
+    explanation: "Reconciliation is the core control loop: observe actual state, compare to desired state, act to eliminate any difference. If you declare 3 replicas and 2 are running, the ReplicaSet controller creates a third. The cluster continuously self-heals toward the declared state."
+
+  - question: "What does kube-proxy manage on each worker node?"
+    options:
+      - "Container image pulls and cache management"
+      - "iptables or IPVS rules that route traffic from Service virtual IPs to Pod IPs"
+      - "TLS certificate renewal for cluster components"
+      - "CPU and memory cgroup limits for containers"
+    correct: 1
+    explanation: "kube-proxy maintains networking rules (iptables or IPVS) on each node. When a Pod sends traffic to a Service's ClusterIP, kube-proxy's rules transparently redirect it to a healthy backend Pod. Container image management is the container runtime's job. Resource limits are enforced by cgroups via the container runtime."

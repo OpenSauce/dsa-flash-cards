@@ -1,0 +1,56 @@
+title: "Pods and Workloads"
+lesson_slug: "k8s-pods-and-workloads"
+questions:
+  - question: "Why is a Pod -- not a container -- the smallest deployable unit in Kubernetes?"
+    options:
+      - "Pods are faster to start than individual containers"
+      - "Kubernetes cannot pull container images without a Pod wrapper"
+      - "Pods group containers that share a network namespace and volumes, making co-location schedulable as a unit"
+      - "The OCI specification requires containers to run inside Pods"
+    correct: 2
+    explanation: "A Pod provides shared infrastructure for tightly coupled processes: same IP address, same port space, and optional shared volumes. This co-location requirement must be expressed at the scheduler level -- you cannot schedule two raw containers to always land on the same node. The Pod is the unit that encodes that dependency."
+
+  - question: "What do containers within the same Pod share?"
+    options:
+      - "The same filesystem and process IDs"
+      - "The same network namespace (IP address and port space) and any mounted volumes"
+      - "The same CPU and memory limit pool"
+      - "The same environment variables and Secrets"
+    correct: 1
+    explanation: "Containers in a Pod share a network namespace -- they have the same IP and communicate via localhost. They also share any volumes explicitly mounted in the Pod spec. They do NOT share filesystems (each container has its own root filesystem) or process namespaces by default."
+
+  - question: "What is the sidecar pattern and what problem does it solve?"
+    options:
+      - "Running two identical containers for high availability within a single Pod"
+      - "A second container in a Pod that handles a cross-cutting concern (logging, proxying, secret injection) without changing the main container"
+      - "A technique to reduce container image size by splitting the application into layers"
+      - "A pattern for sharing CPU resources between containers in the same Pod"
+    correct: 1
+    explanation: "The sidecar runs alongside the main container and handles operational concerns the main container should not need to know about. Because they share the Pod's network namespace (localhost) and volumes, the sidecar can intercept traffic or read/write files without the main application being aware of it."
+
+  - question: "Why should you avoid creating bare Pods directly (without a controller)?"
+    options:
+      - "Bare Pods cannot have resource limits set"
+      - "Bare Pods run with root privileges by default"
+      - "Bare Pods are not rescheduled if the container crashes or the node fails"
+      - "Bare Pods cannot access ConfigMaps or Secrets"
+    correct: 2
+    explanation: "A controller (Deployment, StatefulSet, Job) watches for failed Pods and creates replacements. A bare Pod that crashes stays crashed. A bare Pod on a failed node is gone permanently. Always use a controller so Kubernetes can maintain the desired number of running Pods."
+
+  - question: "What do Namespaces provide, and what do they NOT provide by default?"
+    options:
+      - "They provide network isolation between Pods. They do not provide resource quota enforcement."
+      - "They provide strong security boundaries between tenants. They do not provide logical resource organization."
+      - "They provide logical isolation and access control boundaries. They do not provide network isolation (Pods across Namespaces can communicate freely by default)."
+      - "They provide physical node separation. They do not prevent Pods from sharing CPU."
+    correct: 2
+    explanation: "Namespaces partition resources logically and scope RBAC policies, but they do not create a network boundary. By default, a Pod in Namespace A can send traffic directly to a Pod in Namespace B. Network isolation requires NetworkPolicies applied explicitly to restrict cross-namespace traffic."
+
+  - question: "Which Pod phase means all containers terminated successfully with exit code 0?"
+    options:
+      - "Running"
+      - "Completed"
+      - "Succeeded"
+      - "Terminated"
+    correct: 2
+    explanation: "Succeeded is the terminal phase where all containers exited with code 0. This is the expected final state for batch Jobs. Running means at least one container is executing. Completed and Terminated are not valid Kubernetes Pod phase names."

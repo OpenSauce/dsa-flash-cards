@@ -1,0 +1,56 @@
+title: "Services and Networking"
+lesson_slug: "k8s-services-and-networking"
+questions:
+  - question: "What are the three rules of the Kubernetes flat network model?"
+    options:
+      - "Pods share IPs with the host node; all nodes can reach all Pods; Services balance traffic across Pods"
+      - "Every Pod gets its own IP; all Pods can communicate without NAT; node agents can reach all Pods on their node"
+      - "Every Pod gets a DNS name; Services provide IP addresses; CNI plugins enforce NetworkPolicies"
+      - "Pods in the same Namespace share an IP; cross-Namespace traffic requires a Service; external traffic requires Ingress"
+    correct: 1
+    explanation: "The three rules: (1) every Pod has a unique IP, (2) any Pod can reach any other Pod directly without NAT regardless of node, and (3) node agents (kubelet, kube-proxy) can reach all Pods on their node. CNI plugins must implement these rules -- how they do it varies."
+
+  - question: "What is a CNI plugin responsible for in a Kubernetes cluster?"
+    options:
+      - "Authenticating API server requests from kubelets"
+      - "Assigning IP addresses to Pods and ensuring the flat network model rules are satisfied"
+      - "Managing TLS certificates for inter-Pod communication"
+      - "Enforcing CPU and memory limits on containers"
+    correct: 1
+    explanation: "CNI (Container Network Interface) plugins handle Pod networking: assigning IP addresses from the cluster CIDR range and configuring routes so Pods on any node can reach Pods on any other node. Examples: Calico, Cilium, Flannel, AWS VPC CNI. Without a CNI plugin, Pods cannot communicate."
+
+  - question: "A Service with type ClusterIP vs type LoadBalancer -- what is the key difference?"
+    options:
+      - "ClusterIP supports TCP; LoadBalancer supports HTTP only"
+      - "ClusterIP has no DNS name; LoadBalancer gets a DNS name automatically"
+      - "ClusterIP is reachable only within the cluster; LoadBalancer provisions an external cloud load balancer accessible from the internet"
+      - "ClusterIP supports multiple ports; LoadBalancer only supports a single port"
+    correct: 2
+    explanation: "ClusterIP creates an internal virtual IP only reachable within the cluster -- used for service-to-service communication. LoadBalancer instructs the cloud provider to provision an external load balancer (AWS ELB, GCP LB) with a public IP, making the Service reachable from outside the cluster."
+
+  - question: "How does Kubernetes service discovery work within the cluster?"
+    options:
+      - "Services broadcast their IPs via ARP announcements"
+      - "Pods must query the API server to find Service IP addresses"
+      - "DNS: cluster DNS resolves Service names to their ClusterIP addresses"
+      - "kube-proxy maintains a hosts file on each node with Service IP mappings"
+    correct: 2
+    explanation: "CoreDNS (the cluster DNS server) automatically creates DNS records for every Service: `service-name.namespace.svc.cluster.local`. Any Pod can resolve this name to the Service's ClusterIP. This is why Pods reference Services by name, not by hardcoded IP addresses."
+
+  - question: "What does an Ingress resource do that a Service cannot?"
+    options:
+      - "An Ingress can route to Pods without a Service; a Service always needs Pods"
+      - "An Ingress provides L7 HTTP routing (host-based, path-based, TLS termination); a Service provides L4 TCP/UDP routing"
+      - "An Ingress provides internal cluster routing; a Service provides external routing"
+      - "An Ingress supports UDP; a Service only supports TCP"
+    correct: 1
+    explanation: "Services operate at Layer 4 -- they route TCP/UDP traffic by IP and port with no awareness of HTTP. Ingress operates at Layer 7 -- it can route based on HTTP hostname, URL path, and headers, and terminate TLS. An Ingress lets one external load balancer serve multiple HTTP applications behind different paths."
+
+  - question: "By default, can Pods in one Namespace freely send traffic to Pods in another Namespace?"
+    options:
+      - "No -- Namespaces are isolated by default; you must create a Service to cross Namespace boundaries"
+      - "Yes -- Namespaces provide logical isolation but no network isolation by default"
+      - "Only if both Namespaces are in the same node"
+      - "Only if a NetworkPolicy explicitly allows it"
+    correct: 1
+    explanation: "By default, Kubernetes allows all Pods to communicate with all other Pods across all Namespaces. Namespaces are organizational and RBAC boundaries, not network boundaries. To restrict cross-namespace traffic, you must apply NetworkPolicies explicitly."
