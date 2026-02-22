@@ -41,10 +41,10 @@ questions:
     options:
       - "Run LCS on s and its sorted version"
       - "Run LCS on s with itself"
-      - "Run LCS on s and its reverse -- any subsequence common to both appears in forward and backward order in s, making it a palindrome"
+      - "Run LCS on s and its reverse -- any palindromic subsequence of s also appears as a common subsequence of s and reverse(s)"
       - "Run edit distance between s and its reverse, then subtract from the string length"
     correct: 2
-    explanation: "A palindromic subsequence reads the same forwards and backwards. Any subsequence common to s and reverse(s) must appear in order in s and in reverse order in s -- it is therefore a palindrome. LCS(s, reverse(s)) gives the longest such subsequence."
+    explanation: "A palindromic subsequence reads the same forwards and backwards. For any palindromic subsequence of s, taking the same characters in reverse(s) (where the indices are reversed) produces the same sequence, so it is also a subsequence of reverse(s). Thus every palindromic subsequence of s is a common subsequence of s and reverse(s), and LCS(s, reverse(s)) has exactly the length of the longest palindromic subsequence."
 
   - question: "Why is the state for two-string DP problems typically dp[i][j] (indexing into both strings)?"
     options:

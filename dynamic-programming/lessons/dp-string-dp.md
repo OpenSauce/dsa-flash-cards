@@ -108,7 +108,7 @@ return LCS(s, s_rev)
 
 No new recurrence needed -- just recognize the reduction.
 
-**Why it works:** Any subsequence common to s and s_rev appears in order in s and in reverse order in s. A subsequence that appears in both directions is a palindrome.
+**Why it works:** Every palindromic subsequence of s reads the same forwards and backwards, so it also appears as a subsequence of s_rev. Therefore, the length of the longest palindromic subsequence of s equals LCS(s, s_rev).
 
 ## Key Takeaways
 

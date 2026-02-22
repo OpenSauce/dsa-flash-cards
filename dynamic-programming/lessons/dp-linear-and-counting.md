@@ -52,7 +52,7 @@ dp[i] = max(dp[i-1], dp[i-2] + nums[i])
 
 **Base cases:** `dp[0] = nums[0]`, `dp[1] = max(nums[0], nums[1])`
 
-**Why greedy fails:** Greedily taking every other house doesn't work. Consider `[2, 1, 1, 2]` -- greedy might pick indices 0, 2 (sum 3), but indices 1, 3 also sum to 3, and neither is obviously wrong until you see that `[2, 1, 1, 2]` is best robbed at 0 and 3 (sum 4, adjacent distance is 3 so both allowed... wait, that's indices 0 and 3, not adjacent). The point is that local decisions interact non-locally.
+**Why greedy fails:** Consider the greedy rule "take every other house starting from the first". On `[5, 1, 1, 5]`, this rule picks houses at indices 0 and 2 for a total of 6, but the optimal choice is indices 0 and 3 for a total of 10. A simple local or fixed pattern rule can miss the best non-adjacent combination, which is why we need the skip-or-take DP recurrence.
 
 **Space optimization:** Like Kadane's, only the two previous values are needed. Reduce to O(1) with `prev2` and `prev1` variables.
 

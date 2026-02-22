@@ -55,7 +55,7 @@ For **tabulation (bottom-up)**, you must fill the table so that every dependency
 
 For climbing stairs, `dp[i]` depends on `dp[i-1]` and `dp[i-2]`, so iterate i from 2 to n.
 
-For a 2D table (like LCS), the direction matters: if `dp[i][j]` depends on `dp[i-1][j-1]`, `dp[i-1][j]`, and `dp[i][j-1]`, iterate i left to right, j top to bottom.
+For a 2D table (like LCS), the direction matters: if `dp[i][j]` depends on `dp[i-1][j-1]`, `dp[i-1][j]`, and `dp[i][j-1]`, iterate i from 1..m (rows, top to bottom) and j from 1..n (columns, left to right).
 
 For **memoization (top-down)**, iteration order is implicit -- the recursion handles it. The tradeoff: memoization is easier to write, tabulation avoids stack overflow and has better cache behavior.
 

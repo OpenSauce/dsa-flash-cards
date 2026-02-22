@@ -52,7 +52,7 @@
 
     For 1D DP where `dp[i]` depends on `dp[i-1]` and `dp[i-2]`: iterate i from 2 to n.
 
-    For 2D DP where `dp[i][j]` depends on `dp[i-1][j]`, `dp[i][j-1]`, and `dp[i-1][j-1]`: iterate i then j, both left to right.
+    For 2D DP where `dp[i][j]` depends on `dp[i-1][j]`, `dp[i][j-1]`, and `dp[i-1][j-1]`: iterate in row-major order — move i from top to bottom (rows), and for each i, move j from left to right (columns), so all dependencies are computed before `dp[i][j]`.
 
 - title: "Memoization to Tabulation Conversion"
   difficulty: "medium"
@@ -486,9 +486,9 @@
   Back: |
     `LCS(s, reverse(s))`
 
-    A palindromic subsequence reads the same forwards and backwards. Any subsequence common to s and reverse(s) appears in order in s and in reverse order in s -- making it a palindrome.
+    A palindromic subsequence reads the same forwards and backwards. Every palindromic subsequence of s is also a common subsequence of s and reverse(s): if it appears at indices i₁ < … < i_k in s, then the same characters appear in reverse(s) at indices n - i_k + 1 < … < n - i₁ + 1.
 
-    No new recurrence needed: reduce to LCS, which you already know how to solve.
+    Thus all palindromic subsequences of s live inside the set of common subsequences of s and reverse(s), so the LCS length is at least the LPS length — and this standard reduction is used to compute the exact LPS length without designing a new recurrence.
 
 - title: "Two-String DP State Pattern"
   difficulty: "easy"
