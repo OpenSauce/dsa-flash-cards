@@ -1,0 +1,56 @@
+title: "Binary Search Trees"
+lesson_slug: "ds-binary-search-trees"
+questions:
+  - question: "The BST invariant requires left < node < right. Is this a local or global property?"
+    options:
+      - "Local -- only immediate children must satisfy it"
+      - "Global -- every node in the left subtree must be less than the root, and every node in the right subtree must be greater"
+      - "It depends on whether the tree is balanced"
+      - "Local for insert, global for search"
+    correct: 1
+    explanation: "The BST invariant is global. Checking only immediate children misses violations deeper in the tree. A node in the left subtree could be greater than the root -- the local check would pass but the tree would not be a valid BST."
+
+  - question: "You insert elements 1, 2, 3, 4, 5 in order into an empty BST (no self-balancing). What does the tree look like?"
+    options:
+      - "A balanced tree with 3 at the root"
+      - "A linked list going to the right -- every node is a right child"
+      - "A complete binary tree"
+      - "A tree with 1 at the root and all others as left children"
+    correct: 1
+    explanation: "Each value is greater than the previous, so every insert goes right. The tree degrades to a linked list with height n, making all operations O(n) instead of O(log n). This is why self-balancing trees exist."
+
+  - question: "BST deletion when the node has two children replaces the node with its in-order successor. Why?"
+    options:
+      - "The successor is always a leaf, making deletion trivial"
+      - "The successor is the smallest value greater than the deleted node, so it preserves the BST invariant when placed at that position"
+      - "The successor is always the root of the right subtree"
+      - "The successor has the same value as the deleted node"
+    correct: 1
+    explanation: "The in-order successor is the smallest node in the right subtree. It is greater than everything in the left subtree and less than everything else in the right subtree, so placing it at the deleted position maintains the BST property."
+
+  - question: "How do you validate that a binary tree is a valid BST?"
+    options:
+      - "Check that each node's left child is less and right child is greater"
+      - "Sort the tree and check if it matches"
+      - "Pass down min/max bounds: left children tighten the upper bound, right children tighten the lower bound"
+      - "Count the nodes and verify count equals 2^h - 1"
+    correct: 2
+    explanation: "The bounds approach passes the valid range to each subtree. The left child's range is (min, node.Val) and the right child's range is (node.Val, max). The naive approach of checking only immediate children misses global violations."
+
+  - question: "When should you use a hash map instead of a BST?"
+    options:
+      - "When you need sorted iteration over keys"
+      - "When you need range queries like 'all values between 10 and 50'"
+      - "When you only need O(1) average-case lookup by key and order doesn't matter"
+      - "When you need guaranteed O(log n) worst-case performance"
+    correct: 2
+    explanation: "Hash maps provide O(1) average-case lookup, which beats BST's O(log n). But hash maps cannot iterate in sorted order or support range queries. Use a BST when ordering matters; use a hash map when it doesn't."
+
+  - question: "AVL trees and red-black trees both guarantee O(log n) operations. What is the practical difference?"
+    options:
+      - "AVL trees are strictly balanced (height diff at most 1), giving faster lookups but more rotations on insert/delete. Red-black trees are looser, with fewer rotations."
+      - "Red-black trees are faster for all operations"
+      - "AVL trees support deletion; red-black trees do not"
+      - "Red-black trees use more memory because of color bits"
+    correct: 0
+    explanation: "AVL trees maintain stricter balance (subtree heights differ by at most 1), so lookups are slightly faster. Red-black trees allow heights to differ by up to 2x, resulting in fewer rotations on insert/delete. Most standard libraries use red-black trees because write-heavy workloads benefit from fewer rotations."
