@@ -1,0 +1,56 @@
+title: "Analyzing Code Complexity"
+lesson_slug: "bigo-analyzing-code"
+questions:
+  - question: "What is the time complexity of this code?\n\n```\nfor i in range(n):\n    doWork()\nfor j in range(n):\n    doMoreWork()\n```"
+    options:
+      - "O(n²) — two loops means quadratic"
+      - "O(2n) — two separate O(n) operations"
+      - "O(n) — sequential loops add; lower-order terms drop"
+      - "O(1) — the loops don't interact"
+    correct: 2
+    explanation: "Sequential loops add: O(n) + O(n) = O(2n). Drop the constant: O(n). Two passes over the input does not change the linear growth rate. Quadratic requires nested loops (one inside the other), not sequential loops."
+
+  - question: "What is the time complexity of this code?\n\n```\nfor i in range(n):\n    for j in range(n):\n        doWork()\n```"
+    options:
+      - "O(n) — the inner loop runs n times total"
+      - "O(n log n)"
+      - "O(n²) — nested loops multiply"
+      - "O(2n)"
+    correct: 2
+    explanation: "Nested loops multiply. The outer loop runs n times; for each iteration, the inner loop runs n times. Total: n × n = n². This is the canonical O(n²) pattern."
+
+  - question: "What is the time complexity of this loop?\n\n```\nlow, high = 0, n - 1\nwhile low <= high:\n    mid = (low + high) // 2\n    if condition:\n        return mid\n    elif goLeft:\n        high = mid - 1\n    else:\n        low = mid + 1\n```"
+    options:
+      - "O(n) — the loop touches up to n elements"
+      - "O(log n) — the search space halves each iteration"
+      - "O(n²) — nested comparisons"
+      - "O(1) — it always terminates quickly"
+    correct: 1
+    explanation: "Each iteration halves the range [low, high]. Starting from n elements, the range reaches size 1 after log₂(n) iterations. Each iteration is O(1) work. Total: O(log n). This is the binary search pattern."
+
+  - question: "What is the time complexity of this code?\n\n```\nfor i in range(n):\n    for j in range(i):\n        doWork()\n```"
+    options:
+      - "O(n) — each inner loop is smaller than n"
+      - "O(n log n)"
+      - "O(n²) — the inner iterations sum to n(n-1)/2"
+      - "O(n³)"
+    correct: 2
+    explanation: "The inner loop runs 0, 1, 2, ..., n−1 times across all outer iterations. Total work: 0+1+2+...+(n−1) = n(n−1)/2. Dominant term: n²/2. Drop the constant: O(n²). Triangular loops like this are a common O(n²) pattern."
+
+  - question: "What is amortized O(1) and why does it apply to dynamic array append?"
+    options:
+      - "The append always takes exactly 1 operation"
+      - "The append never triggers a resize"
+      - "Individual appends can be O(n) when a resize occurs, but averaged over n appends, the cost per append is O(1)"
+      - "The array stores elements in O(1) space"
+    correct: 2
+    explanation: "Most appends add to existing capacity: O(1). Occasional appends trigger a resize that copies all n elements: O(n). But resizes happen at sizes 1, 2, 4, 8, ..., n. Total copy work: 1+2+4+...+n ≈ 2n. Over n appends: 2n total work / n operations = O(1) amortized per append."
+
+  - question: "A recursive function calls itself twice with input n−1 each time (no memoization). What is its time complexity?"
+    options:
+      - "O(n)"
+      - "O(n log n)"
+      - "O(n²)"
+      - "O(2ⁿ)"
+    correct: 3
+    explanation: "Each call spawns two more calls. The call tree is a binary tree of depth n. Level 0: 1 call. Level 1: 2 calls. Level 2: 4 calls. Level k: 2ᵏ calls. At depth n, total calls: 1+2+4+...+2ⁿ = 2ⁿ⁺¹ − 1 = O(2ⁿ). Naive Fibonacci is the canonical example."

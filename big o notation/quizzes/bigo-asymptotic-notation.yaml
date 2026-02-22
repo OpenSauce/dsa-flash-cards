@@ -1,0 +1,56 @@
+title: "Asymptotic Notation"
+lesson_slug: "bigo-asymptotic-notation"
+questions:
+  - question: "What does Big O notation describe?"
+    options:
+      - "The exact number of operations an algorithm performs"
+      - "An upper bound on the growth rate of an algorithm's resource use"
+      - "The worst-case runtime of an algorithm"
+      - "The average runtime across all possible inputs"
+    correct: 1
+    explanation: "Big O describes an upper bound on growth rate as input size n approaches infinity. It is not the exact operation count, and it does not mean worst case — Big O and worst case are independent concepts."
+
+  - question: "An algorithm's runtime is measured as T(n) = 5n² + 3n + 100. What is its Big O complexity?"
+    options:
+      - "O(5n²)"
+      - "O(n² + n)"
+      - "O(n²)"
+      - "O(3n)"
+    correct: 2
+    explanation: "Drop constants and lower-order terms. The 5 coefficient drops (constants ignored), the 3n and 100 drop (lower-order terms). Only the dominant term n² remains, giving O(n²)."
+
+  - question: "Why do we drop constants when expressing Big O?"
+    options:
+      - "Because constants are always less than 1"
+      - "Because Big O only applies to sorting algorithms"
+      - "Because asymptotic analysis captures growth behavior as n → ∞, where constant factors become irrelevant compared to the growth shape"
+      - "Because constants are impossible to measure accurately"
+    correct: 2
+    explanation: "As n grows very large, whether the multiplier is 3 or 300 matters far less than whether the function grows linearly or quadratically. Asymptotic analysis focuses on the growth shape — the rate at which cost increases — not the exact value at any particular n."
+
+  - question: "A sorting algorithm is O(n log n) in its best case. Which statement about this algorithm is necessarily true?"
+    options:
+      - "The algorithm is also O(n log n) in its worst case"
+      - "The algorithm is Θ(n log n) overall"
+      - "The best case occurs when the input is already sorted"
+      - "Big O gives an upper bound, so the algorithm's best case is at most n log n steps — it could be faster"
+    correct: 3
+    explanation: "Big O is an upper bound. Saying the best case is O(n log n) means the best case uses at most c × n log n steps for large n. It could be faster (O(n) or O(n log n) tight). Big O and worst/best case are independent — O(n log n) best case says nothing about the worst case."
+
+  - question: "What does Θ(f(n)) (Theta notation) express that O(f(n)) alone does not?"
+    options:
+      - "That the algorithm has no worst case"
+      - "That the growth rate is exactly f(n) — both an upper and lower bound"
+      - "That the algorithm runs in constant time"
+      - "That f(n) is the best possible complexity for this problem"
+    correct: 1
+    explanation: "Theta gives a tight bound: the algorithm grows at least as fast as f(n) (lower bound, Ω) and at most as fast as f(n) (upper bound, O). O alone only provides the upper bound — the actual growth could be faster. Θ says it cannot be faster or slower."
+
+  - question: "What does 'asymptotic' mean in the context of algorithm analysis?"
+    options:
+      - "The analysis only applies to recursive algorithms"
+      - "The algorithm's behavior is measured as input size n approaches infinity"
+      - "The algorithm's constants are measured precisely"
+      - "The runtime is measured in nanoseconds on a specific machine"
+    correct: 1
+    explanation: "Asymptotic analysis examines how an algorithm's resource use behaves as n grows without bound. This is why constants drop out — at n → ∞, the growth shape dominates. Machine-specific timing, by contrast, is constant-sensitive and machine-dependent."
