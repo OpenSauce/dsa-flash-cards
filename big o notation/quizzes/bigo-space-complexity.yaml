@@ -1,0 +1,56 @@
+title: "Space Complexity"
+lesson_slug: "bigo-space-complexity"
+questions:
+  - question: "What does 'auxiliary space' mean?"
+    options:
+      - "The total memory used by the algorithm including the input"
+      - "The memory used only by variables and data structures the algorithm creates, excluding the input"
+      - "The memory on the CPU cache"
+      - "The stack memory used by the operating system"
+    correct: 1
+    explanation: "Auxiliary space is the extra memory an algorithm allocates beyond what is needed to store the input. An algorithm that sorts an array by modifying it in place with only a few variables uses O(1) auxiliary space, even though the input array itself takes O(n) space."
+
+  - question: "A function makes a copy of an n-element array and processes it. What is its auxiliary space complexity?"
+    options:
+      - "O(1) — the original array is not modified"
+      - "O(log n)"
+      - "O(n) — the copy requires n units of memory"
+      - "O(n²)"
+    correct: 2
+    explanation: "Creating a copy of an n-element array allocates n new memory locations. Auxiliary space = O(n). The fact that the original is preserved doesn't affect the space count — we care about extra memory allocated, not whether we mutate the input."
+
+  - question: "A recursive binary search reaches a maximum depth of log₂(n) before the base case. What is its auxiliary space complexity?"
+    options:
+      - "O(1) — it doesn't allocate any data structures"
+      - "O(log n) — each recursive call adds a stack frame"
+      - "O(n) — it stores all elements in the call stack"
+      - "O(n²)"
+    correct: 1
+    explanation: "Each recursive call pushes a stack frame onto the call stack. The maximum recursion depth is log₂(n), so at most log₂(n) frames are on the stack simultaneously. Even without explicit data structures, the call stack uses O(log n) space."
+
+  - question: "What does 'in-place' mean for an algorithm?"
+    options:
+      - "The algorithm modifies the input array directly and never reads it more than once"
+      - "The algorithm uses O(1) auxiliary space, regardless of whether it mutates the input"
+      - "The algorithm runs on the processor's L1 cache"
+      - "The algorithm does not use recursion"
+    correct: 1
+    explanation: "In-place means O(1) auxiliary space — a fixed amount of extra memory regardless of input size. It says nothing about whether the input is mutated; an in-place sort rearranges elements without creating a second array. A few index variables and swaps are fine."
+
+  - question: "You need to check if an array of n elements contains any duplicates. Which trade-off does the hash set approach represent?"
+    options:
+      - "O(n) time, O(1) space — faster and uses no extra memory"
+      - "O(n²) time, O(1) space — slower, no extra memory"
+      - "O(n) time, O(n) space — faster by spending extra memory"
+      - "O(log n) time, O(n) space — binary search with extra memory"
+    correct: 2
+    explanation: "Insert each element into a hash set as you scan. Lookup is O(1) average, so the full scan is O(n). The hash set stores up to n elements: O(n) auxiliary space. Without the hash set, the O(1) space approach requires O(n²) time (compare all pairs). This is the canonical time-space trade-off."
+
+  - question: "A recursive function calls itself once with n−1 each time, going n levels deep. What is its call stack space complexity?"
+    options:
+      - "O(1)"
+      - "O(log n)"
+      - "O(n)"
+      - "O(n²)"
+    correct: 2
+    explanation: "Each recursive call pushes one frame onto the call stack. With n levels of recursion (each call reduces n by 1), the stack grows to n frames deep at its maximum. Stack space = O(n). For large n, this risks a stack overflow — the iterative version would use O(1) space."
