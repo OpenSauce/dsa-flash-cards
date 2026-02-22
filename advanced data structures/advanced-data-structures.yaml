@@ -1,0 +1,642 @@
+# =============================================================================
+# Lesson 1: Tries and String Structures (10 cards)
+# =============================================================================
+
+- title: "Trie — What It Is"
+  difficulty: "easy"
+  tags: ["trie", "string structures"]
+  lesson: ads-tries-and-string-structures
+  Front: |
+    What is a trie (prefix tree)?
+  Back: |
+    A tree where each node represents a single character, and a path from root to a marked node spells a complete word. Edges correspond to characters; nodes are shared by all strings with the same prefix.
+
+    Insert and search are both O(k), where k is the length of the string.
+
+- title: "Trie — Why the isEnd Flag"
+  difficulty: "easy"
+  tags: ["trie", "string structures"]
+  lesson: ads-tries-and-string-structures
+  Front: |
+    A trie contains the word "apple". Why would searching for "app" return a false positive without an `isEnd` flag?
+  Back: |
+    Traversal reaches the 'p' node (shared by "apple") and has no way to know whether "app" was ever inserted as a complete word. The `isEnd` flag marks nodes where a complete word terminates, distinguishing inserted words from internal prefixes.
+
+- title: "Trie — Insert Complexity"
+  difficulty: "easy"
+  tags: ["trie", "string structures"]
+  lesson: ads-tries-and-string-structures
+  Front: |
+    **Trie** — What is the time complexity of insert, and what does it depend on?
+  Back: |
+    O(k), where k is the length of the string being inserted. Each character creates or traverses one edge. The number of strings already in the trie has no effect on insert time.
+
+- title: "Trie — Prefix Search"
+  difficulty: "easy"
+  tags: ["trie", "string structures"]
+  lesson: ads-tries-and-string-structures
+  Front: |
+    How does a trie support prefix search (e.g., "find all words starting with 'pre'"), and why is a hash map insufficient?
+  Back: |
+    Traverse to the node for the last character of the prefix, then enumerate all words reachable from that node. O(k) to reach the node, then O(output) to collect results.
+
+    A hash map requires scanning all keys to find prefix matches — O(n × k) per query. A trie locates the prefix node in O(k) and avoids scanning unrelated keys.
+
+- title: "Trie — Space Trade-Off"
+  difficulty: "medium"
+  tags: ["trie", "string structures"]
+  lesson: ads-tries-and-string-structures
+  Front: |
+    What is the main space downside of a trie, and how is it typically mitigated?
+  Back: |
+    Each node must store a child pointer for every possible character. A fixed array-backed trie allocates ALPHABET_SIZE slots per node even when most are empty — expensive with large alphabets.
+
+    Use a hash map of children instead of a fixed array. This makes nodes proportional to the actual number of distinct characters used, at the cost of slightly slower access.
+
+- title: "Trie vs Hash Map — When to Use Each"
+  difficulty: "medium"
+  tags: ["trie", "string structures"]
+  lesson: ads-tries-and-string-structures
+  Front: |
+    When should you use a trie over a hash map for string storage?
+  Back: |
+    Use a **trie** when:
+    - Prefix search or autocomplete is needed
+    - Sorted iteration over keys is needed (trie produces keys in lexicographic order)
+    - Counting words sharing a prefix
+
+    Use a **hash map** when:
+    - Only exact-match lookups are needed
+    - Memory is constrained (hash maps are more compact)
+
+- title: "Suffix Array — What It Stores"
+  difficulty: "medium"
+  tags: ["suffix array", "string structures"]
+  lesson: ads-tries-and-string-structures
+  Front: |
+    What does a suffix array store, and how does it enable substring search?
+  Back: |
+    An array of integer start indices for all suffixes of a string, sorted in lexicographic order.
+
+    For "banana": suffixes sorted → `["a", "ana", "anana", "banana", "na", "nana"]`
+    Suffix array: `[5, 3, 1, 0, 4, 2]`
+
+    Because the suffix array is sorted, binary search locates any pattern in O(m log n) time, where m is the pattern length and n is the string length.
+
+- title: "Suffix Array — Build Complexity"
+  difficulty: "hard"
+  tags: ["suffix array", "string structures"]
+  lesson: ads-tries-and-string-structures
+  Front: |
+    **Suffix Array** — What is the build complexity, and what is the optimal algorithm?
+  Back: |
+    - **Naive (sort all suffixes):** O(n² log n) — each string comparison is O(n)
+    - **Doubling trick:** O(n log² n) — sort by doubled prefixes iteratively
+    - **SA-IS:** O(n) — optimal; used in production text indexing; complex to implement
+
+    For interviews: knowing O(n log n) or O(n) construction exists is sufficient.
+
+- title: "Suffix Array vs Suffix Tree"
+  difficulty: "hard"
+  tags: ["suffix array", "suffix tree", "string structures"]
+  lesson: ads-tries-and-string-structures
+  Front: |
+    What is the trade-off between a suffix array and a suffix tree?
+  Back: |
+    | | Suffix Array | Suffix Tree |
+    |---|---|---|
+    | Substring search | O(m log n) | O(m) |
+    | Build time | O(n log n) / O(n) | O(n) with Ukkonen's |
+    | Memory | O(n) integers | O(n) nodes, larger constant |
+    | Implementation | Practical | Complex |
+
+    Suffix arrays are preferred in practice — lower memory and simpler code for nearly the same capability.
+
+- title: "Trie — Time Complexities Summary"
+  difficulty: "easy"
+  tags: ["trie", "string structures"]
+  lesson: ads-tries-and-string-structures
+  Front: |
+    **Trie** — What are the time complexities for insert, exact search, and prefix search?
+  Back: |
+    All three are **O(k)**, where k is the length of the string or prefix.
+
+    Each operation traverses exactly one edge per character. The total number of strings in the trie does not affect any of these operations.
+
+# =============================================================================
+# Lesson 2: Balanced Trees (11 cards)
+# =============================================================================
+
+- title: "BST Degradation"
+  difficulty: "easy"
+  tags: ["bst", "balanced trees"]
+  lesson: ads-balanced-trees
+  Front: |
+    Why does a standard BST degrade to O(n) search in the worst case?
+  Back: |
+    Inserting keys in sorted order produces a completely right-skewed (or left-skewed) tree — every node has only one child. The tree becomes equivalent to a linked list. Height is O(n), so search traverses O(n) nodes in the worst case.
+
+- title: "Red-Black Tree — The Five Invariants"
+  difficulty: "hard"
+  tags: ["red-black tree", "balanced trees"]
+  lesson: ads-balanced-trees
+  Front: |
+    **Red-Black Tree** — What are the five invariants that guarantee O(log n) height?
+  Back: |
+    1. Every node is red or black.
+    2. The root is black.
+    3. Every null leaf (NIL sentinel) is black.
+    4. A red node's children are both black (no consecutive red nodes).
+    5. Every path from a node to any of its null leaves has the same number of black nodes (equal black-height).
+
+    Invariants 4 and 5 together bound the height at ≤ 2 log₂(n).
+
+- title: "Red-Black Tree — Why New Nodes Are Red"
+  difficulty: "medium"
+  tags: ["red-black tree", "balanced trees"]
+  lesson: ads-balanced-trees
+  Front: |
+    **Red-Black Tree** — Why is every newly inserted node colored red, not black?
+  Back: |
+    Inserting a black node immediately violates invariant 5 (equal black-height) for every path through that node — a violation that requires touching many ancestors to fix.
+
+    Inserting a red node only risks violant 4 (no consecutive reds), which is correctable with at most 2 local rotations and recoloring, without propagating changes far up the tree.
+
+- title: "Red-Black Tree — Insert Rotations"
+  difficulty: "hard"
+  tags: ["red-black tree", "balanced trees"]
+  lesson: ads-balanced-trees
+  Front: |
+    **Red-Black Tree** — How many rotations does an insert require in the worst case?
+  Back: |
+    At most **2 rotations** per insert.
+
+    The fix-up handles three cases: (1) recolor only, (2) one rotation to convert to case 3, (3) one rotation with recolor. Cases 1 and 3 resolve violations; case 2 converts to case 3. So at most 2 rotations total, regardless of tree size.
+
+- title: "Red-Black Tree — Height Bound"
+  difficulty: "medium"
+  tags: ["red-black tree", "balanced trees"]
+  lesson: ads-balanced-trees
+  Front: |
+    **Red-Black Tree** — What is the maximum height of a red-black tree with n nodes?
+  Back: |
+    **≤ 2 × log₂(n)**
+
+    The invariants guarantee no path is more than twice the shortest path. The shortest possible path has only black nodes (length = black-height). The longest possible path alternates red and black nodes (length = 2 × black-height).
+
+- title: "Red-Black Tree vs AVL Tree"
+  difficulty: "medium"
+  tags: ["red-black tree", "avl tree", "balanced trees"]
+  lesson: ads-balanced-trees
+  Front: |
+    What is the key trade-off between red-black trees and AVL trees?
+  Back: |
+    **AVL:** Height ≤ 1.44 log₂(n) — more strictly balanced, faster lookups.
+
+    **Red-black:** Height ≤ 2 log₂(n) — less strict, but at most 2 rotations per insert/delete vs. O(log n) for AVL.
+
+    Use **AVL** for read-heavy workloads where lookup speed dominates. Use **red-black** for write-heavy workloads where insert/delete throughput matters. C++ `std::map` and Java `TreeMap` use red-black trees.
+
+- title: "Red-Black Tree — All Operation Complexities"
+  difficulty: "easy"
+  tags: ["red-black tree", "balanced trees"]
+  lesson: ads-balanced-trees
+  Front: |
+    **Red-Black Tree** — What are the time complexities for search, insert, and delete?
+  Back: |
+    All three are **O(log n)**.
+
+    The height guarantee (≤ 2 log₂(n)) ensures that no operation traverses more than O(log n) nodes, even in the worst case. Unlike an unbalanced BST, this bound holds for any insertion order.
+
+- title: "Skip List — Structure"
+  difficulty: "medium"
+  tags: ["skip list", "balanced trees"]
+  lesson: ads-balanced-trees
+  Front: |
+    How is a skip list structured, and what gives it O(log n) expected search time?
+  Back: |
+    A skip list layers multiple levels of forward pointers over a sorted linked list. Level 0 is the full list; each higher level is a sparser "express lane" skipping over nodes.
+
+    Random level assignment (each node flips coins to determine its height) produces an expected O(log n) nodes at each level, giving O(log n) expected search by starting at the top level and dropping down.
+
+- title: "Skip List — Probabilistic vs Deterministic"
+  difficulty: "medium"
+  tags: ["skip list", "balanced trees"]
+  lesson: ads-balanced-trees
+  Front: |
+    **Skip List** — What is the key difference between its performance guarantees and those of a red-black tree?
+  Back: |
+    A red-black tree gives **worst-case** O(log n) for all operations — the invariants guarantee it.
+
+    A skip list gives **expected** O(log n) — the bounds hold with high probability but not absolutely. With pathological bad luck on random level assignments, a skip list could degrade.
+
+    In practice the probability of significant degradation is negligible, but the theoretical guarantee is weaker.
+
+- title: "Skip List — Concurrency Advantage"
+  difficulty: "hard"
+  tags: ["skip list", "balanced trees"]
+  lesson: ads-balanced-trees
+  Front: |
+    Why are skip lists preferred over balanced BSTs in concurrent implementations?
+  Back: |
+    Skip list insertions and deletions only modify local forward pointers — no ancestor nodes need to be updated. This makes lock-free implementations straightforward using compare-and-swap (CAS) on individual pointers.
+
+    Balanced BST operations (rotations, recoloring) touch the path from the modified node up to the root, making concurrent access without broad locking difficult.
+
+    Redis sorted sets and Java's `ConcurrentSkipListMap` use skip lists for this reason.
+
+- title: "Skip List — Level Assignment"
+  difficulty: "medium"
+  tags: ["skip list", "balanced trees"]
+  lesson: ads-balanced-trees
+  Front: |
+    How is a new node's level assigned in a skip list, and why does this work?
+  Back: |
+    Flip a coin. If heads, add another level. Repeat until tails. With probability p = 0.5, the expected level is O(log n).
+
+    This gives a geometric distribution of heights, matching the expected structure of a balanced tree without any explicit rebalancing. The expected number of nodes at level k drops by half for each level up.
+
+# =============================================================================
+# Lesson 3: Union-Find (Disjoint Sets) (7 cards)
+# =============================================================================
+
+- title: "Union-Find — Core Operations"
+  difficulty: "easy"
+  tags: ["union-find", "disjoint sets"]
+  lesson: ads-union-find
+  Front: |
+    What are the two core operations of a union-find structure, and what does each do?
+  Back: |
+    **find(x):** Return the root representative of the set containing x. Two elements are in the same set iff `find(a) == find(b)`.
+
+    **union(a, b):** Merge the sets containing a and b into one set.
+
+    Everything else (connectivity queries, cycle detection, MST) is built from these two.
+
+- title: "Union-Find — Path Compression"
+  difficulty: "medium"
+  tags: ["union-find", "disjoint sets"]
+  lesson: ads-union-find
+  Front: |
+    **Union-Find** — How does path compression work, and what does it improve?
+  Back: |
+    During find, after locating the root recursively, set every visited node's parent directly to the root on the way back up.
+
+    ```
+    find(x):
+        if parent[x] != x:
+            parent[x] = find(parent[x])  // compress path
+        return parent[x]
+    ```
+
+    Subsequent finds on the same nodes skip directly to the root. It flattens the tree as a side effect of ordinary operations.
+
+- title: "Union-Find — Union by Rank"
+  difficulty: "medium"
+  tags: ["union-find", "disjoint sets"]
+  lesson: ads-union-find
+  Front: |
+    **Union-Find** — What does union by rank do, and what problem does it prevent?
+  Back: |
+    Always attach the root with lower rank under the root with higher rank. Only increase rank when two equal-rank trees merge.
+
+    Prevents tall chains: without this, repeated unions could create an O(n)-height chain, degrading find to O(n). With union by rank alone, height stays at O(log n).
+
+- title: "Union-Find — Combined Complexity"
+  difficulty: "hard"
+  tags: ["union-find", "disjoint sets"]
+  lesson: ads-union-find
+  Front: |
+    **Union-Find** — What is the amortized complexity per operation with both path compression and union by rank?
+  Back: |
+    **O(α(n))** — the inverse Ackermann function.
+
+    For any n ≤ 10^80, α(n) ≤ 4. The complexity is effectively constant for all practical inputs, but not provably O(1) in theory. This is nearly the best achievable for this problem.
+
+- title: "Union-Find — Kruskal's MST"
+  difficulty: "medium"
+  tags: ["union-find", "disjoint sets", "graph algorithms"]
+  lesson: ads-union-find
+  Front: |
+    How does union-find enable Kruskal's minimum spanning tree algorithm?
+  Back: |
+    Sort all edges by weight. For each edge (u, v) in increasing order:
+    - If `find(u) != find(v)`: add the edge to the MST, call `union(u, v)`
+    - If `find(u) == find(v)`: skip (adding this edge would create a cycle)
+
+    Union-find makes the cycle check O(α(n)) per edge. Total runtime: O(E log E) for sorting + O(E α(n)) for union-find operations.
+
+- title: "Union-Find — Connected Components"
+  difficulty: "easy"
+  tags: ["union-find", "disjoint sets", "graph algorithms"]
+  lesson: ads-union-find
+  Front: |
+    **Union-Find** — How do you count the number of connected components in an undirected graph?
+  Back: |
+    Initialize each node as its own set. For each edge (u, v), call `union(u, v)`. After processing all edges, the number of distinct roots (elements where `parent[x] == x`) equals the number of connected components.
+
+- title: "Union-Find — Limitation"
+  difficulty: "medium"
+  tags: ["union-find", "disjoint sets"]
+  lesson: ads-union-find
+  Front: |
+    What can union-find NOT do that limits its applicability?
+  Back: |
+    **Cannot split sets.** Once two sets are merged, they cannot be un-merged. There is no "un-union" operation.
+
+    Also cannot enumerate all members of a set without iterating every element.
+
+    Problems requiring edge deletion and connectivity restoration need a different approach (offline reversal, link-cut trees).
+
+# =============================================================================
+# Lesson 4: Segment Trees and Fenwick Trees (11 cards)
+# =============================================================================
+
+- title: "Segment Tree — What It Is"
+  difficulty: "easy"
+  tags: ["segment tree"]
+  lesson: ads-segment-trees-and-fenwick-trees
+  Front: |
+    What is a segment tree, and what problem does it solve?
+  Back: |
+    A complete binary tree where each node stores the aggregate (sum, min, max, etc.) of a contiguous subarray. The root covers the entire array; leaves cover individual elements.
+
+    It solves the range query + point update problem: both operations run in O(log n), compared to O(n) query / O(1) update with a plain array or O(1) query / O(n) update with a prefix sum array.
+
+- title: "Segment Tree — Build Complexity"
+  difficulty: "easy"
+  tags: ["segment tree"]
+  lesson: ads-segment-trees-and-fenwick-trees
+  Front: |
+    **Segment Tree** — What is the time and space complexity to build a segment tree from an array of n elements?
+  Back: |
+    **Time:** O(n) — building bottom-up touches each of the 2n nodes exactly once.
+
+    **Space:** O(n) to O(4n) depending on implementation. An iterative array-based implementation uses 2n space (power-of-two size array).
+
+- title: "Segment Tree — Query and Update"
+  difficulty: "medium"
+  tags: ["segment tree"]
+  lesson: ads-segment-trees-and-fenwick-trees
+  Front: |
+    **Segment Tree** — What are the time complexities for range query and point update?
+  Back: |
+    Both are **O(log n)**.
+
+    **Range query:** Walk up from both ends of the query range, collecting aggregates from nodes fully inside the range. At most 2 nodes per level are visited.
+
+    **Point update:** Update the leaf, then propagate up by recomputing each ancestor. At most log n nodes on the root-to-leaf path are touched.
+
+- title: "Segment Tree — Lazy Propagation"
+  difficulty: "hard"
+  tags: ["segment tree", "lazy propagation"]
+  lesson: ads-segment-trees-and-fenwick-trees
+  Front: |
+    **Segment Tree** — What is lazy propagation, and when do you need it?
+  Back: |
+    Lazy propagation defers range updates by storing a "pending update" tag at each node. When visiting a node during a query or update, push the tag to its children first, then proceed normally.
+
+    Without lazy propagation, "add 5 to all elements in [l, r]" requires updating every element — O(n). With lazy propagation, range updates remain O(log n).
+
+    Add lazy propagation only when the problem requires range updates. It significantly increases code complexity.
+
+- title: "Segment Tree — Which Aggregations"
+  difficulty: "medium"
+  tags: ["segment tree"]
+  lesson: ads-segment-trees-and-fenwick-trees
+  Front: |
+    **Segment Tree** — What types of aggregation functions does it support?
+  Back: |
+    Any **associative** function: sum, minimum, maximum, GCD, XOR, product, count, etc.
+
+    Each internal node stores the aggregate of its two children using the chosen function. The function must be associative — `f(f(a,b), c) == f(a, f(b,c))` — so that partial results can be combined.
+
+    This is the segment tree's key advantage over a Fenwick tree, which natively supports only sum.
+
+- title: "Fenwick Tree — What It Is"
+  difficulty: "easy"
+  tags: ["fenwick tree", "binary indexed tree"]
+  lesson: ads-segment-trees-and-fenwick-trees
+  Front: |
+    What is a Fenwick tree (Binary Indexed Tree), and what does it support?
+  Back: |
+    A compact array where each index stores the sum of a specific range of the original array, determined by the lowest set bit of the index. Supports:
+
+    - **Point update:** O(log n)
+    - **Prefix sum query:** O(log n)
+    - **Range sum query:** O(log n) via two prefix queries
+
+    Uses O(n) space and is faster in practice than a segment tree for pure prefix-sum problems.
+
+- title: "Fenwick Tree — The Bit Trick"
+  difficulty: "hard"
+  tags: ["fenwick tree", "binary indexed tree"]
+  lesson: ads-segment-trees-and-fenwick-trees
+  Front: |
+    **Fenwick Tree** — What does `i & -i` compute, and how is it used?
+  Back: |
+    `i & -i` isolates the **lowest set bit** of i (using two's complement: -i = ~i + 1).
+
+    - **Update:** `i += i & -i` — jumps to the next index responsible for a range containing i
+    - **Query:** `i -= i & -i` — strips the lowest set bit to jump to the parent range
+
+    This bit trick efficiently navigates the implicit tree structure without storing explicit pointers, keeping the implementation to ~10 lines.
+
+- title: "Fenwick Tree — Range Query"
+  difficulty: "medium"
+  tags: ["fenwick tree", "binary indexed tree"]
+  lesson: ads-segment-trees-and-fenwick-trees
+  Front: |
+    **Fenwick Tree** — How do you compute the sum of elements from index l to r?
+  Back: |
+    `range_sum(l, r) = prefix_sum(r) - prefix_sum(l - 1)`
+
+    Two prefix queries, each O(log n), giving O(log n) total for range queries. This works because range sum = (sum from 1 to r) minus (sum from 1 to l-1).
+
+- title: "Segment Tree vs Fenwick Tree — Comparison"
+  difficulty: "medium"
+  tags: ["segment tree", "fenwick tree"]
+  lesson: ads-segment-trees-and-fenwick-trees
+  Front: |
+    When should you use a Fenwick tree instead of a segment tree?
+  Back: |
+    Use a **Fenwick tree** when:
+    - You only need prefix sums or range sums
+    - You want simpler code (~10 lines vs. 30+)
+    - You need lower constant factor
+
+    Use a **segment tree** when:
+    - You need range min, max, GCD, or other non-prefix aggregations
+    - You need range updates (with lazy propagation)
+    - Queries cannot be expressed as differences of prefix values
+
+- title: "Fenwick Tree — Limitation"
+  difficulty: "medium"
+  tags: ["fenwick tree"]
+  lesson: ads-segment-trees-and-fenwick-trees
+  Front: |
+    What does a Fenwick tree NOT support that a segment tree handles natively?
+  Back: |
+    A Fenwick tree does not natively support:
+    - **Range min/max queries** — requires extra Fenwick trees or a segment tree
+    - **Arbitrary range aggregations** that are not reversible (sum is reversible via subtraction; min is not)
+    - **Range updates with lazy propagation** — possible with a difference array technique, but not as general
+
+- title: "Range Query Problem — The Trade-Off Space"
+  difficulty: "medium"
+  tags: ["segment tree", "fenwick tree"]
+  lesson: ads-segment-trees-and-fenwick-trees
+  Front: |
+    A plain array gives O(1) update and O(n) range query. A prefix sum array gives O(n) update and O(1) query. What do segment trees and Fenwick trees offer?
+  Back: |
+    Both offer **O(log n) update and O(log n) query** — a balanced trade-off when both operations are needed frequently.
+
+    The prefix sum array is still optimal when updates are rare (batch update then many queries). The plain array is optimal when queries are rare. Use a segment tree or Fenwick tree when updates and queries are interleaved.
+
+# =============================================================================
+# Lesson 5: Caches and Specialized Structures (12 cards)
+# =============================================================================
+
+- title: "LRU Cache — Structure"
+  difficulty: "easy"
+  tags: ["lru cache"]
+  lesson: ads-caches-and-specialized-structures
+  Front: |
+    What two data structures does an LRU cache combine, and what role does each play?
+  Back: |
+    **Hash map:** O(1) lookup of nodes by key.
+
+    **Doubly linked list:** O(1) move-to-front (on access) and O(1) removal from tail (on eviction). The head is most recently used; the tail is least recently used.
+
+    Either alone fails: a hash map cannot reorder entries in O(1); a linked list cannot look up entries by key in O(1).
+
+- title: "LRU Cache — Why Doubly Linked"
+  difficulty: "medium"
+  tags: ["lru cache"]
+  lesson: ads-caches-and-specialized-structures
+  Front: |
+    **LRU Cache** — Why must the linked list be doubly linked, not singly linked?
+  Back: |
+    Moving a node to the front requires removing it from its current position. With a singly linked list, removal requires knowing the predecessor — which requires O(n) traversal or storing an extra backward pointer.
+
+    With a doubly linked list, any node can remove itself in O(1) using its `prev` and `next` pointers directly.
+
+- title: "LRU Cache — Key in Node"
+  difficulty: "hard"
+  tags: ["lru cache"]
+  lesson: ads-caches-and-specialized-structures
+  Front: |
+    **LRU Cache** — Why must each linked list node store its own key?
+  Back: |
+    During eviction, the tail node is removed from the list. The corresponding hash map entry must also be deleted. Without the key stored in the node, the only way to identify which map entry to remove is an O(n) reverse lookup through all map entries.
+
+    Storing the key in the node keeps eviction fully O(1).
+
+- title: "LRU Cache — All Operation Complexities"
+  difficulty: "easy"
+  tags: ["lru cache"]
+  lesson: ads-caches-and-specialized-structures
+  Front: |
+    **LRU Cache** — What are the time complexities for get and put?
+  Back: |
+    Both are **O(1)**.
+
+    - **get:** O(1) hash map lookup + O(1) move-to-front in the doubly linked list
+    - **put:** O(1) hash map insert/update + O(1) prepend to list front; if at capacity, O(1) evict from list tail + O(1) delete from map
+
+- title: "LRU Cache — Eviction Policy"
+  difficulty: "medium"
+  tags: ["lru cache"]
+  lesson: ads-caches-and-specialized-structures
+  Front: |
+    **LRU Cache** — When is an entry evicted, and which entry is chosen?
+  Back: |
+    An entry is evicted when `put` is called and the cache is already at capacity.
+
+    The evicted entry is always the **least recently used** — the tail of the doubly linked list. Every access (get or put) moves the accessed entry to the front, so the tail accumulates the entry that has gone longest without being touched.
+
+- title: "Monotonic Stack — Definition"
+  difficulty: "easy"
+  tags: ["monotonic stack"]
+  lesson: ads-caches-and-specialized-structures
+  Front: |
+    What is a monotonic stack?
+  Back: |
+    A standard stack with the invariant that elements from bottom to top are always either entirely increasing or entirely decreasing.
+
+    When a new element would violate the order, elements are popped until the invariant holds, then the new element is pushed. Each element is pushed and popped at most once — O(n) total for n elements.
+
+- title: "Monotonic Stack — Time Complexity"
+  difficulty: "medium"
+  tags: ["monotonic stack"]
+  lesson: ads-caches-and-specialized-structures
+  Front: |
+    **Monotonic Stack** — What is the overall time complexity of the next-greater-element algorithm on an array of n elements? Why?
+  Back: |
+    **O(n) total.**
+
+    Each element is pushed onto the stack exactly once and popped at most once. Even though individual pushes can trigger multiple pops, no element is processed more than twice across the entire input. This amortized analysis gives O(n) overall.
+
+- title: "Monotonic Stack — Next Greater Element"
+  difficulty: "medium"
+  tags: ["monotonic stack"]
+  lesson: ads-caches-and-specialized-structures
+  Front: |
+    **Monotonic Stack** — How does a decreasing stack (top is smallest) solve the next-greater-element problem?
+  Back: |
+    Iterate left to right. For each element:
+    1. While the stack top < current element: pop the top; current element is its "next greater."
+    2. Push the current element's index.
+
+    When a value enters and is larger than the top, it resolves the "next greater" for all popped elements immediately. Indices remaining on the stack at the end have no next greater element.
+
+- title: "Monotonic Stack — Problem Patterns"
+  difficulty: "medium"
+  tags: ["monotonic stack"]
+  lesson: ads-caches-and-specialized-structures
+  Front: |
+    **Monotonic Stack** — Name three classic problems it solves in O(n).
+  Back: |
+    - **Next greater element / next smaller element** — use a decreasing or increasing stack
+    - **Largest rectangle in a histogram** — pop when a shorter bar is seen; current bar resolves height for all popped bars
+    - **Trapping rain water** — track left and right boundaries using a decreasing stack
+
+    All three share the same structure: pop when the invariant is violated; the popping element resolves pending answers.
+
+- title: "Bloom Filter — What It Is"
+  difficulty: "easy"
+  tags: ["bloom filter"]
+  lesson: ads-caches-and-specialized-structures
+  Front: |
+    What is a bloom filter, and what does it trade for space savings?
+  Back: |
+    A probabilistic set membership structure using a bit array of m bits and k independent hash functions.
+
+    **Insert:** hash to k positions, set all k bits to 1.
+    **Query:** hash to k positions; if any bit is 0 → definitely not in set; if all bits are 1 → probably in set.
+
+    Trade-off: **false positives are possible** (all k bits happen to be set by other elements). **False negatives are impossible** (inserted elements always set their bits to 1).
+
+- title: "Bloom Filter — False Positive Rate"
+  difficulty: "medium"
+  tags: ["bloom filter"]
+  lesson: ads-caches-and-specialized-structures
+  Front: |
+    **Bloom Filter** — What causes false positives, and what happens to the false positive rate as more elements are inserted?
+  Back: |
+    A false positive occurs when all k bit positions for a queried element are set to 1 by prior insertions of different elements — a coincidental hash collision.
+
+    As more elements are inserted, more bits flip to 1. The probability that all k positions for a non-member element are already 1 increases. False positive rate grows monotonically with the number of inserted elements.
+
+    The optimal number of hash functions is k = (m/n) × ln(2), balancing false positive probability.
+
+- title: "Bloom Filter — Deletions"
+  difficulty: "hard"
+  tags: ["bloom filter"]
+  lesson: ads-caches-and-specialized-structures
+  Front: |
+    **Bloom Filter** — Why does a standard bloom filter not support deletion?
+  Back: |
+    Multiple elements can set the same bit to 1. Clearing a bit during deletion would cause false negatives for other elements that share that bit.
+
+    A **counting bloom filter** replaces each bit with a small counter (4 bits). Deletion decrements the counter; a position is "set" if its counter > 0. This supports deletion at 4-8× the memory cost of a standard bloom filter.

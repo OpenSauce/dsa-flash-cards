@@ -1,0 +1,56 @@
+title: "Caches and Specialized Structures"
+lesson_slug: "ads-caches-and-specialized-structures"
+questions:
+  - question: "What two data structures does an LRU cache combine to achieve O(1) get and put?"
+    options:
+      - "A binary heap and a hash map"
+      - "A doubly linked list and a hash map"
+      - "A singly linked list and a binary search tree"
+      - "A circular buffer and a hash set"
+    correct: 1
+    explanation: "A hash map provides O(1) key lookup. A doubly linked list provides O(1) move-to-front and O(1) tail removal (for eviction). Together they satisfy all LRU operations in O(1). A singly linked list cannot remove from an arbitrary position in O(1)."
+
+  - question: "Why does each node in an LRU cache's linked list store its own key?"
+    options:
+      - "So the key can be hashed for faster lookup"
+      - "So the node can be moved to the front without consulting the hash map"
+      - "So the hash map entry can be deleted during O(1) eviction from the tail"
+      - "To prevent duplicate keys from being inserted into the list"
+    correct: 2
+    explanation: "When evicting the least recently used item (tail of the list), you must also remove its entry from the hash map. Without the key stored in the node, you cannot identify which map entry to delete — you would need an O(n) reverse lookup. Storing the key in the node keeps eviction at O(1)."
+
+  - question: "What problem pattern is a monotonic stack designed to solve?"
+    options:
+      - "Finding the k-th largest element in a stream"
+      - "Next greater element, next smaller element, and similar 'nearest boundary' problems"
+      - "Balancing nested parentheses and bracket matching"
+      - "Detecting cycles in a directed graph"
+    correct: 1
+    explanation: "A monotonic stack efficiently answers questions like 'for each element, what is the nearest element to its right that is strictly greater?' When a new element is pushed, it is the 'next greater' for every popped element, resolving their answers immediately. This pattern handles next-greater, next-smaller, largest rectangle in histogram, and trapping rain water."
+
+  - question: "What is the total time complexity of running the next-greater-element algorithm on an array of n elements using a monotonic stack?"
+    options:
+      - "O(n²) — each element might trigger popping the entire stack"
+      - "O(n log n) — similar to merge sort"
+      - "O(n) — each element is pushed and popped at most once"
+      - "O(n × k) where k is the average stack depth"
+    correct: 2
+    explanation: "Each element is pushed onto the stack exactly once and popped at most once. No element is processed more than twice total, so the entire pass over n elements takes O(n) time regardless of how many pops individual pushes trigger."
+
+  - question: "What type of error does a bloom filter allow, and which type does it never produce?"
+    options:
+      - "False negatives are possible; false positives are not"
+      - "False positives are possible; false negatives are not"
+      - "Both false positives and false negatives are possible"
+      - "Neither false positives nor false negatives occur"
+    correct: 1
+    explanation: "A bloom filter can report 'possibly in set' for an element that was never inserted (false positive), because its hash positions happen to all be set by other elements. It never reports 'not in set' for an element that was actually inserted (false negative), because inserting an element always sets its bits to 1."
+
+  - question: "What happens to the false positive rate of a bloom filter as more elements are inserted?"
+    options:
+      - "It decreases, because the filter learns to distinguish elements more precisely"
+      - "It stays constant, because the k hash functions are independent"
+      - "It increases, because more bits become set to 1, making accidental collisions more likely"
+      - "It goes to zero after the filter reaches 50% capacity"
+    correct: 2
+    explanation: "Each inserted element sets k bits to 1. As more elements are inserted, a greater fraction of the bit array is set to 1. A query for a non-member element is more likely to find all k of its positions already set by other elements, producing a false positive. The false positive rate is a function of m (bit array size), n (number of inserted elements), and k (hash functions)."
