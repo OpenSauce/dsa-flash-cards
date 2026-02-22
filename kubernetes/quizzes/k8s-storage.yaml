@@ -1,0 +1,56 @@
+title: "Storage"
+lesson_slug: "k8s-storage"
+questions:
+  - question: "What is the role of a PersistentVolume (PV) vs a PersistentVolumeClaim (PVC)?"
+    options:
+      - "A PV is a storage request from a Pod; a PVC is the actual storage provisioned by an admin"
+      - "A PV is the actual storage resource provisioned in the cluster; a PVC is a Pod's request for storage that gets bound to a PV"
+      - "A PV is for block storage; a PVC is for file storage"
+      - "A PV belongs to a Pod; a PVC belongs to a Namespace"
+    correct: 1
+    explanation: "The PV is the real storage resource -- an EBS volume, an NFS share, a GCP Persistent Disk. The PVC is the Pod's storage requisition: how much capacity, what access mode, which StorageClass. Kubernetes binds a PVC to a matching PV. This two-layer abstraction separates infrastructure provisioning from application storage requests."
+
+  - question: "What does dynamic provisioning via StorageClass eliminate?"
+    options:
+      - "The need for PVCs -- StorageClasses create volumes directly for Pods"
+      - "The need for admins to manually pre-create PVs before PVCs can be created"
+      - "The need for access modes -- all dynamically provisioned volumes support ReadWriteMany"
+      - "The need for reclaim policies -- dynamically provisioned volumes are always deleted when released"
+    correct: 1
+    explanation: "With dynamic provisioning, when a PVC requests a StorageClass (e.g., `gp3`), the CSI driver automatically creates a new PV (provisions an EBS volume), registers it, and binds it to the PVC. No admin needs to pre-create PVs. This is how production Kubernetes clusters work -- static PV management does not scale."
+
+  - question: "Which access mode supports mounting a volume read-write on MULTIPLE nodes simultaneously?"
+    options:
+      - "ReadWriteOnce (RWO)"
+      - "ReadOnlyMany (ROX)"
+      - "ReadWriteMany (RWX)"
+      - "ReadWriteAll (RWA)"
+    correct: 2
+    explanation: "ReadWriteMany (RWX) allows multiple nodes to mount the volume with read-write access simultaneously. It requires a network filesystem (NFS, CephFS, AWS EFS). Block storage like AWS EBS only supports ReadWriteOnce (one node, read-write). ReadWriteAll is not a Kubernetes access mode."
+
+  - question: "What happens to the underlying storage when a PVC with reclaim policy 'Delete' is deleted?"
+    options:
+      - "The PV moves to Released state and waits for admin cleanup"
+      - "The PV is retained but becomes unavailable to new PVCs"
+      - "Both the PV and the underlying storage (the EBS volume, the cloud disk) are automatically deleted"
+      - "The storage is wiped and re-provisioned for the next PVC that requests the same StorageClass"
+    correct: 2
+    explanation: "With the Delete reclaim policy, deleting the PVC triggers deletion of both the PV object and the underlying cloud storage resource. This is convenient but permanent -- the data is gone. For production databases, use Retain so data persists after PVC deletion and requires explicit admin action to reclaim or delete."
+
+  - question: "How does a StatefulSet handle storage differently from a Deployment?"
+    options:
+      - "StatefulSets cannot use PVCs; they use hostPath volumes directly"
+      - "StatefulSets use a volumeClaimTemplates field to create a separate PVC for each Pod; Deployments cannot give each Pod its own PVC"
+      - "StatefulSets share one PVC across all Pods; Deployments create a PVC per Pod"
+      - "StatefulSets require ReadWriteMany volumes; Deployments use ReadWriteOnce"
+    correct: 1
+    explanation: "StatefulSets use `volumeClaimTemplates` to instantiate a distinct PVC for each Pod (data-pod-0, data-pod-1, data-pod-2). When a Pod is rescheduled, it reattaches to its own PVC -- same volume, same data. This persistent per-Pod identity is the primary reason to use a StatefulSet for databases."
+
+  - question: "What does an emptyDir volume provide, and what is its key limitation?"
+    options:
+      - "An emptyDir persists across Pod restarts but not node restarts; its limit is 10Gi"
+      - "An emptyDir is shared storage across all Pods in a Namespace; its limit is that it requires a PVC"
+      - "An emptyDir provides ephemeral shared storage within a single Pod; it is deleted when the Pod is removed from the node"
+      - "An emptyDir is backed by the node's SSD and persists until manually deleted"
+    correct: 2
+    explanation: "An emptyDir is created when a Pod starts and exists for the lifetime of the Pod on that node. Containers in the same Pod share it. It survives container restarts within the Pod, but when the Pod terminates or is evicted, the emptyDir is deleted permanently. Use it for temporary scratchpad or sidecar data sharing, not for anything that must survive Pod termination."

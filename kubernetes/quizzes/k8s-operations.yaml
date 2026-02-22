@@ -1,0 +1,56 @@
+title: "Operations"
+lesson_slug: "k8s-operations"
+questions:
+  - question: "What is the consequence of a liveness probe failure vs a readiness probe failure?"
+    options:
+      - "Liveness failure removes the Pod from Service endpoints; readiness failure restarts the container"
+      - "Both liveness and readiness failure cause the container to be restarted"
+      - "Liveness failure restarts the container; readiness failure removes the Pod from Service endpoints without restarting"
+      - "Both liveness and readiness failure evict the Pod from the node"
+    correct: 2
+    explanation: "Liveness asks 'Is this container alive?' -- failure kills and restarts it. Readiness asks 'Is this container ready for traffic?' -- failure removes the Pod from Service endpoints so no new requests reach it, but the container keeps running (it may recover). The distinction is critical: use readiness for warmup delays, use liveness for deadlock detection."
+
+  - question: "When should you use a startup probe instead of just a liveness probe?"
+    options:
+      - "When you want to check that all Pods in a Deployment are running before routing traffic"
+      - "When a container has a variable or long startup time and might be killed by the liveness probe before finishing initialization"
+      - "When you want to check that external dependencies (databases, caches) are available"
+      - "When you need to monitor container startup across multiple nodes simultaneously"
+    correct: 1
+    explanation: "Without a startup probe, the liveness probe starts checking immediately. If the application takes 2 minutes to initialize but the liveness probe fails after 30 seconds, the container is killed and restarted in an infinite loop. The startup probe disables liveness and readiness until initialization succeeds, giving slow-starting containers the time they need."
+
+  - question: "What is the difference between a Kubernetes Job and a CronJob?"
+    options:
+      - "A Job runs Pods indefinitely; a CronJob terminates Pods after a set duration"
+      - "A Job runs one or more Pods to completion once; a CronJob creates Jobs on a recurring schedule"
+      - "A Job uses cron syntax for scheduling; a CronJob uses a fixed interval"
+      - "A Job runs on a single node; a CronJob distributes work across all nodes"
+    correct: 1
+    explanation: "A Job tracks successful Pod completions and retries failures up to backoffLimit. When enough Pods complete successfully, the Job is done. A CronJob is a Job factory -- at each scheduled time it creates a new Job, which creates Pods. The CronJob itself does not run Pods; Jobs do."
+
+  - question: "What does a taint with effect 'NoExecute' do that 'NoSchedule' does not?"
+    options:
+      - "NoExecute prevents new Pod scheduling only; NoSchedule also terminates existing Pods"
+      - "NoExecute evicts existing Pods that do not have a matching toleration AND prevents new Pods from scheduling; NoSchedule only prevents new scheduling"
+      - "NoExecute is a soft constraint; NoSchedule is a hard constraint"
+      - "NoExecute applies only to system Pods; NoSchedule applies to all Pods"
+    correct: 1
+    explanation: "NoSchedule prevents new Pods from being scheduled on the node, but running Pods are unaffected. NoExecute does both: it prevents new scheduling AND evicts existing Pods that lack a matching toleration (with an optional tolerationSeconds grace period). kubectl drain uses NoExecute to safely evacuate a node for maintenance."
+
+  - question: "Approximately how long does Kubernetes wait by default before rescheduling Pods from a failed node?"
+    options:
+      - "10 seconds (one missed heartbeat interval)"
+      - "40 seconds (node-monitor-grace-period)"
+      - "5-6 minutes (40-second grace period plus 5-minute pod-eviction-timeout)"
+      - "10 minutes (to avoid false positives from network partitions)"
+    correct: 2
+    explanation: "The timeline: after 40 seconds without a heartbeat the node is marked NotReady; after an additional 5 minutes the node controller evicts Pods; Pods managed by controllers are then rescheduled. Total: ~5-6 minutes. This delay prevents mass eviction during transient network issues."
+
+  - question: "What does a Pod Disruption Budget (PDB) guarantee?"
+    options:
+      - "A minimum number of Pods remain available during involuntary disruptions like node failures"
+      - "A minimum number of Pods remain available during voluntary disruptions like node drains and cluster upgrades"
+      - "Pods are distributed evenly across all nodes in the cluster"
+      - "Pods with high priority are not evicted before low-priority Pods"
+    correct: 1
+    explanation: "PDBs protect against voluntary disruptions -- operations where Kubernetes has control, like kubectl drain, cluster upgrades, and manual evictions. A PDB blocks a drain if proceeding would violate the minAvailable or maxUnavailable constraint. PDBs do NOT protect against involuntary disruptions like node failures or OOMKills."
