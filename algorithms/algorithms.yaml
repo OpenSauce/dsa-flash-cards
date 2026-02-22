@@ -1,0 +1,813 @@
+# =============================================================================
+# Lesson 1: Sorting Fundamentals (12 cards)
+# =============================================================================
+
+- title: "What Does Stable Mean in Sorting?"
+  difficulty: "easy"
+  tags: ["sorting", "stability"]
+  lesson: algorithms-sorting-fundamentals
+  Front: |
+    What does it mean for a sorting algorithm to be **stable**?
+  Back: |
+    Equal elements keep their original relative order after sorting.
+
+    Example: sorting students by grade -- two students with a B stay in their original order. Matters when sorting by multiple keys (sort by name, then stable sort by grade preserves alphabetical order within each grade).
+
+- title: "Which Common Sorts Are Stable?"
+  difficulty: "easy"
+  tags: ["sorting", "stability"]
+  lesson: algorithms-sorting-fundamentals
+  Front: |
+    Which of the six common sorts are stable: bubble, selection, insertion, merge, quick, heap?
+  Back: |
+    **Stable:** bubble sort, insertion sort, merge sort.
+
+    **Unstable:** selection sort, quick sort, heap sort.
+
+    Selection sort's swap can move equal elements past each other. Quick sort's partitioning can reorder equals. Heap sort's extract-and-swap breaks relative order.
+
+- title: "In-Place Sorting Definition"
+  difficulty: "easy"
+  tags: ["sorting", "in-place"]
+  lesson: algorithms-sorting-fundamentals
+  Front: |
+    What does **in-place** mean for a sorting algorithm?
+  Back: |
+    Uses O(1) extra memory beyond the input array (ignoring the call stack). The sort rearranges elements within the original array rather than allocating a separate copy.
+
+    In-place sorts: selection, insertion, bubble, heap, quick. Not in-place: merge sort (O(n) auxiliary space for merging).
+
+- title: "Adaptive Sorting Definition"
+  difficulty: "easy"
+  tags: ["sorting", "adaptive"]
+  lesson: algorithms-sorting-fundamentals
+  Front: |
+    What does **adaptive** mean for a sorting algorithm?
+  Back: |
+    It runs faster on inputs that are already partially sorted.
+
+    Insertion sort is adaptive: O(n) on nearly-sorted data. Selection sort is not: it always does n(n-1)/2 comparisons regardless of input order.
+
+- title: "Comparison-Based Sorting Lower Bound"
+  difficulty: "medium"
+  tags: ["sorting", "lower bound", "complexity"]
+  lesson: algorithms-sorting-fundamentals
+  Front: |
+    What is the comparison-based sorting lower bound, and why?
+  Back: |
+    **Omega(n log n)** worst-case comparisons.
+
+    Proof sketch: n! possible permutations must be distinguished. A comparison gives 1 bit of information, so you need at least log2(n!) comparisons. By Stirling's approximation, log2(n!) = Theta(n log n).
+
+- title: "Bypass the Comparison Lower Bound"
+  difficulty: "medium"
+  tags: ["sorting", "lower bound", "non-comparison"]
+  lesson: algorithms-sorting-fundamentals
+  Front: |
+    Can any sort beat O(n log n)? Under what conditions?
+  Back: |
+    Non-comparison sorts like counting sort and radix sort achieve O(n) by exploiting input structure (e.g., integers in a known range) rather than comparing elements.
+
+    The O(n log n) bound applies only to comparison-based sorts.
+
+- title: "Bubble Sort Complexity"
+  difficulty: "easy"
+  tags: ["sorting", "bubble sort", "complexity"]
+  lesson: algorithms-sorting-fundamentals
+  Front: |
+    What are bubble sort's time and space complexities?
+  Back: |
+    - **Time:** O(n^2) average and worst. O(n) best with early-exit (stop if a pass makes no swaps).
+    - **Space:** O(1).
+    - Stable, adaptive (with early-exit).
+
+    Strictly worse than insertion sort in practice -- more swaps, no advantage.
+
+- title: "Selection Sort Complexity"
+  difficulty: "easy"
+  tags: ["sorting", "selection sort", "complexity"]
+  lesson: algorithms-sorting-fundamentals
+  Front: |
+    What are selection sort's time and space complexities?
+  Back: |
+    - **Time:** O(n^2) always. No best-case shortcut.
+    - **Space:** O(1).
+    - Not stable, not adaptive.
+
+    Does at most n swaps (one per position). Useful only when writes are expensive (e.g., flash memory).
+
+- title: "Insertion Sort Complexity"
+  difficulty: "easy"
+  tags: ["sorting", "insertion sort", "complexity"]
+  lesson: algorithms-sorting-fundamentals
+  Front: |
+    What are insertion sort's time and space complexities?
+  Back: |
+    - **Time:** O(n^2) worst (reverse-sorted). O(n) best (already sorted).
+    - **Space:** O(1).
+    - Stable, adaptive.
+
+    The most practical elementary sort. Used inside Timsort and introsort for small subarrays (typically < 32 elements).
+
+- title: "Which Elementary Sort Is Best in Practice?"
+  difficulty: "medium"
+  tags: ["sorting", "insertion sort", "comparison"]
+  lesson: algorithms-sorting-fundamentals
+  Front: |
+    Among bubble, selection, and insertion sort, which is preferred in practice and why?
+  Back: |
+    **Insertion sort.** Adaptive (O(n) on nearly-sorted data), stable, and has low overhead. Real-world sorting libraries switch to insertion sort for small subarrays because its simplicity beats O(n log n) algorithms at small n.
+
+    Selection sort's only edge: fewer swaps. Bubble sort has no practical advantage over either.
+
+- title: "What Is Timsort?"
+  difficulty: "medium"
+  tags: ["sorting", "timsort", "hybrid"]
+  lesson: algorithms-sorting-fundamentals
+  Front: |
+    What is Timsort and where is it used?
+  Back: |
+    A hybrid of merge sort and insertion sort. Finds naturally ordered runs in the data, extends short runs with insertion sort, then merges runs.
+
+    Used in Python (`sorted()`, `list.sort()`) and Java (for object arrays). Exploits partial order in real-world data for near-linear performance on many inputs.
+
+- title: "What Is Introsort?"
+  difficulty: "medium"
+  tags: ["sorting", "introsort", "hybrid"]
+  lesson: algorithms-sorting-fundamentals
+  Front: |
+    What is introsort and where is it used?
+  Back: |
+    A hybrid of quick sort, heap sort, and insertion sort. Starts with quicksort, switches to heap sort if recursion depth exceeds 2*log(n), and finishes small partitions with insertion sort.
+
+    Used in C++ STL and Go's sort package. Combines quicksort's average-case speed with heap sort's worst-case guarantee.
+
+# =============================================================================
+# Lesson 2: Divide-and-Conquer Sorts (12 cards)
+# =============================================================================
+
+- title: "Divide-and-Conquer Paradigm"
+  difficulty: "easy"
+  tags: ["divide and conquer", "paradigm"]
+  lesson: algorithms-divide-and-conquer-sorts
+  Front: |
+    What are the three steps of the **divide-and-conquer** paradigm?
+  Back: |
+    1. **Divide** the problem into smaller subproblems of the same type.
+    2. **Conquer** each subproblem recursively (or directly if small enough).
+    3. **Combine** the subproblem solutions into a solution for the original problem.
+
+- title: "Merge Sort vs Quick Sort: Where the Work Happens"
+  difficulty: "hard"
+  tags: ["sorting", "merge sort", "quick sort", "divide and conquer"]
+  lesson: algorithms-divide-and-conquer-sorts
+  Front: |
+    Both merge sort and quick sort use divide-and-conquer. Where does each do its main work -- in the **divide** step or the **combine** step?
+  Back: |
+    **Merge sort:** easy divide (split at midpoint), hard combine (merge two sorted halves in O(n)).
+
+    **Quick sort:** hard divide (partition around a pivot in O(n)), easy combine (nothing -- the partitioned subarrays are already in the right place).
+
+- title: "Merge Sort Complexity"
+  difficulty: "easy"
+  tags: ["sorting", "merge sort", "complexity"]
+  lesson: algorithms-divide-and-conquer-sorts
+  Front: |
+    What are merge sort's time and space complexities?
+  Back: |
+    - **Time:** O(n log n) guaranteed. No input triggers worse performance.
+    - **Space:** O(n) auxiliary for the merge step.
+    - Stable.
+
+- title: "Why Merge Sort Guarantees O(n log n)"
+  difficulty: "medium"
+  tags: ["sorting", "merge sort", "complexity"]
+  lesson: algorithms-divide-and-conquer-sorts
+  Front: |
+    Why does merge sort always run in O(n log n), regardless of input order?
+  Back: |
+    It always splits exactly in half, creating log(n) levels. Each level does O(n) work to merge. The split point does not depend on the data, so no input can cause worse performance.
+
+- title: "Quick Sort Complexity"
+  difficulty: "easy"
+  tags: ["sorting", "quick sort", "complexity"]
+  lesson: algorithms-divide-and-conquer-sorts
+  Front: |
+    What are quick sort's time and space complexities?
+  Back: |
+    - **Time:** O(n log n) average. O(n^2) worst case.
+    - **Space:** O(log n) stack space average. O(n) worst case.
+    - Not stable.
+
+- title: "Quick Sort Worst Case Trigger"
+  difficulty: "medium"
+  tags: ["sorting", "quick sort", "worst case"]
+  lesson: algorithms-divide-and-conquer-sorts
+  Front: |
+    What causes quick sort's O(n^2) worst case?
+  Back: |
+    The pivot is always the minimum or maximum element. One partition has n-1 elements, the other has 0. This creates n levels instead of log(n).
+
+    Typical trigger: sorted input with a fixed first-or-last-element pivot.
+
+- title: "Quick Sort Pivot Selection Strategies"
+  difficulty: "medium"
+  tags: ["sorting", "quick sort", "pivot"]
+  lesson: algorithms-divide-and-conquer-sorts
+  Front: |
+    How do you mitigate quick sort's O(n^2) worst case?
+  Back: |
+    Better pivot selection:
+
+    - **Randomized pivot:** pick a random element. Expected O(n log n) regardless of input.
+    - **Median-of-three:** take the median of the first, middle, and last elements. Handles sorted and reverse-sorted input well.
+
+- title: "Why Quick Sort Is Fastest in Practice"
+  difficulty: "medium"
+  tags: ["sorting", "quick sort", "cache"]
+  lesson: algorithms-divide-and-conquer-sorts
+  Front: |
+    Why is quick sort typically the fastest general-purpose sort despite its O(n^2) worst case?
+  Back: |
+    Cache locality. Partitioning works in-place on contiguous memory, which is friendly to CPU caches. Small constant factors compound this advantage.
+
+    Merge sort accesses an auxiliary array (extra memory traffic). Heap sort jumps between parent/child indices (cache misses). Quick sort reads and writes sequentially within the partition.
+
+- title: "Heap Sort Complexity"
+  difficulty: "easy"
+  tags: ["sorting", "heap sort", "complexity"]
+  lesson: algorithms-divide-and-conquer-sorts
+  Front: |
+    What are heap sort's time and space complexities?
+  Back: |
+    - **Time:** O(n log n) guaranteed. Heapify is O(n), then n extractions at O(log n) each.
+    - **Space:** O(1). In-place.
+    - Not stable.
+
+- title: "Heap Sort Cache Locality Problem"
+  difficulty: "medium"
+  tags: ["sorting", "heap sort", "cache"]
+  lesson: algorithms-divide-and-conquer-sorts
+  Front: |
+    Why is heap sort slower than quick sort in practice, despite both being O(n log n)?
+  Back: |
+    Poor cache locality. Heap operations access parent (index i/2) and child (indices 2i, 2i+1) positions, which are far apart in memory for large arrays. This causes frequent cache misses.
+
+    Quick sort accesses contiguous memory during partitioning, which the CPU cache handles efficiently.
+
+- title: "When to Use Merge Sort"
+  difficulty: "medium"
+  tags: ["sorting", "merge sort", "use case"]
+  lesson: algorithms-divide-and-conquer-sorts
+  Front: |
+    When should you choose merge sort over quick sort or heap sort?
+  Back: |
+    When you need **stability** (equal elements keep original order) or a **worst-case O(n log n) guarantee** without sacrificing stability.
+
+    Also preferred for **external sorting** -- data too large for RAM is naturally sorted as mergeable chunks from disk.
+
+- title: "When to Use Heap Sort"
+  difficulty: "medium"
+  tags: ["sorting", "heap sort", "use case"]
+  lesson: algorithms-divide-and-conquer-sorts
+  Front: |
+    When should you choose heap sort over merge sort or quick sort?
+  Back: |
+    When you need **O(n log n) worst-case guarantee** and **O(1) space** (in-place). Heap sort is the only O(n log n) sort that is also in-place.
+
+    Used as the fallback in introsort: quicksort switches to heapsort when recursion depth exceeds 2*log(n).
+
+# =============================================================================
+# Lesson 3: Searching (10 cards)
+# =============================================================================
+
+- title: "Linear Search Complexity"
+  difficulty: "easy"
+  tags: ["searching", "linear search", "complexity"]
+  lesson: algorithms-searching
+  Front: |
+    What is the time complexity of linear search?
+  Back: |
+    O(n) worst and average. O(1) best (target is the first element).
+
+    No preconditions -- works on unsorted data with O(1) space.
+
+- title: "When to Use Linear Search"
+  difficulty: "easy"
+  tags: ["searching", "linear search", "use case"]
+  lesson: algorithms-searching
+  Front: |
+    When is linear search the right choice?
+  Back: |
+    When the data is small, unsorted, and searched infrequently. The overhead of sorting (O(n log n)) or building a hash table (O(n) space) is not justified for one or two lookups.
+
+- title: "Binary Search Complexity"
+  difficulty: "easy"
+  tags: ["searching", "binary search", "complexity"]
+  lesson: algorithms-searching
+  Front: |
+    What is the time complexity of binary search, and what does it require?
+  Back: |
+    **O(log n).** Requires the input to be sorted.
+
+    Each comparison eliminates half the remaining search space. 1 billion elements need at most ~30 comparisons.
+
+- title: "Binary Search Pseudocode"
+  difficulty: "medium"
+  tags: ["searching", "binary search", "pseudocode"]
+  lesson: algorithms-searching
+  Front: |
+    What does this pseudocode do, and what is the critical loop condition?
+
+    ```
+    lo, hi = 0, n - 1
+    while lo <= hi:
+        mid = lo + (hi - lo) / 2
+        if arr[mid] == target: return mid
+        if arr[mid] < target: lo = mid + 1
+        else: hi = mid - 1
+    return -1
+    ```
+  Back: |
+    Standard binary search on a sorted array. Returns the index of `target` or -1 if not found.
+
+    The critical condition is `lo <= hi` (not `lo < hi`). With `hi = mid - 1`, using `lo < hi` skips the final single-element check when `lo == hi`.
+
+- title: "Binary Search Off-by-One Bug"
+  difficulty: "hard"
+  tags: ["searching", "binary search", "pitfall"]
+  lesson: algorithms-searching
+  Front: |
+    What is the most common binary search bug?
+  Back: |
+    Using `lo < hi` instead of `lo <= hi` (or vice versa). The condition must match the update rules:
+
+    - `hi = mid - 1` pairs with `lo <= hi`
+    - `hi = mid` pairs with `lo < hi`
+
+    Mismatching them either skips the last element or causes an infinite loop.
+
+- title: "Binary Search Lower Bound"
+  difficulty: "medium"
+  tags: ["searching", "binary search", "lower bound"]
+  lesson: algorithms-searching
+  Front: |
+    What is a **lower bound** binary search, and what does it find?
+  Back: |
+    Finds the first position where `arr[i] >= target`. Returns the insertion point if the target is not present.
+
+    Use for "first occurrence" or "insert position in sorted order."
+
+- title: "Binary Search Upper Bound"
+  difficulty: "medium"
+  tags: ["searching", "binary search", "upper bound"]
+  lesson: algorithms-searching
+  Front: |
+    What is an **upper bound** binary search, and how does it relate to lower bound?
+  Back: |
+    Finds the first position where `arr[i] > target` (one past the last occurrence).
+
+    **Count of target in sorted array** = upper_bound - lower_bound.
+
+- title: "Binary Search on Answer Space"
+  difficulty: "hard"
+  tags: ["searching", "binary search", "answer space"]
+  lesson: algorithms-searching
+  Front: |
+    What is **binary search on the answer space**, and when does it apply?
+  Back: |
+    When a problem has a monotonic feasibility condition (below threshold X it fails, at X and above it succeeds), binary search on X instead of iterating through every value.
+
+    Converts O(range) or worse into O(log(range) * cost_of_check).
+
+    Example: "minimum capacity to ship packages in D days" -- binary search on capacity, checking feasibility at each midpoint.
+
+- title: "Hash Lookup Complexity"
+  difficulty: "easy"
+  tags: ["searching", "hash table", "complexity"]
+  lesson: algorithms-searching
+  Front: |
+    What is the time complexity of hash table lookup?
+  Back: |
+    **O(1) average.** O(n) worst case (all keys collide into one bucket).
+
+    Uses O(n) space. No ordering -- you cannot do range queries or find the next element.
+
+- title: "Hash Lookup vs Binary Search"
+  difficulty: "medium"
+  tags: ["searching", "hash table", "binary search", "comparison"]
+  lesson: algorithms-searching
+  Front: |
+    When should you use hash lookup vs binary search?
+  Back: |
+    **Hash lookup:** O(1) average for single-key queries on unsorted data. O(n) space.
+
+    **Binary search:** O(log n) on sorted data. O(1) space. Supports range queries, next/prev element, and ordered iteration.
+
+    Hash is faster for pure existence checks. Binary search is better when you need ordering or cannot afford O(n) extra space.
+
+# =============================================================================
+# Lesson 4: Graph Traversal (11 cards)
+# =============================================================================
+
+- title: "Adjacency List Representation"
+  difficulty: "easy"
+  tags: ["graphs", "adjacency list", "representation"]
+  lesson: algorithms-graph-traversal
+  Front: |
+    What is an **adjacency list** and what is its space complexity?
+  Back: |
+    For each vertex, store a list of its neighbors. Space: **O(V + E)**.
+
+    Edge lookup (u, v) takes O(degree(u)). Iterating neighbors of u takes O(degree(u)). Best for sparse graphs (most real-world graphs).
+
+- title: "Adjacency Matrix Representation"
+  difficulty: "easy"
+  tags: ["graphs", "adjacency matrix", "representation"]
+  lesson: algorithms-graph-traversal
+  Front: |
+    What is an **adjacency matrix** and what is its space complexity?
+  Back: |
+    A V x V boolean grid where `matrix[u][v]` is true if edge (u,v) exists. Space: **O(V^2)**.
+
+    Edge lookup is O(1). Iterating neighbors is O(V) (scan entire row). Best for dense graphs or when O(1) edge checks are critical.
+
+- title: "Adjacency List vs Matrix: Default Choice"
+  difficulty: "easy"
+  tags: ["graphs", "adjacency list", "adjacency matrix"]
+  lesson: algorithms-graph-traversal
+  Front: |
+    Should you default to an adjacency list or adjacency matrix?
+  Back: |
+    **Adjacency list.** Most graphs are sparse (E << V^2). An adjacency matrix wastes O(V^2) space when the graph has few edges.
+
+    Use a matrix only for dense graphs or when you need O(1) edge-existence checks.
+
+- title: "BFS Algorithm and Data Structure"
+  difficulty: "easy"
+  tags: ["graphs", "BFS", "queue"]
+  lesson: algorithms-graph-traversal
+  Front: |
+    What data structure does BFS use, and how does it traverse a graph?
+  Back: |
+    A **queue** (FIFO). BFS visits all vertices at distance d before any at distance d+1 (level-by-level).
+
+    Enqueue the start vertex, then repeatedly dequeue a vertex, process it, and enqueue its unvisited neighbors.
+
+- title: "BFS Pseudocode"
+  difficulty: "medium"
+  tags: ["graphs", "BFS", "pseudocode"]
+  lesson: algorithms-graph-traversal
+  Front: |
+    What does this graph traversal do?
+
+    ```
+    queue = [start]
+    visited = {start}
+    while queue not empty:
+        v = dequeue()
+        for each neighbor u of v:
+            if u not in visited:
+                visited.add(u)
+                enqueue(u)
+    ```
+  Back: |
+    **Breadth-first search.** Visits vertices level by level. Marking visited on enqueue (not dequeue) prevents a vertex from being added to the queue multiple times.
+
+    Time: O(V + E). Space: O(V).
+
+- title: "BFS and Shortest Paths"
+  difficulty: "medium"
+  tags: ["graphs", "BFS", "shortest path"]
+  lesson: algorithms-graph-traversal
+  Front: |
+    Does BFS find shortest paths? Under what condition?
+  Back: |
+    Yes, in **unweighted** graphs. BFS discovers each vertex at the minimum number of edges from the source.
+
+    Does NOT work for weighted graphs. Use Dijkstra (non-negative weights) or Bellman-Ford (handles negative weights).
+
+- title: "DFS Algorithm and Data Structure"
+  difficulty: "easy"
+  tags: ["graphs", "DFS", "stack"]
+  lesson: algorithms-graph-traversal
+  Front: |
+    What data structure does DFS use, and how does it traverse a graph?
+  Back: |
+    A **stack** (explicit) or the **call stack** (recursion). DFS explores as deep as possible along each branch before backtracking.
+
+    Time: O(V + E). Space: O(V).
+
+- title: "BFS vs DFS: When to Use Which"
+  difficulty: "medium"
+  tags: ["graphs", "BFS", "DFS", "comparison"]
+  lesson: algorithms-graph-traversal
+  Front: |
+    When should you use BFS vs DFS?
+  Back: |
+    **BFS:** shortest path in unweighted graphs, level-order traversal, finding nodes within k hops.
+
+    **DFS:** cycle detection, topological sort, exploring all paths (backtracking), problems where the solution is deep in the graph.
+
+- title: "DFS Cycle Detection in Directed Graphs"
+  difficulty: "hard"
+  tags: ["graphs", "DFS", "cycle detection"]
+  lesson: algorithms-graph-traversal
+  Front: |
+    How do you detect a cycle in a **directed** graph using DFS?
+  Back: |
+    A cycle exists if DFS encounters a vertex that is currently on the recursion stack (a **back edge**). Track three states per vertex: unvisited, in-progress (on stack), completed.
+
+    A vertex being "visited" is not enough -- in a directed graph, reaching an already-completed vertex via a different path is not a cycle.
+
+- title: "Topological Sort Definition"
+  difficulty: "easy"
+  tags: ["graphs", "topological sort", "DAG"]
+  lesson: algorithms-graph-traversal
+  Front: |
+    What is a **topological sort**, and what does it require?
+  Back: |
+    A linear ordering of vertices in a DAG such that for every directed edge (u, v), u appears before v.
+
+    Requires a **directed acyclic graph (DAG)**. If there is a cycle, no topological ordering exists.
+
+- title: "Topological Sort Algorithms"
+  difficulty: "medium"
+  tags: ["graphs", "topological sort", "DFS", "Kahn"]
+  lesson: algorithms-graph-traversal
+  Front: |
+    What are the two standard algorithms for topological sort?
+  Back: |
+    **DFS-based:** run DFS; when a vertex finishes (all descendants explored), push it to a stack. Read the stack top-to-bottom.
+
+    **Kahn's algorithm (BFS-based):** start with zero-in-degree vertices. Remove them, decrement neighbors' in-degrees, repeat. Also detects cycles (output has fewer than V vertices if a cycle exists).
+
+    Both run in O(V + E).
+
+# =============================================================================
+# Lesson 5: Array Techniques (10 cards)
+# =============================================================================
+
+- title: "Two-Pointer Technique Overview"
+  difficulty: "easy"
+  tags: ["arrays", "two pointer"]
+  lesson: algorithms-array-techniques
+  Front: |
+    What is the **two-pointer technique** and what does it achieve?
+  Back: |
+    Use two indices that move through an array based on a condition. Reduces many O(n^2) pair or subarray problems to O(n).
+
+    Two main variants: opposite-direction (converging from both ends) and same-direction (fast/slow).
+
+- title: "Opposite-Direction Two-Pointer"
+  difficulty: "medium"
+  tags: ["arrays", "two pointer", "sorted"]
+  lesson: algorithms-array-techniques
+  Front: |
+    How does opposite-direction two-pointer work for pair-sum on a sorted array?
+
+    ```
+    left, right = 0, n - 1
+    while left < right:
+        s = arr[left] + arr[right]
+        if s == target: return (left, right)
+        if s < target: left += 1
+        else: right -= 1
+    ```
+  Back: |
+    Start at both ends. If the sum is too small, advance left (increase). If too large, advance right (decrease). O(n) time, O(1) space.
+
+    **Precondition:** the array must be sorted. The sorted order tells you which pointer to move.
+
+- title: "Fast/Slow Pointer Technique"
+  difficulty: "medium"
+  tags: ["arrays", "two pointer", "fast slow"]
+  lesson: algorithms-array-techniques
+  Front: |
+    What is the **fast/slow pointer** variant of two-pointer, and what problems does it solve?
+  Back: |
+    Both pointers start at the beginning. Fast advances every step; slow advances only when a condition is met.
+
+    - **Remove duplicates in-place:** slow marks the write position, fast scans ahead.
+    - **Linked list cycle detection (Floyd's):** fast moves 2 steps, slow moves 1. They meet inside the cycle if one exists.
+
+- title: "Two-Pointer Limitation"
+  difficulty: "medium"
+  tags: ["arrays", "two pointer", "limitation"]
+  lesson: algorithms-array-techniques
+  Front: |
+    When does the two-pointer technique NOT apply?
+  Back: |
+    When there is no monotonic condition to determine which pointer to move. Typically requires sorted input or a structural property (like a linked list).
+
+    For unsorted pair-sum, a hash set in O(n) is usually better than sorting + two-pointer.
+
+- title: "Fixed-Size Sliding Window"
+  difficulty: "medium"
+  tags: ["arrays", "sliding window", "fixed"]
+  lesson: algorithms-array-techniques
+  Front: |
+    How does a **fixed-size sliding window** work?
+
+    ```
+    windowSum = sum of first k elements
+    best = windowSum
+    for i from k to n - 1:
+        windowSum += arr[i]
+        windowSum -= arr[i - k]
+        best = max(best, windowSum)
+    ```
+  Back: |
+    Maintain a window of exactly k elements. Slide right by adding one element and removing one. Each element enters and leaves exactly once.
+
+    Reduces O(nk) brute force to **O(n)**. Classic problem: maximum sum subarray of size k.
+
+- title: "Variable-Size Sliding Window"
+  difficulty: "medium"
+  tags: ["arrays", "sliding window", "variable"]
+  lesson: algorithms-array-techniques
+  Front: |
+    How does a **variable-size sliding window** work?
+  Back: |
+    Expand by advancing the right pointer. Shrink by advancing the left pointer when the window violates a constraint. Both pointers advance at most n times total, so total work is O(n).
+
+    Classic problems: longest substring without repeating characters, minimum window substring.
+
+- title: "Sliding Window Limitation"
+  difficulty: "medium"
+  tags: ["arrays", "sliding window", "limitation"]
+  lesson: algorithms-array-techniques
+  Front: |
+    When does the sliding window technique NOT apply?
+  Back: |
+    When the problem involves **non-contiguous subsequences**. Sliding window requires contiguity (a subarray or substring).
+
+    Also requires a monotonic property: expanding the window can only make the constraint harder to satisfy, so shrinking always helps restore it.
+
+- title: "Prefix Sum Build and Query"
+  difficulty: "medium"
+  tags: ["arrays", "prefix sum"]
+  lesson: algorithms-array-techniques
+  Front: |
+    How do you build a prefix sum array and answer range sum queries?
+  Back: |
+    **Build:** `prefix[0] = 0; prefix[i+1] = prefix[i] + arr[i]`. Array has n+1 elements.
+
+    **Query:** `sum(l, r) = prefix[r+1] - prefix[l]` gives the sum of arr[l..r] in O(1).
+
+    O(n) build, O(1) per query. The extra element `prefix[0] = 0` avoids special-casing index 0.
+
+- title: "Prefix Sum: Subarray Sum Equals K"
+  difficulty: "hard"
+  tags: ["arrays", "prefix sum", "hash map"]
+  lesson: algorithms-array-techniques
+  Front: |
+    How do you find the number of subarrays whose sum equals k using prefix sums?
+  Back: |
+    For each index i, check if `prefix[i] - k` exists in a hash map of previously seen prefix sums. If so, there is a subarray ending at i with sum k.
+
+    O(n) time and space. Works because `prefix[i] - prefix[j] == k` means the subarray `arr[j..i-1]` sums to k.
+
+- title: "When Prefix Sum Breaks Down"
+  difficulty: "medium"
+  tags: ["arrays", "prefix sum", "limitation"]
+  lesson: algorithms-array-techniques
+  Front: |
+    When is a prefix sum array NOT sufficient?
+  Back: |
+    When the underlying array is **updated between queries**. Prefix sums assume static data -- any update requires rebuilding in O(n).
+
+    For dynamic data with both updates and queries, use a Fenwick tree (binary indexed tree) or segment tree for O(log n) per operation.
+
+# =============================================================================
+# Lesson 6: Greedy and Backtracking (10 cards)
+# =============================================================================
+
+- title: "Greedy Algorithm Definition"
+  difficulty: "easy"
+  tags: ["greedy", "strategy"]
+  lesson: algorithms-greedy-and-backtracking
+  Front: |
+    What is a **greedy algorithm**?
+  Back: |
+    An algorithm that builds a solution step by step, always choosing the option that looks best right now, without reconsidering past choices.
+
+    Fast (often O(n) or O(n log n)), but only correct when the problem has greedy choice property and optimal substructure.
+
+- title: "Greedy Choice Property"
+  difficulty: "medium"
+  tags: ["greedy", "theory"]
+  lesson: algorithms-greedy-and-backtracking
+  Front: |
+    What is the **greedy choice property**?
+  Back: |
+    A globally optimal solution can be reached by making locally optimal choices at each step. You never need to undo a choice.
+
+    This is what distinguishes greedy from dynamic programming. Both have optimal substructure, but DP problems lack the greedy choice property.
+
+- title: "Activity Selection Greedy Strategy"
+  difficulty: "medium"
+  tags: ["greedy", "activity selection"]
+  lesson: algorithms-greedy-and-backtracking
+  Front: |
+    In the **activity selection** problem (maximize non-overlapping activities), what is the greedy choice?
+  Back: |
+    Always pick the activity that **finishes earliest**. This leaves the most time for remaining activities.
+
+    Why it works: swapping any later-finishing activity for the earliest-finishing one never reduces the total count. O(n log n) to sort by end time, then O(n) to scan.
+
+- title: "Greedy vs Dynamic Programming"
+  difficulty: "medium"
+  tags: ["greedy", "dynamic programming", "comparison"]
+  lesson: algorithms-greedy-and-backtracking
+  Front: |
+    How do greedy algorithms differ from dynamic programming?
+  Back: |
+    Both require optimal substructure.
+
+    - **Greedy:** makes one choice per step, never revisits. Faster.
+    - **DP:** considers all choices per step, compares subproblem results. Slower but always correct.
+
+    If the greedy choice is provably safe, use greedy. If a counterexample exists (like coin change with [1,3,4]), you need DP.
+
+- title: "Coin Change: Greedy Fails"
+  difficulty: "hard"
+  tags: ["greedy", "dynamic programming", "counterexample"]
+  lesson: algorithms-greedy-and-backtracking
+  Front: |
+    Why does the greedy approach fail for coin change with denominations [1, 3, 4] and amount 6?
+  Back: |
+    Greedy picks 4 + 1 + 1 = 3 coins. Optimal is 3 + 3 = 2 coins.
+
+    The greedy choice (largest denomination first) is not always globally optimal with arbitrary denominations. This problem requires DP. Greedy works only with special denomination systems like US coins (25, 10, 5, 1).
+
+- title: "Backtracking Definition"
+  difficulty: "easy"
+  tags: ["backtracking", "strategy"]
+  lesson: algorithms-greedy-and-backtracking
+  Front: |
+    What is **backtracking**?
+  Back: |
+    A strategy that builds solutions incrementally, exploring choices recursively and undoing (backtracking) choices that violate constraints.
+
+    Three steps: **choose** (modify state), **explore** (recurse), **unchoose** (restore state). The "unchoose" step is what distinguishes it from plain recursion.
+
+- title: "Backtracking Pattern"
+  difficulty: "medium"
+  tags: ["backtracking", "pattern", "pseudocode"]
+  lesson: algorithms-greedy-and-backtracking
+  Front: |
+    What does this pseudocode implement?
+
+    ```
+    function solve(state):
+        if state is complete: record solution
+        for each choice:
+            if choice is valid:
+                make choice
+                solve(state)
+                undo choice
+    ```
+  Back: |
+    The **backtracking** template. Explores all valid candidates by trying each choice, recursing, and undoing.
+
+    The "undo choice" line is critical -- it restores state so the next iteration of the loop explores a clean alternative.
+
+- title: "Pruning in Backtracking"
+  difficulty: "medium"
+  tags: ["backtracking", "pruning"]
+  lesson: algorithms-greedy-and-backtracking
+  Front: |
+    What is **pruning** in backtracking, and why does it matter?
+  Back: |
+    Skipping branches of the search tree that cannot lead to valid solutions. Instead of exploring every possibility (O(b^n)), pruning eliminates large subtrees early.
+
+    Example: in N-queens, if placing a queen creates a conflict, skip all extensions of that placement. Pruning does not change worst-case complexity but dramatically reduces practical search space.
+
+- title: "Backtracking Classic Problems"
+  difficulty: "easy"
+  tags: ["backtracking", "examples"]
+  lesson: algorithms-greedy-and-backtracking
+  Front: |
+    Name four classic backtracking problems.
+  Back: |
+    1. **Permutations** -- build each by choosing one unused element at a time.
+    2. **Subsets** -- for each element, include it or not (2^n total).
+    3. **N-queens** -- place queens row by row, pruning conflicts.
+    4. **Sudoku** -- fill cells one at a time, trying digits 1-9, pruning violations.
+
+- title: "Recognizing Greedy vs Backtracking vs DP"
+  difficulty: "hard"
+  tags: ["greedy", "backtracking", "dynamic programming", "strategy"]
+  lesson: algorithms-greedy-and-backtracking
+  Front: |
+    How do you recognize whether a problem needs greedy, backtracking, or DP?
+  Back: |
+    | Signal | Strategy |
+    |---|---|
+    | Optimize with a simple rule, no revisiting needed | Greedy |
+    | "Find all" configurations, permutations, subsets | Backtracking |
+    | Constraint satisfaction (Sudoku, N-queens) | Backtracking |
+    | Optimize, but greedy fails on counterexamples | DP |
+
+    Greedy decides once. Backtracking tries everything and undoes. DP tries everything and remembers.
