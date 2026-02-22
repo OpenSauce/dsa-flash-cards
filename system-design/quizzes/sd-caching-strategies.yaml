@@ -1,0 +1,56 @@
+title: "Caching Strategies"
+lesson_slug: "sd-caching-strategies"
+questions:
+  - question: "Write-through vs write-back: which guarantees no data loss if the cache crashes?"
+    options:
+      - "Write-back, because it writes to the cache first"
+      - "Write-through, because data goes to the backing store on every write"
+      - "Write-around, because it bypasses the cache entirely"
+      - "Neither -- caches are never durable"
+    correct: 1
+    explanation: "Write-through writes to both the cache and the backing store simultaneously. The write is acknowledged only after both complete. If the cache crashes, the backing store already has the data. Write-back writes to the cache only and flushes asynchronously -- a crash before flushing loses data."
+
+  - question: "When is write-around caching the right choice?"
+    options:
+      - "When reads are far more common than writes"
+      - "When every write will be read immediately"
+      - "When writes are heavy but written data is rarely re-read"
+      - "When the cache has limited memory"
+    correct: 2
+    explanation: "Write-around sends writes directly to the backing store, bypassing the cache. This avoids filling the cache with data that will never be read again. Best for log ingestion, bulk imports, and archival writes -- heavy write workloads where the written data is unlikely to be queried soon."
+
+  - question: "How is LRU (Least Recently Used) eviction implemented to achieve O(1) get and put?"
+    options:
+      - "A sorted array indexed by access time"
+      - "A hash map plus a doubly linked list tracking access order"
+      - "A binary heap sorted by timestamp"
+      - "A simple counter per cache entry"
+    correct: 1
+    explanation: "LRU requires O(1) access (to look up any key) and O(1) eviction order updates (to move accessed items to the front). A hash map provides O(1) lookup. A doubly linked list tracks access order -- accessed entries move to the head, the tail is the LRU candidate. On eviction, remove the tail."
+
+  - question: "What is the thundering herd problem in caching?"
+    options:
+      - "Too many servers writing to the same cache simultaneously"
+      - "A popular cache entry expires and many concurrent requests simultaneously hit the backing store"
+      - "The cache running out of memory and evicting too many entries"
+      - "Cache entries being read faster than they can be written"
+    correct: 1
+    explanation: "When a heavily accessed cache entry expires, all requests that would have hit it simultaneously miss and go to the backing store. The store receives a sudden spike of identical queries. Mitigations: lock on miss (only one request fetches, others wait), stale-while-revalidate (serve stale data while a background refresh happens), or probabilistic early expiration."
+
+  - question: "What is the difference between cache-aside and read-through caching?"
+    options:
+      - "Cache-aside is for reads; read-through is for writes"
+      - "Cache-aside stores the application code in the cache; read-through stores the data"
+      - "In cache-aside the application manages cache misses; in read-through the cache fetches from the store transparently"
+      - "Read-through is faster because it bypasses the application"
+    correct: 2
+    explanation: "Cache-aside (lazy loading): on a miss, the application reads from the backing store and writes to the cache itself. The application owns the caching logic. Read-through: on a miss, the cache fetches from the backing store transparently. The application always reads from the cache and never calls the store directly. Read-through simplifies application code."
+
+  - question: "Why is TTL-based invalidation simpler than event-driven invalidation, and what is its downside?"
+    options:
+      - "TTL is more precise; event-driven invalidation is approximate"
+      - "TTL requires no coordination between writers and the cache, but data can be stale within the TTL window"
+      - "TTL works better for write-heavy workloads; event-driven is for read-heavy"
+      - "TTL is more expensive to implement than event-driven invalidation"
+    correct: 1
+    explanation: "TTL: set an expiration time and let entries expire automatically. No coordination required, self-healing. Downside: data is stale for up to the TTL duration after an update. Event-driven invalidation: the writer explicitly deletes or updates the cache entry. More precise, but requires the write path to know about and coordinate with the cache -- and is vulnerable to race conditions."

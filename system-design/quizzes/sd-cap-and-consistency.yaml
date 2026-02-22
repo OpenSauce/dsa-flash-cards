@@ -1,0 +1,56 @@
+title: "CAP Theorem and Consistency Models"
+lesson_slug: "sd-cap-and-consistency"
+questions:
+  - question: "What do the letters C, A, and P stand for in the CAP theorem?"
+    options:
+      - "Concurrency, Atomicity, Persistence"
+      - "Consistency, Availability, Partition Tolerance"
+      - "Concurrency, Availability, Performance"
+      - "Consistency, Atomicity, Partition Tolerance"
+    correct: 1
+    explanation: "CAP stands for Consistency (every read returns the most recent write), Availability (every request receives a response), and Partition Tolerance (the system continues operating despite network failures between nodes). A distributed system can guarantee at most two of the three."
+
+  - question: "Why is partition tolerance non-negotiable for distributed systems?"
+    options:
+      - "It is optional -- systems can choose to require reliable networks"
+      - "Network partitions are inevitable in production; a system that cannot tolerate them stops working on any network failure"
+      - "Partition tolerance is only required for systems with more than 10 nodes"
+      - "It is required by cloud provider SLAs"
+    correct: 1
+    explanation: "Network failures happen in every production system -- cables are cut, switches fail, availability zones lose connectivity. A system that cannot tolerate partitions stops working the moment any network hiccup occurs. This makes partition tolerance mandatory. The real CAP trade-off is between C and A during those inevitable partitions."
+
+  - question: "Which of these is an AP system, and why?"
+    options:
+      - "ZooKeeper -- it refuses requests during partitions to maintain correctness"
+      - "HBase -- it uses leader election to ensure only one node serves reads"
+      - "Cassandra -- it keeps serving requests during partitions, accepting potential staleness"
+      - "MongoDB (default) -- it blocks reads during partitions until the leader is confirmed"
+    correct: 2
+    explanation: "Cassandra is an AP system: during a network partition, nodes continue serving requests rather than refusing to respond. Reads may return stale data. This is the right trade-off for use cases like social media feeds or shopping carts where availability matters more than perfect consistency. ZooKeeper and HBase are CP systems."
+
+  - question: "What does PACELC add beyond the CAP theorem?"
+    options:
+      - "It adds a fourth property: durability"
+      - "It covers the latency-consistency trade-off during normal operation (without partitions)"
+      - "It refines the definition of consistency to include causal ordering"
+      - "It explains how to achieve all three CAP properties simultaneously"
+    correct: 1
+    explanation: "CAP only addresses behavior during network partitions, which are rare. PACELC adds the Else clause: even during normal operation (no partition), systems trade off Latency vs Consistency. Strong consistency requires coordination (slower); eventual consistency allows immediate responses (faster). This latency-consistency trade-off matters every day, not just during failures."
+
+  - question: "What is the difference between strong consistency and eventual consistency?"
+    options:
+      - "Strong consistency uses synchronous replication; eventual consistency uses asynchronous replication"
+      - "Strong consistency guarantees every read sees the most recent write; eventual consistency guarantees convergence but allows stale reads"
+      - "Strong consistency is faster because it skips coordination steps"
+      - "Eventual consistency is only safe for read-only workloads"
+    correct: 1
+    explanation: "Strong consistency: every read returns the most recent write. Reads may block until all replicas confirm. High latency, lower availability. Eventual consistency: reads may return stale data, but all nodes will eventually converge to the same value given no new updates. Low latency, high availability. The right choice depends on whether staleness is tolerable."
+
+  - question: "When is eventual consistency an acceptable trade-off?"
+    options:
+      - "When checking an account balance immediately after a transfer"
+      - "When acquiring a distributed lock for a critical section"
+      - "When displaying a social media like count or a product recommendation feed"
+      - "When processing financial transactions that must debit exactly once"
+    correct: 2
+    explanation: "Eventual consistency is acceptable when seeing a slightly stale value causes no real harm. A like count being 1,000 instead of 1,001 for a few milliseconds is fine. A product recommendation feed being a few seconds old is fine. But financial debits, inventory decrements, and distributed locks require strong consistency -- an incorrect answer is worse than a delayed one."
