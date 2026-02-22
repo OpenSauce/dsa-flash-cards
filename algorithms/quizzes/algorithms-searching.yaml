@@ -1,0 +1,56 @@
+title: "Searching"
+lesson_slug: "algorithms-searching"
+questions:
+  - question: "What is the precondition for binary search to work correctly?"
+    options:
+      - "The array must contain unique elements"
+      - "The array must fit in memory"
+      - "The array must be sorted"
+      - "The array must have a power-of-two length"
+    correct: 2
+    explanation: "Binary search halves the search space by comparing to the middle element. This only works if the array is sorted -- otherwise, eliminating half the array could discard the target."
+
+  - question: "You write binary search with the loop condition `while lo < hi` and the update `hi = mid - 1`. What bug does this introduce?"
+    options:
+      - "It enters an infinite loop when the target is at index 0"
+      - "It skips checking the last remaining element when lo == hi"
+      - "It causes an off-by-one error only on even-length arrays"
+      - "It returns the wrong index for duplicate elements"
+    correct: 1
+    explanation: "When lo == hi, the loop exits without checking that element. With `hi = mid - 1`, you should use `lo <= hi` so the final single-element case is checked. The condition and update rules must be consistent."
+
+  - question: "When is linear search the right choice over binary search or hash lookup?"
+    options:
+      - "When the data is sorted and you need multiple lookups"
+      - "When the dataset is small, unsorted, and searched infrequently"
+      - "When you need O(1) lookup time"
+      - "When you need to find all occurrences of a value"
+    correct: 1
+    explanation: "For small or unsorted data with few queries, the overhead of sorting (O(n log n)) or building a hash table (O(n) space) is not justified. Linear search is O(n) with no setup cost."
+
+  - question: 'What does "binary search on the answer space" mean?'
+    options:
+      - "Using binary search to find the optimal solution in a sorted output array"
+      - "Binary searching for the answer to a yes/no question by repeatedly halving the possible range"
+      - "Running binary search on each element of the input"
+      - "Using two binary searches to find a range"
+    correct: 1
+    explanation: 'If a problem has a monotonic feasibility condition (below some threshold it fails, at or above it succeeds), you can binary search on the threshold value instead of trying every possibility. Example: "minimum capacity to ship packages in D days" -- binary search on capacity, checking feasibility at each midpoint.'
+
+  - question: "What is the average-case time for hash table lookup, and what is the worst case?"
+    options:
+      - "O(log n) average, O(n) worst"
+      - "O(1) average, O(n) worst"
+      - "O(1) average, O(log n) worst"
+      - "O(n) average, O(n^2) worst"
+    correct: 1
+    explanation: "Hash functions distribute keys across buckets for O(1) average access. In the worst case, all keys hash to the same bucket, degenerating to a linked list scan in O(n). Good hash functions and resizing policies make the worst case rare."
+
+  - question: "Binary search finds any matching index. What variation finds the first position where arr[i] >= target?"
+    options:
+      - "Upper bound"
+      - "Interpolation search"
+      - "Lower bound"
+      - "Exponential search"
+    correct: 2
+    explanation: "Lower bound finds the first index where the element is >= target. Upper bound finds the first index where the element is > target. Together, upper bound minus lower bound gives the count of the target value in the array."

@@ -1,0 +1,56 @@
+title: "Graph Traversal"
+lesson_slug: "algorithms-graph-traversal"
+questions:
+  - question: "What data structure does BFS use to determine visit order?"
+    options:
+      - "Stack"
+      - "Priority queue (min-heap)"
+      - "Queue (FIFO)"
+      - "Hash set"
+    correct: 2
+    explanation: "BFS uses a queue to process vertices in the order they are discovered. This ensures vertices at distance d from the source are visited before vertices at distance d+1, producing level-by-level traversal."
+
+  - question: "What data structure does DFS use (explicitly or implicitly)?"
+    options:
+      - "Queue"
+      - "Stack (or the call stack via recursion)"
+      - "Priority queue"
+      - "Deque"
+    correct: 1
+    explanation: "DFS uses a stack -- either explicitly or implicitly via recursive function calls. The stack ensures the most recently discovered vertex is explored first, creating depth-first traversal."
+
+  - question: "BFS finds the shortest path in an unweighted graph. Does this guarantee hold for weighted graphs?"
+    options:
+      - "Yes -- BFS always finds the shortest path regardless of edge weights"
+      - "No -- BFS counts edges, not weights. Use Dijkstra's algorithm for weighted shortest paths"
+      - "Only if all weights are equal"
+      - "Only if there are no negative weights"
+    correct: 1
+    explanation: "BFS finds the path with the fewest edges, not the lowest total weight. In a weighted graph, a path with more edges can have a lower total weight. Dijkstra's algorithm handles non-negative weights; Bellman-Ford handles negative weights."
+
+  - question: "What is the space complexity of an adjacency list vs an adjacency matrix for a graph with V vertices and E edges?"
+    options:
+      - "Both use O(V + E)"
+      - "List: O(V^2), Matrix: O(V + E)"
+      - "List: O(V + E), Matrix: O(V^2)"
+      - "Both use O(V^2)"
+    correct: 2
+    explanation: "An adjacency list stores each edge once (plus vertex headers), totaling O(V + E). An adjacency matrix allocates a V x V grid regardless of how many edges exist, using O(V^2). For sparse graphs (E << V^2), the list is far more space-efficient."
+
+  - question: "What is required for a topological sort to exist?"
+    options:
+      - "The graph must be undirected"
+      - "The graph must be a directed acyclic graph (DAG)"
+      - "The graph must be connected"
+      - "The graph must have weighted edges"
+    correct: 1
+    explanation: "A topological ordering places every vertex before its successors. If there is a cycle, no such ordering exists -- vertex A must come before B, B before C, and C before A, which is impossible. The graph must be directed (to have an ordering direction) and acyclic."
+
+  - question: "How can you detect a cycle in a directed graph using DFS?"
+    options:
+      - "If DFS visits a vertex that is already in the visited set"
+      - "If DFS encounters a vertex that is currently on the recursion stack (a back edge)"
+      - "If DFS completes without visiting all vertices"
+      - "If the graph has more edges than vertices"
+    correct: 1
+    explanation: "In a directed graph, revisiting a vertex is not necessarily a cycle -- it could be reached via different paths. A cycle exists only if DFS reaches a vertex that is still on the current recursion stack, forming a back edge. This means there is a path from the vertex back to itself."

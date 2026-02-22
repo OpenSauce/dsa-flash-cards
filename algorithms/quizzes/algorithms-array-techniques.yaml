@@ -1,0 +1,56 @@
+title: "Array Techniques"
+lesson_slug: "algorithms-array-techniques"
+questions:
+  - question: "What precondition does the opposite-direction two-pointer technique require for finding a pair that sums to a target?"
+    options:
+      - "The array must contain only positive numbers"
+      - "The array must be sorted"
+      - "The array must have an even number of elements"
+      - "The array must not contain duplicates"
+    correct: 1
+    explanation: "Opposite-direction two-pointer relies on sorted order to decide which pointer to move: if the sum is too small, advance the left pointer (increase); if too large, advance the right pointer (decrease). Without sorting, you cannot determine which pointer to move."
+
+  - question: "A brute force approach checks every subarray of size k, taking O(nk) time. How does a fixed-size sliding window reduce this?"
+    options:
+      - "It sorts the array first, then uses binary search"
+      - "It uses a hash map to cache all subarray sums"
+      - "It adds the new element and removes the old one as the window slides, making each step O(1) for a total of O(n)"
+      - "It divides the array into k chunks and processes each independently"
+    correct: 2
+    explanation: "Instead of recomputing the sum from scratch, the sliding window incrementally updates: add the element entering the window, subtract the element leaving. Each element enters and leaves exactly once, so the total work is O(n)."
+
+  - question: "Given a prefix sum array where prefix[i] = sum of arr[0..i-1], what is the formula for the sum of elements from index l to r (inclusive)?"
+    options:
+      - "prefix[r] - prefix[l]"
+      - "prefix[r + 1] - prefix[l]"
+      - "prefix[r] - prefix[l - 1]"
+      - "prefix[r + 1] - prefix[l + 1]"
+    correct: 1
+    explanation: "prefix[r + 1] contains the sum of arr[0..r]. prefix[l] contains the sum of arr[0..l-1]. Subtracting gives the sum of arr[l..r]."
+
+  - question: "When does the sliding window technique NOT apply?"
+    options:
+      - "When the array contains negative numbers"
+      - "When the problem involves non-contiguous subsequences"
+      - "When the window size is variable"
+      - "When the array has more than 10,000 elements"
+    correct: 1
+    explanation: "Sliding window requires contiguity -- the window is a contiguous subarray or substring. Problems about non-contiguous subsequences (e.g., longest increasing subsequence) cannot use sliding window. The technique works fine with negative numbers and variable window sizes."
+
+  - question: "In Floyd's cycle detection, a fast pointer moves two steps and a slow pointer moves one step. What does it mean if they meet?"
+    options:
+      - "The linked list is sorted"
+      - "The linked list has a duplicate value"
+      - "The linked list contains a cycle"
+      - "The linked list has an even number of nodes"
+    correct: 2
+    explanation: "If there is no cycle, the fast pointer reaches the end and the two never meet. If there is a cycle, the fast pointer enters it first and the slow pointer eventually follows. Since the fast pointer gains one step per iteration, they must eventually collide inside the cycle."
+
+  - question: "You need to shrink a variable-size sliding window. When do you advance the left pointer?"
+    options:
+      - "After processing every element"
+      - "When the window contains fewer than k elements"
+      - "When the current window violates the constraint (e.g., contains duplicate characters, exceeds a sum limit)"
+      - "When the right pointer reaches the end of the array"
+    correct: 2
+    explanation: "In variable-size sliding window, the right pointer expands the window and the left pointer shrinks it. You shrink by advancing the left pointer whenever the window state violates the problem's constraint, until the constraint is restored."

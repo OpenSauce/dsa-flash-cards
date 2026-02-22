@@ -1,0 +1,56 @@
+title: "Divide-and-Conquer Sorts"
+lesson_slug: "algorithms-divide-and-conquer-sorts"
+questions:
+  - question: "Why does merge sort guarantee O(n log n) time regardless of input?"
+    options:
+      - "It uses a hash table to avoid redundant comparisons"
+      - "It always splits the array in half (log n levels) and merges each level in O(n), regardless of the input order"
+      - "It detects sorted runs and skips them"
+      - "It uses randomization to avoid worst-case behavior"
+    correct: 1
+    explanation: "Merge sort always divides the array at the midpoint, creating exactly log(n) levels. Each level requires O(n) work to merge. The input order does not affect the number of levels or the merge cost, so the total is always O(n log n)."
+
+  - question: "What causes quicksort's O(n^2) worst case, and how is it typically mitigated?"
+    options:
+      - "Duplicate elements cause infinite loops; mitigated by three-way partitioning"
+      - "The pivot is always the min or max (e.g., sorted input with fixed pivot); mitigated by randomized or median-of-three pivot selection"
+      - "The merge step takes O(n^2) on certain inputs; mitigated by using in-place merging"
+      - "Stack overflow from deep recursion; mitigated by increasing the stack size"
+    correct: 1
+    explanation: "When the pivot is always the extreme value, one partition has n-1 elements and the other has 0, giving n levels instead of log(n). Randomized pivots or median-of-three selection make this astronomically unlikely."
+
+  - question: "What is the main trade-off of merge sort compared to quicksort?"
+    options:
+      - "Merge sort is not stable"
+      - "Merge sort has O(n^2) worst-case time"
+      - "Merge sort requires O(n) extra space for the merge step"
+      - "Merge sort cannot sort linked lists"
+    correct: 2
+    explanation: "Merge sort needs O(n) auxiliary space to merge two sorted halves. Quicksort partitions in-place using O(log n) stack space. This extra memory cost is merge sort's main disadvantage in practice."
+
+  - question: "Why is heap sort slower than quicksort in practice despite having the same O(n log n) time complexity?"
+    options:
+      - "Heap sort does more comparisons per element"
+      - "Heap sort requires O(n) extra space"
+      - "Heap sort has poor cache locality -- it jumps between parent and child indices instead of accessing contiguous memory"
+      - "Heap sort is not a comparison-based sort"
+    correct: 2
+    explanation: "Heap operations access parent (i/2) and child (2i, 2i+1) indices, which are far apart in memory for large arrays. This causes frequent cache misses. Quicksort's partitioning accesses contiguous memory, which is cache-friendly."
+
+  - question: "Which O(n log n) sort is typically the fastest in practice for general-purpose sorting?"
+    options:
+      - "Merge sort -- its stability makes it faster"
+      - "Heap sort -- its O(1) space usage reduces memory overhead"
+      - "Quicksort -- its cache-friendly access pattern and small constant factors outweigh its worse theoretical worst case"
+      - "All three perform identically in practice"
+    correct: 2
+    explanation: "Quicksort's in-place partitioning accesses contiguous memory, making it very cache-friendly on modern hardware. Its small constant factors make it faster than merge sort and heap sort for most inputs, despite its O(n^2) worst case (which is easily avoided with good pivot selection)."
+
+  - question: "What are the three steps of the divide-and-conquer paradigm?"
+    options:
+      - "Sort, search, merge"
+      - "Initialize, iterate, terminate"
+      - "Divide the problem into subproblems, conquer each recursively, combine the results"
+      - "Hash, compare, swap"
+    correct: 2
+    explanation: "Divide-and-conquer breaks a problem into smaller instances of the same problem (divide), solves them recursively or directly (conquer), and combines the subproblem solutions into the final answer (combine). Merge sort divides at the midpoint and combines by merging. Quicksort divides by partitioning and combines trivially."

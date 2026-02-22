@@ -1,0 +1,56 @@
+title: "Greedy Algorithms and Backtracking"
+lesson_slug: "algorithms-greedy-and-backtracking"
+questions:
+  - question: "What two properties must a problem have for a greedy algorithm to produce an optimal solution?"
+    options:
+      - "Sorted input and unique elements"
+      - "Greedy choice property and optimal substructure"
+      - "Polynomial time complexity and constant space"
+      - "A recursive structure and overlapping subproblems"
+    correct: 1
+    explanation: "Greedy choice property means a globally optimal solution can be reached by making locally optimal choices. Optimal substructure means an optimal solution contains optimal solutions to subproblems. Both must hold for greedy to be correct."
+
+  - question: "How does a greedy algorithm differ from dynamic programming?"
+    options:
+      - "Greedy uses recursion; DP uses iteration"
+      - "Greedy makes one choice per step and never revisits; DP considers all choices and picks the best after comparing subproblem results"
+      - "Greedy works on graphs; DP works on arrays"
+      - "They are the same thing with different names"
+    correct: 1
+    explanation: "Both require optimal substructure. Greedy commits to the locally optimal choice without looking back (fast). DP evaluates all options at each step, storing results to avoid recomputation (slower but always correct). If the greedy choice is provably safe, greedy is preferred."
+
+  - question: "What makes backtracking more efficient than brute force?"
+    options:
+      - "It uses memoization to cache subproblem results"
+      - "It sorts the input first to reduce the search space"
+      - "It abandons (prunes) branches that violate constraints early, instead of generating all candidates first"
+      - "It uses a hash table to eliminate duplicate candidates"
+    correct: 2
+    explanation: "Brute force generates all possible candidates and checks each one. Backtracking builds candidates incrementally and stops exploring a branch as soon as it detects a constraint violation (pruning). This avoids exploring large subtrees that cannot produce valid solutions."
+
+  - question: "In the activity selection problem, what is the greedy choice?"
+    options:
+      - "Always pick the activity with the earliest start time"
+      - "Always pick the activity with the shortest duration"
+      - "Always pick the activity with the earliest finish time"
+      - "Always pick the activity that overlaps with the fewest others"
+    correct: 2
+    explanation: "Picking the earliest-finishing activity leaves the maximum time for remaining activities. This greedy choice is provably optimal: any solution that picks a later-finishing activity can swap in the earlier one without reducing the total count."
+
+  - question: "What are the three key steps in the backtracking pattern?"
+    options:
+      - "Sort, filter, merge"
+      - "Hash, lookup, delete"
+      - "Choose (make a decision), explore (recurse), unchoose (undo the decision)"
+      - "Divide, conquer, combine"
+    correct: 2
+    explanation: "Backtracking modifies state (choose), recurses to explore that branch (explore), then restores state (unchoose) before trying the next option. The unchoose step is what distinguishes backtracking from plain recursion."
+
+  - question: "The coin change problem asks for the minimum number of coins to make a given amount. With denominations [1, 3, 4], greedy picks 4+1+1 = 3 coins for amount 6. What is the optimal answer?"
+    options:
+      - "3 coins (4+1+1) -- greedy is correct here"
+      - "2 coins (3+3)"
+      - "6 coins (1+1+1+1+1+1)"
+      - "The problem has no solution with these denominations"
+    correct: 1
+    explanation: "3+3 = 6 using only 2 coins, which is fewer than the greedy answer of 3 coins. This shows that greedy does not always work for coin change with arbitrary denominations. The problem requires dynamic programming to find the true optimum."

@@ -1,0 +1,56 @@
+title: "Sorting Fundamentals"
+lesson_slug: "algorithms-sorting-fundamentals"
+questions:
+  - question: "What does it mean for a sorting algorithm to be stable?"
+    options:
+      - "It always runs in O(n log n) time"
+      - "It uses O(1) extra space"
+      - "Equal elements keep their original relative order after sorting"
+      - "It terminates on all inputs without infinite loops"
+    correct: 2
+    explanation: "A stable sort preserves the relative order of elements with equal keys. For example, if two students both have grade B, a stable sort keeps them in the same order they appeared in the original list."
+
+  - question: "What is the time complexity of insertion sort on an array that is already nearly sorted?"
+    options:
+      - "O(n^2) -- insertion sort always takes quadratic time"
+      - "O(n log n) -- it switches to a divide-and-conquer strategy"
+      - "O(n) -- each element is close to its sorted position, requiring few shifts"
+      - "O(1) -- it detects sorted input and returns immediately"
+    correct: 2
+    explanation: "Insertion sort is adaptive. On nearly-sorted data, each element needs very few shifts, so the total work is proportional to the number of elements (plus the small number of inversions). This is why hybrid sorts like Timsort use insertion sort for small or partially-sorted runs."
+
+  - question: "Which of the three elementary sorts (bubble, selection, insertion) minimizes the number of writes (swaps)?"
+    options:
+      - "Bubble sort -- it only swaps adjacent elements"
+      - "Selection sort -- it performs at most n swaps"
+      - "Insertion sort -- it shifts elements instead of swapping"
+      - "They all perform the same number of swaps"
+    correct: 1
+    explanation: "Selection sort finds the minimum and swaps it into position, performing at most n swaps total. Bubble sort can do O(n^2) swaps. Insertion sort does shifts, not swaps, but the total number of writes can be O(n^2)."
+
+  - question: "What is the comparison-based sorting lower bound, and what does it mean?"
+    options:
+      - "O(n) -- you must look at every element at least once"
+      - "O(n log n) -- no comparison-based sort can do fewer comparisons in the worst case"
+      - "O(n^2) -- the simplest sorts all take quadratic time"
+      - "O(log n) -- the minimum depth of a balanced binary tree"
+    correct: 1
+    explanation: "The decision tree argument shows that n! permutations require at least log2(n!) = Theta(n log n) comparisons to distinguish. This means O(n^2) sorts like bubble, selection, and insertion are provably suboptimal for large inputs."
+
+  - question: "When does insertion sort outperform quicksort in practice?"
+    options:
+      - "On arrays larger than 10,000 elements"
+      - "On small arrays (typically below 12-32 elements) where its low overhead beats quicksort's constant factors"
+      - "On completely random data where no patterns exist"
+      - "Never -- quicksort is always faster"
+    correct: 1
+    explanation: "Quicksort's recursion and partitioning overhead exceeds insertion sort's simple shifts for small arrays. This is why Timsort and introsort switch to insertion sort below a threshold (typically 12-32 elements)."
+
+  - question: "What does 'adaptive' mean for a sorting algorithm?"
+    options:
+      - "It uses different amounts of memory depending on the input size"
+      - "It automatically parallelizes across multiple CPU cores"
+      - "It runs faster on inputs that are already partially sorted"
+      - "It adapts its comparison function to different data types"
+    correct: 2
+    explanation: "An adaptive sort exploits existing order in the input. Insertion sort is adaptive: O(n) on nearly-sorted data, O(n^2) on reverse-sorted. Selection sort is not adaptive: it always does n(n-1)/2 comparisons regardless of input order."
