@@ -912,11 +912,11 @@
   Front: |
     Which HTTP methods are idempotent and which are safe?
   Back: |
-    **Safe (no side effects):** GET only.
+    **Safe (no side effects by HTTP spec):** GET, HEAD, OPTIONS.
 
-    **Idempotent (N calls = 1 call):** GET, PUT, DELETE.
+    **Idempotent (N calls = 1 call by HTTP spec):** GET, HEAD, PUT, DELETE, OPTIONS.
 
-    **Neither safe nor idempotent:** POST, PATCH.
+    **Neither safe nor idempotent in typical APIs:** POST, PATCH.
 
     **Why it matters:** Idempotent operations can be safely retried. A failed POST may create duplicate resources if retried without an idempotency key.
 

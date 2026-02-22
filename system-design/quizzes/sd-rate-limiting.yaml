@@ -46,11 +46,11 @@ questions:
     correct: 1
     explanation: "Leaky bucket: requests queue up and are processed at a fixed rate -- like water leaking at a steady drip. No matter how large a burst arrives, the output rate is constant. This protects downstream services that cannot handle spikes. Token bucket allows bursts to pass through (if the bucket is full), which can overwhelm a downstream service that expects steady input."
 
-  - question: "When is per-user rate limiting preferable to per-IP rate limiting?"
+  - question: "For authenticated API endpoints, why is per-user rate limiting preferable to per-IP rate limiting?"
     options:
-      - "For public APIs that do not require authentication"
-      - "For protecting login and signup endpoints"
-      - "For authenticated API endpoints where each user's quota should be enforced independently"
-      - "When users share a corporate network and would all share the same IP limit"
-    correct: 2
-    explanation: "Per-user limits apply after authentication, tying the quota to the authenticated identity. This is fair and precise for API billing and abuse prevention. Per-IP limits work for unauthenticated endpoints (login, signup) but break in corporate networks where thousands of users share one IP -- one abusive user blocks everyone. Per-user limits cannot protect unauthenticated endpoints."
+      - "Per-IP limits are harder to implement than per-user limits"
+      - "Per-user limits enforce each user's quota independently, regardless of shared network infrastructure"
+      - "Per-IP limits cannot be applied to authenticated endpoints"
+      - "Per-user limits are always more performant than per-IP limits"
+    correct: 1
+    explanation: "Per-user limits tie the quota to the authenticated identity, so each user's usage is tracked independently. This is critical when users share network infrastructure (e.g., corporate NAT) -- per-IP limits would penalize all users behind the same IP for one user's abuse. Per-IP limits are still useful for unauthenticated endpoints like login and signup."
