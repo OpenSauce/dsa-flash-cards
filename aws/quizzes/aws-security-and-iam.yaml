@@ -53,4 +53,4 @@ questions:
       - "Version, Statement, Condition"
       - "Allow, Deny, Resource"
     correct: 1
-    explanation: "Every IAM policy statement requires: Effect (Allow or Deny), Action (one or more AWS API actions like s3:GetObject or ec2:*), and Resource (the ARN of the resource(s) the statement applies to, or * for all). Principal is required in resource-based policies (like S3 bucket policies) but not in identity-based policies."
+    explanation: "Every IAM policy statement includes three key elements: Effect (Allow or Deny), Action (one or more AWS API actions like s3:GetObject or ec2:*), and Resource (the ARN of the resource(s) the statement applies to, or * for all)."

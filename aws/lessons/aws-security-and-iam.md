@@ -50,10 +50,12 @@ A minimal policy document:
 }
 ```
 
-Each statement has three required fields:
+In **identity-based policies** (attached to users, groups, or roles), each statement has three required fields:
 - **Effect**: `Allow` or `Deny`
 - **Action**: One or more AWS API actions (e.g., `s3:GetObject`, `ec2:DescribeInstances`, `dynamodb:*`)
 - **Resource**: The ARN(s) of the specific resources the statement applies to, or `*` for all
+
+In **resource-based policies** (like S3 bucket policies), each statement also requires a **Principal** field that specifies *who* (which AWS account, user, role, or service) the statement applies to.
 
 ## Principle of Least Privilege
 
