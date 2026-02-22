@@ -1,197 +1,722 @@
-- title: "Linux - Processes vs Threads"
-  difficulty: "medium"
-  tags: ["linux", "processes", "threads", "kernel"]
-  Front: |
-    What is the difference between a **process** and a **thread** in Linux?
-  Back: |
-    A process is an independent execution unit with its own virtual address space, file descriptors, and signal handlers. A thread is a lightweight execution unit that shares its parent process's address space and resources with other threads in the same process.
+# =============================================================================
+# Lesson 1: The Linux Filesystem (10 cards)
+# =============================================================================
 
-    **Key differences:**
-    - **Memory:** Processes have isolated memory. One process cannot read another's memory without explicit IPC. Threads share heap and global data -- fast communication, but concurrency bugs (races, deadlocks) become possible.
-    - **Creation cost:** Forking a process copies page tables and file descriptors (though copy-on-write makes this cheaper than a full copy). Creating a thread is faster because it shares the existing address space.
-    - **Failure isolation:** A crashing process does not take down other processes. A crashing thread can corrupt shared memory and take down the entire process.
-
-    **Linux implementation detail:** The kernel does not distinguish between processes and threads at the scheduler level. Both are `task_struct` entries in the runqueue. The `clone()` syscall creates both -- the flags determine how much is shared (e.g., `CLONE_VM` shares memory, making it a thread).
-
-- title: "Linux - File Permissions"
+- title: "Linux Root Directory"
   difficulty: "easy"
-  tags: ["linux", "permissions", "chmod", "filesystem"]
+  tags: ["linux", "filesystem", "FHS"]
+  lesson: linux-filesystem
   Front: |
-    What do the Linux file permissions **755** and **644** mean?
+    What is `/` in Linux, and what makes it special?
   Back: |
-    Linux permissions are three octal digits representing **owner**, **group**, and **others**. Each digit is the sum of: **4** (read) + **2** (write) + **1** (execute).
+    The root directory -- the top of the entire filesystem tree. Every file on the system, regardless of which physical disk or partition it lives on, is accessible somewhere beneath `/`. There is no concept of "drive letters" like Windows -- all storage is mounted into this single tree.
 
-    **755 = rwxr-xr-x:**
-    - Owner: read + write + execute (7)
-    - Group: read + execute (5)
-    - Others: read + execute (5)
-    - Standard for directories and executable scripts
-
-    **644 = rw-r--r--:**
-    - Owner: read + write (6)
-    - Group: read only (4)
-    - Others: read only (4)
-    - Standard for regular files (configs, source code, documents)
-
-    **Why directories need execute:** The execute bit on a directory means "permission to traverse." Without it, you cannot `cd` into the directory or access files inside it, even if you can list its contents.
-
-- title: "Linux - Kill Signals"
-  difficulty: "medium"
-  tags: ["linux", "signals", "kill", "SIGTERM", "SIGKILL"]
-  Front: |
-    What is the difference between `kill`, `kill -9`, and `kill -15`?
-  Back: |
-    `kill <pid>` sends **SIGTERM** (signal 15) by default. The process can catch this signal, clean up resources, and exit gracefully. This is the polite way to terminate a process.
-
-    `kill -15 <pid>` is identical to `kill <pid>` -- SIGTERM is the default.
-
-    `kill -9 <pid>` sends **SIGKILL** (signal 9). The kernel terminates the process immediately. The process cannot catch, block, or ignore SIGKILL. No cleanup happens -- open files are not flushed, network connections are not closed, temporary files are not removed.
-
-    **Always try SIGTERM first.** Only escalate to SIGKILL when the process is unresponsive. A well-written daemon uses a SIGTERM handler to flush buffers, release locks, and deregister from service discovery before exiting.
-
-    **Other useful signals:**
-    - `kill -1` (SIGHUP): Conventionally tells a daemon to reload its configuration
-    - `kill -2` (SIGINT): Same as pressing Ctrl+C
-
-- title: "Linux - chmod, chown, chgrp"
+- title: "FHS: /etc Purpose"
   difficulty: "easy"
-  tags: ["linux", "permissions", "chmod", "chown", "chgrp"]
+  tags: ["linux", "filesystem", "FHS", "configuration"]
+  lesson: linux-filesystem
   Front: |
-    What do `chmod`, `chown`, and `chgrp` do?
+    What lives in `/etc` on a Linux system?
   Back: |
-    **`chmod`** changes file permissions (the read/write/execute bits):
+    System-wide configuration files. Examples: `/etc/hosts` (hostname to IP mappings), `/etc/passwd` (user accounts), `/etc/nginx/` (nginx config). Edited by administrators, read by services at runtime. Static -- contents do not change during normal operation.
+
+- title: "FHS: /var Purpose"
+  difficulty: "easy"
+  tags: ["linux", "filesystem", "FHS"]
+  lesson: linux-filesystem
+  Front: |
+    What lives in `/var` on a Linux system, and how does it differ from `/etc`?
+  Back: |
+    Variable runtime data: logs (`/var/log/`), mail spools, package caches (`/var/cache/`), and database files. Unlike `/etc` (static configuration), `/var` grows and changes during normal operation. When a disk fills up, `/var/log/` is the first place to check.
+
+- title: "FHS: /tmp Behavior"
+  difficulty: "easy"
+  tags: ["linux", "filesystem", "FHS", "tmpfs"]
+  lesson: linux-filesystem
+  Front: |
+    What is `/tmp`, and why should you never store important data there?
+  Back: |
+    A world-writable directory for temporary files. Many distributions mount it as `tmpfs` (backed by RAM), so contents are lost on reboot. Even without `tmpfs`, many distros clear `/tmp` on boot. Any user can write to it; do not rely on it for persistence.
+
+- title: "What Is an Inode?"
+  difficulty: "medium"
+  tags: ["linux", "filesystem", "inode"]
+  lesson: linux-filesystem
+  Front: |
+    What is an **inode** in Linux, and what does it store?
+  Back: |
+    A kernel data structure representing a file or directory on disk. Stores: size, UID/GID ownership, permission bits, timestamps, and pointers to data blocks. Does **not** store the filename -- filenames live in directory entries that map a name to an inode number.
+
+- title: "Hardlink Definition"
+  difficulty: "medium"
+  tags: ["linux", "filesystem", "hardlinks", "inodes"]
+  lesson: linux-filesystem
+  Front: |
+    What is a **hardlink**, and what happens if you delete the original file?
+  Back: |
+    A second directory entry pointing to the same inode as the original file. Both entries are indistinguishable -- same inode number, same data, same permissions. Deleting the original does not remove the data; it only removes one name. The data persists until all hardlinks (all directory entries referencing the inode) are removed.
+
+- title: "Symlink Definition"
+  difficulty: "easy"
+  tags: ["linux", "filesystem", "symlinks"]
+  lesson: linux-filesystem
+  Front: |
+    What is a **symlink** (symbolic link), and what happens if the target is deleted?
+  Back: |
+    A file with its own inode whose content is a path to another file or directory. A pointer to a name, not to data. If the target is deleted or moved, the symlink becomes a dangling reference -- it points to a path that no longer exists.
+
+- title: "Hardlink vs Symlink Constraints"
+  difficulty: "medium"
+  tags: ["linux", "filesystem", "hardlinks", "symlinks"]
+  lesson: linux-filesystem
+  Front: |
+    What are the two key constraints on **hardlinks** that symlinks do not have?
+  Back: |
+    1. **Cannot cross filesystem boundaries** -- inode numbers are per-filesystem; a directory entry on one filesystem cannot reference an inode on another.
+    2. **Cannot point to directories** -- to prevent cycles in the filesystem tree (which would break recursive tools like `find`).
+
+    Symlinks can cross filesystems and point to directories.
+
+- title: "/proc Filesystem"
+  difficulty: "medium"
+  tags: ["linux", "filesystem", "proc", "virtual filesystem"]
+  lesson: linux-filesystem
+  Front: |
+    What is `/proc`, and what makes it different from a regular filesystem?
+  Back: |
+    A virtual filesystem -- no data on disk. The kernel synthesizes its contents on demand. `/proc/<pid>/` exposes per-process information (open file descriptors, memory maps, command line, environment). `/proc/cpuinfo`, `/proc/meminfo` expose system-wide kernel data. Tools like `ps` and `top` read from `/proc`.
+
+- title: "Everything Is a File"
+  difficulty: "easy"
+  tags: ["linux", "filesystem", "philosophy"]
+  lesson: linux-filesystem
+  Front: |
+    What does "everything is a file" mean in Linux?
+  Back: |
+    Hardware devices, running processes, network sockets, and pipes all appear as filesystem entries and are accessible via the same read/write system calls as regular files. `/dev/sda` is a disk. `/dev/null` discards writes. `/proc/<pid>/fd/` lists open file descriptors. This uniform interface means standard tools (cat, grep, awk) work on hardware and processes.
+
+# =============================================================================
+# Lesson 2: Users, Groups, and Permissions (9 cards)
+# =============================================================================
+
+- title: "Linux Permission Classes"
+  difficulty: "easy"
+  tags: ["linux", "permissions", "users", "groups"]
+  lesson: linux-permissions
+  Front: |
+    What are the three permission classes in Linux file permissions, and who does each apply to?
+  Back: |
+    - **User (u):** The file's owner
+    - **Group (g):** Members of the file's assigned group
+    - **Other (o):** Everyone else
+
+    The kernel applies only one class per access attempt -- the most specific one that matches (owner first, then group, then other).
+
+- title: "Permission Bits: rwx Values"
+  difficulty: "easy"
+  tags: ["linux", "permissions", "chmod", "octal"]
+  lesson: linux-permissions
+  Front: |
+    What are the numeric values of the **read**, **write**, and **execute** permission bits?
+  Back: |
+    - **Read (r):** 4
+    - **Write (w):** 2
+    - **Execute (x):** 1
+
+    Each permission class (user/group/other) is the sum of its enabled bits. 6 = rw-, 7 = rwx, 5 = r-x, 4 = r--.
+
+- title: "Octal Permission: 755"
+  difficulty: "easy"
+  tags: ["linux", "permissions", "octal", "chmod"]
+  lesson: linux-permissions
+  Front: |
+    What does file permission `755` mean in rwx notation?
+  Back: |
+    `rwxr-xr-x`
+    - User: 7 = 4+2+1 = rwx (full access)
+    - Group: 5 = 4+0+1 = r-x (read and execute)
+    - Other: 5 = 4+0+1 = r-x (read and execute)
+
+    Standard for directories and executable scripts: owner can modify, everyone else can read and traverse.
+
+- title: "Octal Permission: 644"
+  difficulty: "easy"
+  tags: ["linux", "permissions", "octal", "chmod"]
+  lesson: linux-permissions
+  Front: |
+    What does file permission `644` mean in rwx notation?
+  Back: |
+    `rw-r--r--`
+    - User: 6 = 4+2+0 = rw- (read and write)
+    - Group: 4 = 4+0+0 = r-- (read only)
+    - Other: 4 = 4+0+0 = r-- (read only)
+
+    Standard for regular files: owner can edit, world can read, nobody can execute.
+
+- title: "Directory Execute Bit"
+  difficulty: "medium"
+  tags: ["linux", "permissions", "directories", "execute bit"]
+  lesson: linux-permissions
+  Front: |
+    What does the **execute bit** mean on a **directory**, and what happens without it?
+  Back: |
+    Permission to **traverse** -- to enter the directory and access files inside it by path. Without the execute bit, you cannot `cd` into the directory or open files inside it, even if you can list the directory's name. The read bit on a directory only lets you list its contents (`ls`).
+
+- title: "chmod Command"
+  difficulty: "easy"
+  tags: ["linux", "permissions", "chmod"]
+  lesson: linux-permissions
+  Front: |
+    What does `chmod` do? Give one example of numeric and one of symbolic notation.
+  Back: |
+    Changes file permission bits.
+
     ```bash
-    chmod 755 script.sh     # numeric: rwxr-xr-x
-    chmod u+x script.sh     # symbolic: add execute for owner
+    chmod 755 script.sh    # numeric: sets exactly rwxr-xr-x
+    chmod u+x script.sh    # symbolic: adds execute for owner only
+    chmod -R 644 /srv/     # recursive: apply to all files in tree
     ```
 
-    **`chown`** changes the file owner (and optionally the group):
+- title: "chown Command"
+  difficulty: "easy"
+  tags: ["linux", "permissions", "chown"]
+  lesson: linux-permissions
+  Front: |
+    What does `chown` do, and how do you change both owner and group in one command?
+  Back: |
+    Changes the file's owner (and optionally the group). Only root can change ownership to a different user.
+
     ```bash
-    chown alice file.txt          # change owner to alice
+    chown alice file.txt             # change owner to alice
     chown alice:developers file.txt  # change owner and group
+    chown -R www-data:www-data /var/www/
     ```
 
-    **`chgrp`** changes only the group:
-    ```bash
-    chgrp developers file.txt
-    ```
+- title: "umask"
+  difficulty: "medium"
+  tags: ["linux", "permissions", "umask"]
+  lesson: linux-permissions
+  Front: |
+    What is `umask`, and what permissions result from `umask 022` when creating a new file?
+  Back: |
+    A bitmask that removes permission bits from newly created files. Files default to 666; directories default to 777. umask 022 removes write from group and other:
 
-    In practice, `chown user:group` is used more often than `chgrp` since it handles both in one command. All three require appropriate privileges -- typically root or the current file owner.
+    - New file: 666 - 022 = **644** (rw-r--r--)
+    - New directory: 777 - 022 = **755** (rwxr-xr-x)
 
-- title: "Linux - Filesystem Hierarchy"
+    Set per-session with `umask 027`. Login shells inherit from `/etc/profile`.
+
+- title: "UID and GID"
   difficulty: "easy"
-  tags: ["linux", "filesystem", "directories"]
+  tags: ["linux", "permissions", "users", "UID", "GID"]
+  lesson: linux-permissions
   Front: |
-    What is the difference between `/tmp`, `/var`, `/etc`, and `/home`?
+    What are **UID** and **GID**, and what is special about UID 0?
   Back: |
-    **`/etc`** -- System configuration files. Network settings (`/etc/hosts`), user accounts (`/etc/passwd`), service configs (`/etc/nginx/`). Edited by admins, read by services.
+    - **UID** (user ID): a numeric identifier for a user. Usernames are human-readable aliases -- the kernel uses UIDs.
+    - **GID** (group ID): a numeric identifier for a group.
+    - **UID 0** is root -- the superuser. Processes running as UID 0 bypass most permission checks.
 
-    **`/home`** -- User home directories. Each user gets `/home/username/` for personal files, dotfiles, and application settings.
+    Stored in `/etc/passwd` (users) and `/etc/group` (groups).
 
-    **`/tmp`** -- Temporary files. Any user can write here. Contents may be cleared on reboot (many distros mount it as `tmpfs`, which lives in RAM). Do not store anything important here.
+# =============================================================================
+# Lesson 3: Processes and Signals (11 cards)
+# =============================================================================
 
-    **`/var`** -- Variable data that changes at runtime. Log files (`/var/log/`), mail spools, package caches (`/var/cache/`), database files. Unlike `/etc` (which is config), `/var` holds data that grows and changes during normal operation.
-
-    **Other common directories:**
-    - `/usr` -- Installed programs and libraries (read-only in normal operation)
-    - `/bin`, `/sbin` -- Essential system binaries
-    - `/proc`, `/sys` -- Virtual filesystems exposing kernel and process information
-
-- title: "Linux - Symlinks vs Hardlinks"
-  difficulty: "medium"
-  tags: ["linux", "symlinks", "hardlinks", "filesystem", "inodes"]
-  Front: |
-    What is a **symlink** vs a **hardlink**?
-  Back: |
-    Both create additional filesystem entries that point to existing data, but they work differently at the inode level.
-
-    **Hardlink:** A direct reference to the same inode (the same data on disk). The original file and the hardlink are indistinguishable -- they share the same inode number, same data blocks, same permissions. Deleting the original does not affect the hardlink because the data persists until all references are removed.
-
-    **Symlink (symbolic link):** A separate file (its own inode) that contains a path to the target. It is a pointer to a name, not to data. If the target is deleted or moved, the symlink becomes a dangling reference (broken link).
-
-    **Constraints:**
-    - Hardlinks cannot cross filesystem boundaries (inodes are per-filesystem)
-    - Hardlinks cannot point to directories (to prevent cycles in the filesystem tree)
-    - Symlinks can point anywhere -- other filesystems, directories, even non-existent paths
-
-    **Common use:** Symlinks are far more common. They are used to create aliases (`/usr/bin/python -> /usr/bin/python3`), switch between versions, and reference shared libraries.
-
-- title: "Linux - stdin, stdout, stderr"
-  difficulty: "medium"
-  tags: ["linux", "stdin", "stdout", "stderr", "redirection"]
-  Front: |
-    What is `stdin`, `stdout`, and `stderr`? What does `2>&1` do?
-  Back: |
-    Every Linux process has three standard file descriptors opened at birth:
-    - **fd 0 (stdin):** Standard input. Where the process reads input (keyboard by default, or piped data).
-    - **fd 1 (stdout):** Standard output. Normal program output.
-    - **fd 2 (stderr):** Standard error. Error messages and diagnostics.
-
-    **`2>&1` redirects stderr to wherever stdout is currently going.** The `2` is stderr's file descriptor, `>` means redirect, and `&1` means "to the same destination as fd 1."
-
-    ```bash
-    # Send both stdout and stderr to a file:
-    command > output.log 2>&1
-
-    # Discard all output:
-    command > /dev/null 2>&1
-
-    # Pipe both stdout and stderr to another command:
-    command 2>&1 | grep "error"
-    ```
-
-    **Why stderr exists separately:** It lets you redirect normal output to a file while still seeing errors on the terminal, or pipe output to another program without error messages contaminating the data stream.
-
-- title: "Linux - Cron Jobs"
+- title: "What Is a Process?"
   difficulty: "easy"
-  tags: ["linux", "cron", "scheduling"]
+  tags: ["linux", "processes"]
+  lesson: linux-processes
   Front: |
-    What is a **cron job** and what does `0 5 * * *` mean?
+    What is a **process** in Linux?
   Back: |
-    Cron is a time-based job scheduler in Unix systems. You define scheduled commands in a crontab file, and the cron daemon executes them at the specified times.
+    A running instance of a program. Each process has: a unique PID (process ID), its own virtual address space, open file descriptors, signal handlers, and a PPID (parent process ID). Every process on the system belongs to a tree rooted at PID 1 (systemd or init).
 
-    **Crontab format:** five fields, left to right:
-    ```
-    minute  hour  day-of-month  month  day-of-week
-    (0-59)  (0-23)   (1-31)    (1-12)    (0-7)
-    ```
+- title: "PID and PPID"
+  difficulty: "easy"
+  tags: ["linux", "processes", "PID"]
+  lesson: linux-processes
+  Front: |
+    What are **PID** and **PPID**?
+  Back: |
+    - **PID** (Process ID): a unique integer the kernel assigns to each running process.
+    - **PPID** (Parent Process ID): the PID of the process that created this one.
 
-    **`0 5 * * *`** = "At minute 0 of hour 5, every day of every month, every day of the week" = **daily at 5:00 AM**.
+    Every process has a parent, forming a tree. PID 1 (systemd/init) is the root -- it is the ancestor of all user-space processes.
 
-    **Common patterns:**
-    - `*/15 * * * *` -- every 15 minutes
-    - `0 0 * * 0` -- midnight every Sunday
-    - `0 9 1 * *` -- 9 AM on the first of each month
-
-    **Gotchas:**
-    - Cron jobs run with a minimal environment. `PATH`, environment variables, and shell rc files may not be loaded. Use absolute paths for commands.
-    - stdout/stderr go to the system mail by default. Redirect output explicitly or it silently vanishes.
-
-- title: "Linux - grep, awk, sed"
+- title: "fork() System Call"
   difficulty: "medium"
-  tags: ["linux", "grep", "awk", "sed", "text processing"]
+  tags: ["linux", "processes", "fork", "syscall"]
+  lesson: linux-processes
   Front: |
-    What do `grep`, `awk`, and `sed` do? When would you use each?
+    What does the `fork()` system call do?
   Back: |
-    **`grep`** -- Search. Filters lines matching a pattern.
-    ```bash
-    grep "ERROR" /var/log/app.log       # lines containing ERROR
-    grep -r "TODO" src/                  # recursive search in files
-    ```
-    Use for: finding lines, counting matches, checking if a pattern exists.
+    Creates an exact copy of the calling process. The child gets a new PID but inherits the parent's memory, file descriptors, and signal handlers. Memory is not immediately copied -- Linux uses copy-on-write: pages are only duplicated when either process writes to them. `fork()` returns the child's PID to the parent and 0 to the child.
 
-    **`sed`** -- Find and replace. A stream editor that transforms text line-by-line.
-    ```bash
-    sed 's/old/new/g' file.txt          # replace all occurrences
-    sed -i '5d' file.txt                # delete line 5 in-place
-    ```
-    Use for: substitutions, deletions, in-place file editing.
+- title: "exec() System Call"
+  difficulty: "medium"
+  tags: ["linux", "processes", "exec", "syscall"]
+  lesson: linux-processes
+  Front: |
+    What does the `exec()` system call do?
+  Back: |
+    Replaces the current process's memory image with a new program. The PID stays the same; the code, data, and stack are replaced by the new executable. File descriptors remain open (unless marked close-on-exec). Used with `fork()`: shell forks, child calls exec to load the command.
 
-    **`awk`** -- Column-based processing. Splits each line into fields and operates on them.
+- title: "Zombie Process"
+  difficulty: "medium"
+  tags: ["linux", "processes", "zombie"]
+  lesson: linux-processes
+  Front: |
+    What is a **zombie process**, and is it consuming significant resources?
+  Back: |
+    A process that has exited but whose parent has not yet called `wait()` to collect its exit status. Not consuming CPU or memory (other than a process table entry). The kernel keeps the entry so the parent can retrieve the exit status. Many zombies indicate a parent that is not properly reaping children.
+
+- title: "Orphan Process"
+  difficulty: "medium"
+  tags: ["linux", "processes", "orphan"]
+  lesson: linux-processes
+  Front: |
+    What is an **orphan process**, and what happens to it?
+  Back: |
+    A process whose parent has exited before it. The kernel automatically re-parents it to PID 1 (systemd/init). Init calls `wait()` on any children it inherits, so orphans are properly reaped when they eventually exit. Background jobs started from a shell become orphans (and thus children of init) when the shell exits.
+
+- title: "Process States"
+  difficulty: "medium"
+  tags: ["linux", "processes", "process states"]
+  lesson: linux-processes
+  Front: |
+    What do the **R**, **S**, **D**, and **Z** process states mean?
+  Back: |
+    Visible in the `STAT` column of `ps aux`:
+    - **R (Running):** Currently executing on a CPU
+    - **S (Sleeping):** Waiting for an event (I/O, timer) -- interruptible, can be killed
+    - **D (Disk sleep):** Waiting for I/O, cannot be interrupted -- "unkillable" during this wait
+    - **Z (Zombie):** Exited, waiting for parent to call `wait()`
+
+- title: "SIGTERM vs SIGKILL"
+  difficulty: "medium"
+  tags: ["linux", "signals", "SIGTERM", "SIGKILL"]
+  lesson: linux-processes
+  Front: |
+    What is the difference between **SIGTERM** and **SIGKILL**?
+  Back: |
+    **SIGTERM (15):** The polite termination request. The process can catch it, flush buffers, close connections, and exit cleanly. Sent by default: `kill <pid>`.
+
+    **SIGKILL (9):** Cannot be caught, blocked, or ignored. The kernel terminates the process immediately -- no cleanup, no flushing. Sent with `kill -9 <pid>`.
+
+    Always try SIGTERM first. SIGKILL is for unresponsive processes only.
+
+- title: "SIGHUP Convention"
+  difficulty: "medium"
+  tags: ["linux", "signals", "SIGHUP"]
+  lesson: linux-processes
+  Front: |
+    What is **SIGHUP**, and why do daemons respond to it differently than other processes?
+  Back: |
+    Originally sent when a terminal connection was lost. For daemons (which have no terminal), SIGHUP has been repurposed by convention to mean "reload your configuration file." This lets you update a service's config and apply it without a restart:
+
+    ```bash
+    kill -HUP $(cat /var/run/nginx.pid)
+    # or: nginx -s reload
+    ```
+
+- title: "Process vs Thread"
+  difficulty: "medium"
+  tags: ["linux", "processes", "threads"]
+  lesson: linux-processes
+  Front: |
+    What is the key difference between a **process** and a **thread** in Linux?
+  Back: |
+    **Process:** isolated address space, its own file descriptors and signal handlers. A crash affects only that process.
+
+    **Thread:** shares the process's address space, file descriptors, and signal handlers with other threads. A crash in one thread can corrupt shared memory and take down the entire process.
+
+    Threads communicate cheaply (shared memory) but require synchronization. Processes communicate via IPC (pipes, sockets) but are fully isolated.
+
+- title: "Ctrl+C vs Ctrl+Z"
+  difficulty: "easy"
+  tags: ["linux", "signals", "job control"]
+  lesson: linux-processes
+  Front: |
+    What signals do **Ctrl+C** and **Ctrl+Z** send to the foreground process?
+  Back: |
+    - **Ctrl+C** → SIGINT (2): requests the process to terminate. Most programs exit immediately; some (like Python's interactive shell) catch it.
+    - **Ctrl+Z** → SIGTSTP (20): suspends the process (state T -- stopped). The shell regains the prompt. Resume with `fg` (foreground) or `bg` (background in the background).
+
+# =============================================================================
+# Lesson 4: Shell, Pipes, and I/O Redirection (9 cards)
+# =============================================================================
+
+- title: "What Is a Shell?"
+  difficulty: "easy"
+  tags: ["linux", "shell", "bash"]
+  lesson: linux-shell-io
+  Front: |
+    What is a **shell** in Linux?
+  Back: |
+    A command interpreter -- a program that reads commands, runs programs, and returns their output. It forks a child process for each command, waits for it to finish, and prints the next prompt. Also handles redirection, pipes, environment variables, and job control. Common shells: bash, zsh, sh, fish.
+
+- title: "Standard File Descriptors"
+  difficulty: "easy"
+  tags: ["linux", "stdin", "stdout", "stderr", "file descriptors"]
+  lesson: linux-shell-io
+  Front: |
+    What are file descriptors **0**, **1**, and **2**?
+  Back: |
+    Every process starts with three standard file descriptors:
+    - **0 (stdin):** Standard input -- where the process reads input (keyboard by default)
+    - **1 (stdout):** Standard output -- normal program output
+    - **2 (stderr):** Standard error -- error messages and diagnostics
+
+- title: "Why stderr Exists"
+  difficulty: "medium"
+  tags: ["linux", "stderr", "redirection"]
+  lesson: linux-shell-io
+  Front: |
+    Why does **stderr** (FD 2) exist separately from **stdout** (FD 1)?
+  Back: |
+    So output and errors can be routed independently. You can pipe a command's stdout to another program for processing while errors still appear on your terminal. Or redirect stdout to a file for machine parsing while capturing errors separately. If errors mixed into stdout, piped programs would receive unexpected data.
+
+- title: "Output Redirection: > vs >>"
+  difficulty: "easy"
+  tags: ["linux", "redirection", "shell"]
+  lesson: linux-shell-io
+  Front: |
+    What is the difference between `>` and `>>` in shell redirection?
+  Back: |
+    - `>` **overwrites** the file (truncates to zero, then writes). Creates the file if it does not exist.
+    - `>>` **appends** to the file. Creates the file if it does not exist.
+
+    Use `>>` for logs you want to accumulate. Use `>` when you want a fresh file each run.
+
+- title: "2>&1 Explained"
+  difficulty: "medium"
+  tags: ["linux", "redirection", "stderr", "stdout"]
+  lesson: linux-shell-io
+  Front: |
+    What does `2>&1` mean, and why does order matter in `> file.txt 2>&1`?
+  Back: |
+    `2>&1` redirects stderr (FD 2) to wherever stdout (FD 1) currently points. The `&` means "file descriptor," not a file named `1`.
+
+    Order matters: `> file.txt 2>&1` first points stdout at the file, then points stderr at stdout (the file). Writing it as `2>&1 > file.txt` redirects stderr to the terminal (stdout's current destination), then moves stdout to the file -- stderr ends up on the terminal, not in the file.
+
+- title: "How Pipes Work"
+  difficulty: "easy"
+  tags: ["linux", "pipes", "shell"]
+  lesson: linux-shell-io
+  Front: |
+    What does a pipe (`|`) do in the shell?
+  Back: |
+    Connects stdout of the left command to stdin of the right command. The two commands run concurrently -- the left writes, the right reads, buffered by the kernel. Only stdout flows through the pipe; stderr bypasses it and appears on the terminal. To pipe both: `command 2>&1 | next`.
+
+- title: "PATH Variable"
+  difficulty: "easy"
+  tags: ["linux", "shell", "PATH", "environment variables"]
+  lesson: linux-shell-io
+  Front: |
+    What does the `PATH` environment variable control?
+  Back: |
+    A colon-separated list of directories the shell searches for executables when you type a command name. The shell checks each directory in order and runs the first match.
+
+    ```bash
+    echo $PATH
+    # /usr/local/bin:/usr/bin:/bin
+    export PATH="$HOME/.local/bin:$PATH"  # prepend a directory
+    ```
+
+- title: "export vs Local Variable"
+  difficulty: "easy"
+  tags: ["linux", "shell", "environment variables", "export"]
+  lesson: linux-shell-io
+  Front: |
+    What is the difference between `VAR=value` and `export VAR=value` in the shell?
+  Back: |
+    `VAR=value` sets a shell-local variable -- visible only in the current shell session. Child processes do not inherit it.
+
+    `export VAR=value` adds the variable to the environment, which child processes inherit via `exec()`. A variable without export is not visible in subshells, scripts, or programs you run.
+
+- title: "Input Redirection and /dev/null"
+  difficulty: "easy"
+  tags: ["linux", "redirection", "shell", "dev/null"]
+  lesson: linux-shell-io
+  Front: |
+    What does `< file.txt` do, and what is `/dev/null`?
+  Back: |
+    `< file.txt` redirects stdin to read from a file instead of the keyboard. Useful for feeding input to commands that expect interactive input.
+
+    `/dev/null` is the "bit bucket" -- a special device that discards everything written to it and returns EOF when read. `command > /dev/null 2>&1` discards all output and errors.
+
+# =============================================================================
+# Lesson 5: Essential Commands (10 cards)
+# =============================================================================
+
+- title: "grep Purpose"
+  difficulty: "easy"
+  tags: ["linux", "grep", "text processing"]
+  lesson: linux-essential-commands
+  Front: |
+    What does `grep` do? What does `grep -v` do?
+  Back: |
+    Filters lines from input that match a pattern (regular expression).
+
+    ```bash
+    grep "ERROR" app.log       # lines containing ERROR
+    grep -r "TODO" src/        # recursive search across files
+    grep -i "error" app.log    # case-insensitive
+    grep -v "DEBUG" app.log    # invert: lines NOT matching DEBUG
+    grep -c "ERROR" app.log    # count matching lines
+    ```
+
+- title: "sed Purpose"
+  difficulty: "easy"
+  tags: ["linux", "sed", "text processing"]
+  lesson: linux-essential-commands
+  Front: |
+    What does `sed` do? Give one practical example.
+  Back: |
+    A stream editor that transforms text line by line. Most commonly used for find-and-replace.
+
+    ```bash
+    sed 's/old/new/g' file.txt          # replace all occurrences per line
+    sed -i 's/localhost/prod.db/g' config.yaml  # in-place edit
+    sed -n '10,20p' file.txt            # print lines 10-20 only
+    ```
+
+    Use `sed` for substitutions, deletions, and in-place file editing.
+
+- title: "awk Purpose"
+  difficulty: "medium"
+  tags: ["linux", "awk", "text processing"]
+  lesson: linux-essential-commands
+  Front: |
+    What does `awk` do? How does it differ from `grep` and `sed`?
+  Back: |
+    Splits each line into fields and processes them. Column-aware: `$1` is the first field, `$2` the second.
+
     ```bash
     awk '{print $1, $3}' data.txt       # print columns 1 and 3
-    awk -F: '{print $1}' /etc/passwd    # print usernames (: delimiter)
+    awk -F: '{print $1}' /etc/passwd    # colon-delimited: print usernames
+    awk '$3 > 100 {print $0}' data.txt  # conditional row filter
     ```
-    Use for: extracting specific columns, computing sums/averages, reformatting structured text.
 
-    **Mental model:** `grep` filters rows. `awk` selects columns. `sed` transforms content. They compose naturally with pipes: `grep "200" access.log | awk '{print $7}' | sort | uniq -c | sort -rn` gives you the most-requested URLs with 200 status.
+    `grep` filters rows. `sed` transforms content. `awk` selects columns and computes.
+
+- title: "grep/awk/sed Mental Model"
+  difficulty: "easy"
+  tags: ["linux", "grep", "awk", "sed", "text processing"]
+  lesson: linux-essential-commands
+  Front: |
+    What is the mental model for when to use `grep`, `sed`, and `awk`?
+  Back: |
+    - **`grep`** — filters rows (does this line match the pattern?)
+    - **`sed`** — transforms content (replace/delete text in each line)
+    - **`awk`** — selects columns and computes (extract field 3, sum values)
+
+    They compose naturally: `grep "200" access.log | awk '{print $7}' | sort | uniq -c | sort -rn`
+
+- title: "find vs grep"
+  difficulty: "easy"
+  tags: ["linux", "find", "grep"]
+  lesson: linux-essential-commands
+  Front: |
+    When do you use `find` vs `grep`?
+  Back: |
+    - **`find`** — search the filesystem by **metadata**: name, type, size, modification date. Answers: "where is the file?"
+    - **`grep`** — search file **contents** for a pattern. Answers: "which files contain this text?"
+
+    ```bash
+    find /etc -name "*.conf"          # locate config files by name
+    grep -r "database_host" /etc/     # find files containing a string
+    ```
+
+- title: "ps and top"
+  difficulty: "easy"
+  tags: ["linux", "ps", "top", "processes"]
+  lesson: linux-essential-commands
+  Front: |
+    What does `ps aux` show, and how does it differ from `top`?
+  Back: |
+    `ps aux` -- a **static snapshot** of all running processes. Shows PID, %CPU, %MEM, state, and command. Use for scripting or when you need a stable list to grep through.
+
+    `top` -- a **live, updating** view of processes sorted by CPU usage. Press `q` to quit, `M` to sort by memory, `k` to kill a process. `htop` is a friendlier alternative.
+
+- title: "df vs du"
+  difficulty: "medium"
+  tags: ["linux", "df", "du", "disk usage"]
+  lesson: linux-essential-commands
+  Front: |
+    What is the difference between `df` and `du`?
+  Back: |
+    - **`df -h`** — shows disk usage per **mounted filesystem** (is the disk full?). Filesystem-level view.
+    - **`du -sh /path/`** — shows disk usage of a **directory tree** (what is consuming the space?). File-level view.
+
+    Workflow: `df -h` to identify the full filesystem, then `du -sh /var/* | sort -rh` to find what's using it.
+
+- title: "curl Basics"
+  difficulty: "easy"
+  tags: ["linux", "curl", "networking", "HTTP"]
+  lesson: linux-essential-commands
+  Front: |
+    What is `curl` used for, and what flag shows you request and response headers?
+  Back: |
+    Transfers data to/from URLs. The go-to tool for HTTP API testing and debugging.
+
+    ```bash
+    curl https://api.example.com/health          # GET request
+    curl -X POST -H "Content-Type: application/json" \
+         -d '{"key": "val"}' https://api.example.com/
+    curl -I https://example.com                  # headers only (HEAD request)
+    curl -v https://example.com                  # verbose: all headers
+    ```
+
+    Use `-v` to debug; it shows the full request and response including TLS handshake.
+
+- title: "ss Command"
+  difficulty: "medium"
+  tags: ["linux", "ss", "networking", "sockets"]
+  lesson: linux-essential-commands
+  Front: |
+    What does `ss -tlnp` show?
+  Back: |
+    All TCP sockets in listening state, with port numbers and the process using them.
+
+    - `-t` — TCP sockets only
+    - `-l` — listening sockets only
+    - `-n` — numeric (show port numbers, not service names)
+    - `-p` — show the process name and PID
+
+    Use this to check what is listening on a port, or to confirm a service started successfully.
+
+- title: "free Command"
+  difficulty: "easy"
+  tags: ["linux", "free", "memory"]
+  lesson: linux-essential-commands
+  Front: |
+    What does `free -h` show, and what does the "available" column mean?
+  Back: |
+    Shows RAM and swap usage in human-readable units. The columns:
+    - **total** — physical RAM installed
+    - **used** — memory in use
+    - **free** — unused and unallocated
+    - **available** — memory that can be given to new processes without swapping (includes reclaimable cache)
+
+    The "available" column is more useful than "free" -- the kernel uses idle RAM for disk caching, so "free" appears low even on a healthy system.
+
+# =============================================================================
+# Lesson 6: Job Control and Scheduling (8 cards)
+# =============================================================================
+
+- title: "Background Job with &"
+  difficulty: "easy"
+  tags: ["linux", "job control", "background"]
+  lesson: linux-job-scheduling
+  Front: |
+    What does adding `&` to a command do?
+  Back: |
+    Runs the command as a background job. The shell returns the prompt immediately; the command continues running concurrently. The shell prints `[1] 12345` (job number, PID).
+
+    stdout/stderr remain connected to the terminal unless redirected:
+    ```bash
+    long-task > output.log 2>&1 &
+    ```
+
+- title: "fg, bg, jobs Commands"
+  difficulty: "easy"
+  tags: ["linux", "job control", "fg", "bg", "jobs"]
+  lesson: linux-job-scheduling
+  Front: |
+    What do `fg`, `bg`, and `jobs` do?
+  Back: |
+    - **`jobs`** — list all background and stopped jobs in the current shell session (with job numbers)
+    - **`fg`** or **`fg %2`** — bring a background/stopped job to the foreground
+    - **`bg`** or **`bg %2`** — resume a stopped job in the background
+
+    Job numbers (`%1`, `%2`) are shell-local; they differ from PIDs.
+
+- title: "Ctrl+Z Behavior"
+  difficulty: "easy"
+  tags: ["linux", "job control", "signals", "SIGTSTP"]
+  lesson: linux-job-scheduling
+  Front: |
+    What does **Ctrl+Z** do, and how do you resume the process afterward?
+  Back: |
+    Sends SIGTSTP to the foreground process, **suspending** it (state T -- stopped, not terminated). The shell regains the prompt and shows the job entry:
+
+    ```
+    [1]+  Stopped    python train.py
+    ```
+
+    Resume options:
+    - `fg` — resume in the foreground
+    - `bg` — resume in the background
+
+- title: "nohup"
+  difficulty: "medium"
+  tags: ["linux", "job control", "nohup", "SIGHUP"]
+  lesson: linux-job-scheduling
+  Front: |
+    What does `nohup` do, and why is it needed when running background jobs remotely?
+  Back: |
+    Runs a command with SIGHUP ignored. When a terminal closes, the shell sends SIGHUP to all its child processes (including `&` background jobs), which terminates them. `nohup` makes the process survive terminal close.
+
+    ```bash
+    nohup ./long-task.sh > output.log 2>&1 &
+    ```
+
+    For production, prefer systemd services -- they handle restarts and logging. Use `nohup` for one-off tasks.
+
+- title: "Crontab Field Order"
+  difficulty: "medium"
+  tags: ["linux", "cron", "scheduling"]
+  lesson: linux-job-scheduling
+  Front: |
+    What are the five time fields in a crontab entry, in order?
+  Back: |
+    ```
+    minute  hour  day-of-month  month  day-of-week
+     0-59   0-23     1-31       1-12     0-7
+    ```
+
+    Special values: `*` (any), `*/n` (every n), `1,15` (list), `1-5` (range). Example: `0 3 * * 1-5` = 3:00 AM Monday through Friday.
+
+- title: "Reading a Crontab Entry"
+  difficulty: "medium"
+  tags: ["linux", "cron", "scheduling"]
+  lesson: linux-job-scheduling
+  Front: |
+    What does `*/15 * * * * /usr/bin/check.sh` mean?
+  Back: |
+    Runs `/usr/bin/check.sh` every 15 minutes, all day, every day.
+
+    `*/15` in the minute field means: when minute mod 15 equals 0 (i.e., at :00, :15, :30, :45 past every hour). The four `*` fields mean: any hour, any day of month, any month, any day of week.
+
+- title: "Cron PATH Gotcha"
+  difficulty: "medium"
+  tags: ["linux", "cron", "scheduling", "PATH"]
+  lesson: linux-job-scheduling
+  Front: |
+    A script works when run manually but fails silently when scheduled in cron. What is the most likely cause?
+  Back: |
+    **Minimal PATH environment.** Cron runs with a stripped-down PATH (typically `/usr/bin:/bin`). Commands installed to `/usr/local/bin`, `~/bin`, or custom paths are not found.
+
+    Fix: use absolute paths in cron commands, and redirect output explicitly:
+    ```bash
+    0 5 * * *  /home/alice/scripts/backup.sh >> /var/log/backup.log 2>&1
+    ```
+
+- title: "cron vs systemd Timers"
+  difficulty: "medium"
+  tags: ["linux", "cron", "systemd", "scheduling"]
+  lesson: linux-job-scheduling
+  Front: |
+    When should you use **cron** vs **systemd timers**?
+  Back: |
+    **cron:** Simple recurring commands, user-level tasks, quick scripts. Available everywhere; no daemon setup required beyond the cron daemon.
+
+    **systemd timers:** Better for service-level tasks because they provide:
+    - Logging via journald (no manual redirect needed)
+    - Dependency ordering (run after network is up)
+    - Catch-up on missed runs if the system was off
+    - `systemctl status` for monitoring
+
+    Use cron for simplicity; use systemd timers when you are already managing the system with systemd.

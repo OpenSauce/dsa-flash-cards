@@ -1,0 +1,56 @@
+title: "Processes and Signals"
+lesson_slug: "linux-processes"
+questions:
+  - question: "What is a zombie process?"
+    options:
+      - "A process consuming 100% CPU that cannot be killed"
+      - "A process running with elevated privileges after its original owner logged out"
+      - "A process that has exited but whose parent has not yet called wait() to collect its exit status"
+      - "A process stuck in disk-sleep state waiting for I/O that will never complete"
+    correct: 2
+    explanation: "A zombie process has already exited -- it is not consuming CPU or memory (except a process table entry). The kernel preserves the entry so the parent can retrieve the exit status via wait(). Once the parent calls wait(), the zombie is fully reaped. Many zombies indicate a parent that is not properly handling child exits."
+
+  - question: "What is the difference between SIGTERM and SIGKILL?"
+    options:
+      - "SIGTERM terminates the process tree; SIGKILL terminates only the process itself"
+      - "SIGTERM can be caught or ignored, allowing the process to clean up; SIGKILL cannot be caught, blocked, or ignored -- the kernel terminates immediately"
+      - "SIGTERM requires root privileges; SIGKILL can be sent by any user"
+      - "SIGTERM is for user processes; SIGKILL is only for kernel threads"
+    correct: 1
+    explanation: "SIGTERM (15) is the default kill signal. A process can install a handler to catch it, flush buffers, close connections, and exit gracefully. SIGKILL (9) bypasses all handlers -- the kernel terminates the process immediately with no cleanup. Always try SIGTERM first; escalate to SIGKILL only if the process is unresponsive."
+
+  - question: "A parent process exits before its children. What happens to the orphaned children?"
+    options:
+      - "They are immediately killed along with the parent"
+      - "They are paused until a new parent process is manually assigned"
+      - "They are re-parented to PID 1 (systemd/init), which calls wait() when they eventually exit"
+      - "They become zombie processes until the system reboots"
+    correct: 2
+    explanation: "The kernel automatically re-parents orphan processes to PID 1 (init or systemd). This ensures that when the orphan eventually exits, its exit status will be collected by a process that is always running and properly calls wait(). This is why background processes started in a shell continue running after you close the terminal."
+
+  - question: "What is the relationship between fork() and exec() when a shell runs a command?"
+    options:
+      - "fork() loads the new program into memory; exec() creates the child process"
+      - "fork() creates a copy of the shell process; exec() replaces the child's memory image with the new program"
+      - "fork() and exec() are the same system call -- they are two names for the same operation"
+      - "exec() creates the child process; fork() then copies the parent's memory into it"
+    correct: 1
+    explanation: "fork() creates an exact copy of the calling process (the child starts as a clone of the shell). Then the child calls exec() to replace its own memory with the new program. The PID stays the same; the code, data, and stack are replaced. The shell (parent) then calls wait() for the child to finish."
+
+  - question: "Threads share an address space while processes have isolated address spaces. What is the main risk of this sharing?"
+    options:
+      - "Threads cannot communicate with each other without using sockets"
+      - "A bug in one thread can corrupt shared memory, potentially crashing all threads in the process"
+      - "Threads must run on the same CPU core, limiting parallelism"
+      - "Threads cannot access the filesystem because they share the parent's file descriptor table"
+    correct: 1
+    explanation: "Because all threads in a process share the same address space, a memory corruption bug in one thread (buffer overflow, use-after-free, etc.) can corrupt data structures used by other threads, causing the entire process to crash or behave incorrectly. In contrast, a crashing process cannot affect other processes' isolated memory."
+
+  - question: "What information is exposed in /proc/<pid>/ for a running process?"
+    options:
+      - "The process's compiled binary and source code"
+      - "Open file descriptors, memory maps, command line, and process status -- as readable files"
+      - "The process's network traffic history"
+      - "Performance counters and cache hit rates reported by the CPU"
+    correct: 1
+    explanation: "/proc/<pid>/ contains: fd/ (symlinks to all open file descriptors), maps (memory map showing loaded libraries), cmdline (the command that started the process), status (human-readable state, memory usage, PID/PPID), and environ (environment variables). Tools like ps, lsof, and strace read from /proc to gather process information."

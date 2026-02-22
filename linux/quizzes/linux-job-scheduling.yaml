@@ -1,0 +1,56 @@
+title: "Job Control and Scheduling"
+lesson_slug: "linux-job-scheduling"
+questions:
+  - question: "What does the crontab entry `*/15 * * * *` mean?"
+    options:
+      - "At 15:00 every day"
+      - "Every 15 hours"
+      - "Every 15 minutes"
+      - "On the 15th of every month"
+    correct: 2
+    explanation: "The five crontab fields are: minute, hour, day-of-month, month, day-of-week. */15 in the minute field means 'every 15 minutes' (i.e., when minute is 0, 15, 30, or 45). The remaining * values mean 'any.' So */15 * * * * runs at :00, :15, :30, and :45 past every hour, every day."
+
+  - question: "A command is running with `&` in the background. What happens when you close the terminal?"
+    options:
+      - "The process keeps running because & makes it immune to terminal close"
+      - "The shell sends SIGHUP to all its child processes, terminating the background job"
+      - "The process is paused and resumes when you open a new terminal"
+      - "The process is automatically moved to PID 1 as an orphan"
+    correct: 1
+    explanation: "When a terminal closes, the shell sends SIGHUP to all its child processes (including background jobs started with &). SIGHUP's default action is to terminate. Use nohup to run a command with SIGHUP ignored, so it survives terminal close. Alternatively, use a terminal multiplexer (tmux, screen) or a systemd service."
+
+  - question: "What are the five fields in a crontab entry, in order?"
+    options:
+      - "second, minute, hour, day, month"
+      - "minute, hour, day-of-month, month, day-of-week"
+      - "hour, minute, day-of-month, day-of-week, month"
+      - "month, day, hour, minute, second"
+    correct: 1
+    explanation: "Crontab fields (left to right): minute (0-59), hour (0-23), day-of-month (1-31), month (1-12), day-of-week (0-7, where both 0 and 7 are Sunday). Followed by the command. A common mnemonic: 'm h dom mon dow'. The fields support *, */n, ranges (1-5), and lists (1,15)."
+
+  - question: "A cron job works when you run it manually but fails silently when cron executes it. What is the most likely cause?"
+    options:
+      - "The cron daemon is not installed on this system"
+      - "Cron only runs jobs as root; regular user crontabs are ignored"
+      - "Cron runs with a minimal PATH -- commands not at absolute paths are not found; there is also no output unless explicitly redirected"
+      - "Cron requires the script to have the setuid bit set"
+    correct: 2
+    explanation: "Cron's environment has a very limited PATH (typically /usr/bin:/bin). Commands that work in your shell because they are in /usr/local/bin or ~/bin will not be found by cron. Always use absolute paths in cron commands. Also, cron sends stdout/stderr to the system mail by default; without explicit redirection, you never see the error. Add >> /path/to/logfile 2>&1 to capture output."
+
+  - question: "What does Ctrl+Z do to a foreground process?"
+    options:
+      - "It terminates the process immediately, same as SIGKILL"
+      - "It sends SIGTSTP, suspending (stopping) the process and returning control to the shell"
+      - "It moves the process to the background and it continues running"
+      - "It sends SIGINT, asking the process to exit gracefully"
+    correct: 1
+    explanation: "Ctrl+Z sends SIGTSTP (terminal stop) to the foreground process, which suspends it (state T -- stopped). The shell regains the prompt. The process is not terminated -- use fg to resume it in the foreground or bg to resume it in the background. Ctrl+C sends SIGINT (interrupt), which typically terminates the process."
+
+  - question: "When should you prefer systemd timers over cron?"
+    options:
+      - "Always -- systemd timers are strictly superior to cron in every situation"
+      - "When the task needs to run more frequently than once per minute"
+      - "When you need logging via journald, dependency ordering, or catch-up on missed runs after downtime"
+      - "When the task needs to run as a specific user other than root"
+    correct: 2
+    explanation: "systemd timers integrate with journald for structured logging (no manual redirect needed), support dependency ordering (run after the network is up, after another service starts), and can catch up on missed runs if the system was down. Cron is simpler for basic recurring tasks and user-level schedules. For service-level tasks on modern systemd systems, timers are the better choice."

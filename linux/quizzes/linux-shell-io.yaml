@@ -1,0 +1,56 @@
+title: "Shell, Pipes, and I/O Redirection"
+lesson_slug: "linux-shell-io"
+questions:
+  - question: "What does `2>&1` do?"
+    options:
+      - "Redirects stdout to stderr"
+      - "Redirects stderr (FD 2) to wherever stdout (FD 1) is currently pointing"
+      - "Multiplies the output by sending it to two destinations simultaneously"
+      - "Closes file descriptor 2 and reassigns it to file descriptor 1"
+    correct: 1
+    explanation: "2>&1 means: take file descriptor 2 (stderr) and redirect it to the same destination as file descriptor 1 (stdout). The `&` indicates a file descriptor number, not a file named '1'. Order matters: `> file.txt 2>&1` redirects stdout to the file first, then points stderr at stdout's new destination (the file)."
+
+  - question: "What is the difference between `>` and `>>` in shell redirection?"
+    options:
+      - "> redirects stdout; >> redirects both stdout and stderr"
+      - "> creates a new file; >> is only valid if the file already exists"
+      - "> overwrites the file (or creates it); >> appends to the file (or creates it)"
+      - "> redirects to a file; >> redirects to a pipe"
+    correct: 2
+    explanation: "> truncates the destination file and writes from the beginning (overwriting any existing content). >> opens the file in append mode, adding output after any existing content. Both create the file if it does not exist. Use >> for log accumulation; use > when you want a fresh file each run."
+
+  - question: "A pipe (`|`) connects two commands. What exactly does it connect?"
+    options:
+      - "It connects stdout of the left command to stdin of the right command"
+      - "It connects both stdout and stderr of the left command to stdin of the right command"
+      - "It connects stdout of the left command to stderr of the right command"
+      - "It copies the left command's output to a file, then feeds that file to the right command"
+    correct: 0
+    explanation: "A pipe connects only stdout of the left command to stdin of the right command. stderr is not included -- error messages from the left command appear on the terminal and do not flow through the pipe. To pipe stderr as well, redirect stderr to stdout first: `command 2>&1 | next-command`."
+
+  - question: "What does the PATH environment variable control?"
+    options:
+      - "The directory where the shell stores temporary files"
+      - "The colon-separated list of directories the shell searches when looking for an executable by name"
+      - "The list of allowed commands a user can run"
+      - "The default working directory for new processes"
+    correct: 1
+    explanation: "When you type a command name, the shell searches each directory in PATH in order until it finds an executable with that name. If not found, you get 'command not found.' This is why installing a program to /usr/local/bin works without specifying the full path -- /usr/local/bin is in the default PATH."
+
+  - question: "Why does stderr (FD 2) exist as a separate stream from stdout (FD 1)?"
+    options:
+      - "For performance: the kernel handles them with different I/O schedulers"
+      - "So error messages can be separated from output data -- you can pipe stdout to another command without error messages contaminating the data stream"
+      - "For security: only root processes can write to stderr"
+      - "Because early Unix terminals had two physical output channels"
+    correct: 1
+    explanation: "Separate streams let you route output and errors independently. You can pipe a command's stdout to another program for processing while errors still appear on your terminal. Or redirect stdout to a file for machine parsing while logging errors separately. If errors mixed into stdout, piped programs would receive unexpected data and potentially produce wrong results."
+
+  - question: "What are file descriptors 0, 1, and 2?"
+    options:
+      - "Process ID, parent PID, and group ID"
+      - "stdin, stdout, and stderr -- the three standard streams every process starts with"
+      - "Read buffer, write buffer, and error buffer in the kernel I/O subsystem"
+      - "The first three files in the process's open file table, determined at random"
+    correct: 1
+    explanation: "Every process starts with three standard file descriptors: 0 (stdin -- where the process reads input), 1 (stdout -- where it writes normal output), and 2 (stderr -- where it writes error messages). These are integer handles; the shell sets them up before executing the program. Redirection changes where these file descriptors point."
