@@ -1,0 +1,47 @@
+title: "Trees and Traversals"
+lesson_slug: "ds-trees-and-traversals"
+questions:
+  - question: "What distinguishes a 'complete' binary tree from a 'full' binary tree?"
+    options:
+      - "A full tree has all levels filled; a complete tree allows gaps anywhere"
+      - "A complete tree fills every level left to right, with only the last level possibly incomplete. A full tree requires every node to have 0 or 2 children."
+      - "They mean the same thing"
+      - "A complete tree is always balanced; a full tree is never balanced"
+    correct: 1
+    explanation: "Complete means every level is filled except possibly the last, which must be filled from left to right (heaps use this). Full means every internal node has exactly two children -- no single-child nodes."
+
+  - question: "Which traversal produces sorted output when applied to a BST?"
+    options:
+      - "Pre-order (Root, Left, Right)"
+      - "Post-order (Left, Right, Root)"
+      - "In-order (Left, Root, Right)"
+      - "Level-order (BFS)"
+    correct: 2
+    explanation: "In-order visits the left subtree, then the node, then the right subtree. On a BST where left < node < right, this visits values in ascending order."
+
+  - question: "You need to safely delete all nodes in a binary tree (free children before parents). Which traversal order?"
+    options:
+      - "Pre-order -- process root first, then children"
+      - "In-order -- process nodes in sorted order"
+      - "Post-order -- process children before parent"
+      - "Level-order -- process by depth"
+    correct: 2
+    explanation: "Post-order visits both children before the parent. This guarantees that by the time you delete a node, its children are already freed -- no dangling references."
+
+  - question: "On a balanced binary tree with n nodes, which traversal method uses less space: DFS or BFS?"
+    options:
+      - "DFS uses O(log n) stack space; BFS uses O(n) queue space. DFS is better."
+      - "BFS uses O(log n) queue space; DFS uses O(n) stack space. BFS is better."
+      - "Both use O(n) space"
+      - "Both use O(log n) space"
+    correct: 0
+    explanation: "DFS uses O(h) space where h = O(log n) on a balanced tree. BFS uses O(w) where w is the maximum width. For a complete binary tree the last level has ~n/2 nodes, so BFS uses O(n). DFS is more space-efficient on balanced trees."
+
+  - question: "You need to find the minimum depth of a binary tree (shortest path from root to any leaf). Which traversal and why?"
+    options:
+      - "DFS post-order -- it processes leaves first"
+      - "DFS pre-order -- it finds the root first"
+      - "BFS level-order -- it finds the first leaf encountered, which is guaranteed to be at minimum depth"
+      - "In-order -- it processes nodes in sorted order, which maps to depth"
+    correct: 2
+    explanation: "BFS explores level by level. The first leaf it encounters is at the minimum depth. DFS would need to explore every path to find the shortest one. BFS guarantees the shortest path by construction."

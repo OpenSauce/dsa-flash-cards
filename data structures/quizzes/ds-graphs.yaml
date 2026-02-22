@@ -1,0 +1,56 @@
+title: "Graphs"
+lesson_slug: "ds-graphs"
+questions:
+  - question: "An adjacency list uses O(V + E) space. An adjacency matrix uses O(V^2). When is the matrix a better choice?"
+    options:
+      - "When the graph is sparse (few edges)"
+      - "When you need to frequently check whether a specific edge exists in a dense graph"
+      - "When you need to iterate over a vertex's neighbors quickly"
+      - "When memory is limited"
+    correct: 1
+    explanation: "An adjacency matrix gives O(1) edge lookup vs O(degree) for an adjacency list. When the graph is dense (E approaches V^2), the matrix wastes no space since most cells are filled. For sparse graphs, the list is more space-efficient."
+
+  - question: "BFS on an unweighted graph from source S visits node T at distance 3. Is 3 guaranteed to be the shortest path?"
+    options:
+      - "No -- BFS explores randomly and may miss shorter paths"
+      - "Yes -- BFS explores nodes in order of distance from the source"
+      - "Only if the graph has no cycles"
+      - "Only if the graph is a tree"
+    correct: 1
+    explanation: "BFS uses a queue (FIFO), which guarantees nodes are visited in order of their distance from the source. The first time BFS reaches a node, it has found the shortest path (in terms of edge count) to that node."
+
+  - question: "How do you detect a cycle in a directed graph using DFS?"
+    options:
+      - "Check if any vertex has more than one incoming edge"
+      - "Track vertices on the current DFS path. A cycle exists if you revisit a vertex that is still on the path (a back edge)."
+      - "Run BFS and check if any vertex is visited twice"
+      - "Count edges -- a cycle exists if E >= V"
+    correct: 1
+    explanation: "In a directed graph, a globally-visited vertex might be reached via a different path (no cycle). A cycle exists only when DFS encounters a vertex that is still on the current recursion path -- this is called a back edge."
+
+  - question: "What is a connected component in an undirected graph?"
+    options:
+      - "Any two vertices connected by a single edge"
+      - "A maximal set of vertices where every pair has a path between them"
+      - "A vertex with the highest degree"
+      - "A subgraph with no cycles"
+    correct: 1
+    explanation: "A connected component is a maximal connected subgraph: every vertex in the component is reachable from every other vertex, and no additional vertex outside the component is reachable. Find all components by running BFS/DFS from each unvisited vertex."
+
+  - question: "What is the time complexity of BFS or DFS on a graph represented as an adjacency list?"
+    options:
+      - "O(V) -- each vertex is visited once"
+      - "O(E) -- each edge is traversed once"
+      - "O(V + E) -- each vertex is visited once and each edge is examined once"
+      - "O(V * E) -- for each vertex, all edges are checked"
+    correct: 2
+    explanation: "Each vertex enters the queue/stack once (V operations). For each vertex, we iterate its adjacency list (total E entries across all lists). The combined work is O(V + E)."
+
+  - question: "You have a directed graph representing course prerequisites. You want to find a valid order to take all courses. Which algorithm?"
+    options:
+      - "BFS shortest path"
+      - "DFS cycle detection"
+      - "Topological sort (BFS with Kahn's algorithm or DFS with post-order)"
+      - "Dijkstra's algorithm"
+    correct: 2
+    explanation: "Topological sort produces a linear ordering of vertices such that for every directed edge u -> v, u appears before v. This directly solves prerequisite ordering. It only works on directed acyclic graphs (DAGs) -- if the graph has a cycle, no valid ordering exists."
