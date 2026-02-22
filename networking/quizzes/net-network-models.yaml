@@ -1,0 +1,56 @@
+title: "Network Models: OSI and TCP/IP"
+lesson_slug: net-network-models
+questions:
+  - question: "What are the four layers of the TCP/IP model, listed from lowest to highest?"
+    options:
+      - "Physical, Data Link, Network, Application"
+      - "Link, Internet, Transport, Application"
+      - "Network, Transport, Session, Application"
+      - "Link, Network, Transport, Presentation"
+    correct: 1
+    explanation: "The TCP/IP model has four layers from bottom to top: Link (physical transmission), Internet (IP routing), Transport (TCP/UDP), and Application (HTTP, DNS, etc.). This differs from the 7-layer OSI model, which splits these into finer pieces."
+
+  - question: "In system design conversations, what does 'Layer 3' typically refer to?"
+    options:
+      - "The transport layer, where TCP and UDP operate"
+      - "The application layer, where HTTP operates"
+      - "The network/IP layer, responsible for routing and addressing"
+      - "The data link layer, responsible for MAC addressing"
+    correct: 2
+    explanation: "OSI layer numbers are the convention in system design. Layer 3 is the Network layer, which corresponds to IP (routing, addressing). Layer 4 is Transport (TCP/UDP). Layer 7 is Application (HTTP, DNS). These OSI numbers are used even though the internet runs TCP/IP."
+
+  - question: "What is encapsulation in the context of network models?"
+    options:
+      - "Encrypting data before transmission"
+      - "Each layer wrapping the data from the layer above with its own header"
+      - "Combining multiple TCP streams into one connection"
+      - "Compressing packet payloads to reduce size"
+    correct: 1
+    explanation: "Encapsulation means each layer adds its own header as data travels down the stack. An HTTP request gets wrapped in a TCP header, then an IP header, then an Ethernet frame. The receiver unwraps in reverse. This layering allows each protocol to operate independently."
+
+  - question: "What is the OSI layer that corresponds to TCP/IP's Transport layer?"
+    options:
+      - "OSI Layer 3 (Network)"
+      - "OSI Layer 4 (Transport)"
+      - "OSI Layer 5 (Session)"
+      - "OSI Layer 6 (Presentation)"
+    correct: 1
+    explanation: "OSI Layer 4 (Transport) maps directly to TCP/IP's Transport layer. Both are where TCP and UDP operate, handling end-to-end delivery between processes. The OSI model adds Session (Layer 5) and Presentation (Layer 6) above Transport, which TCP/IP folds into the Application layer."
+
+  - question: "What is the primary responsibility of the Internet layer in the TCP/IP model?"
+    options:
+      - "Establishing reliable connections between applications"
+      - "Defining how data is displayed and formatted"
+      - "Routing packets across networks using IP addresses"
+      - "Managing physical transmission of bits over a medium"
+    correct: 2
+    explanation: "The Internet layer (corresponding to OSI Layer 3) handles routing and logical addressing via IP. Each router makes an independent forwarding decision based on the destination IP address. This layer does not guarantee delivery or ordering -- that is TCP's responsibility at the Transport layer."
+
+  - question: "Why does layering in network models matter for protocol design?"
+    options:
+      - "It ensures all protocols must use the same encryption scheme"
+      - "It forces all traffic through a single bottleneck for easier monitoring"
+      - "Each layer has a defined interface and can evolve independently of other layers"
+      - "It eliminates the need for routing decisions at intermediate nodes"
+    correct: 2
+    explanation: "Layering enforces separation of concerns. HTTP does not need to know whether it runs over fiber or Wi-Fi. New physical media can be added at Layer 1-2 without changing Layer 4-7 protocols. This modularity is why the internet's underlying transport can evolve (TCP → QUIC) without breaking application protocols."

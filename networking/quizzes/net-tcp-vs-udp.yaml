@@ -1,0 +1,56 @@
+title: "TCP vs UDP"
+lesson_slug: net-tcp-vs-udp
+questions:
+  - question: "What does the TCP three-way handshake (SYN, SYN-ACK, ACK) achieve?"
+    options:
+      - "It encrypts the connection using TLS before data flows"
+      - "Both sides synchronize initial sequence numbers so they can track sent and received bytes"
+      - "The server authenticates the client's identity before accepting data"
+      - "It negotiates the maximum packet size (MTU) for the connection"
+    correct: 1
+    explanation: "The three-way handshake synchronizes sequence numbers between client and server. Both sides pick a random initial sequence number and confirm the other side received it. This lets TCP track which bytes have been sent and received, enabling ordered delivery and retransmission of lost segments."
+
+  - question: "Why does TCP use random initial sequence numbers rather than starting at zero?"
+    options:
+      - "Random numbers compress better over the wire"
+      - "To prevent attackers from predicting sequence numbers and forging packets (TCP hijacking)"
+      - "The OS requires randomness to allocate memory for connection state"
+      - "To ensure no two connections use the same sequence numbers simultaneously"
+    correct: 1
+    explanation: "Predictable sequence numbers allow attackers to forge packets and inject data into an existing connection -- a TCP sequence prediction attack. Random initial sequence numbers also prevent confusion with delayed packets from a previous connection on the same port that might arrive after the new connection is established."
+
+  - question: "Which protocol is connectionless?"
+    options:
+      - "TCP, because it does not maintain application state"
+      - "UDP, because it sends packets with no prior handshake or connection setup"
+      - "Both TCP and UDP are connectionless at the IP layer"
+      - "Neither -- all transport protocols require a connection"
+    correct: 1
+    explanation: "UDP is connectionless. It sends datagrams directly to the destination address with no handshake, no connection state, and no confirmation of delivery. TCP is connection-oriented -- it requires the three-way handshake to establish connection state before data can flow."
+
+  - question: "What is head-of-line blocking in TCP, and why does it matter for HTTP/2?"
+    options:
+      - "A TCP bug where the first packet in a connection is always dropped and retransmitted"
+      - "A lost TCP segment stalls all data behind it until retransmitted, blocking all HTTP/2 streams on that connection"
+      - "HTTP/2 requests are queued behind each other because the server processes them sequentially"
+      - "The browser's request queue that limits concurrent fetches to 6 per domain"
+    correct: 1
+    explanation: "TCP's byte stream is ordered. If segment N is lost, all subsequent segments wait in the receive buffer until N is retransmitted. HTTP/2 multiplexes many streams over one TCP connection -- so a single lost packet stalls every stream, not just the one that had the loss. HTTP/3 (QUIC/UDP) was built specifically to solve this."
+
+  - question: "When is UDP preferred over TCP?"
+    options:
+      - "When the application needs guaranteed delivery and ordering"
+      - "When the application connects to a database that requires transaction integrity"
+      - "When low latency matters more than completeness, such as video streaming or online gaming"
+      - "When the payload is large and needs fragmentation across many packets"
+    correct: 2
+    explanation: "UDP is preferred when occasional data loss is acceptable and latency is critical. Video streaming can skip a dropped frame rather than wait for retransmission. Online gaming position updates are made stale by the next update anyway. DNS uses UDP because the overhead of a TCP handshake is disproportionate to a single-question/answer exchange."
+
+  - question: "What does TCP flow control prevent?"
+    options:
+      - "An attacker from sending more data than the receiver can verify"
+      - "Network congestion from overwhelming routers between sender and receiver"
+      - "A fast sender from overwhelming a slow receiver's buffer"
+      - "Duplicate packets from reaching the receiver out of order"
+    correct: 2
+    explanation: "Flow control protects the receiver. The receiver advertises a window size (how much data it can buffer). The sender never sends more than this window without receiving ACKs. Congestion control, by contrast, protects the network -- it limits the sender's rate based on network conditions (packet loss, latency) rather than the receiver's buffer capacity."
