@@ -1,0 +1,56 @@
+title: "Message Queues and Async Processing"
+lesson_slug: "sd-message-queues"
+questions:
+  - question: "When should you use asynchronous communication instead of a synchronous request-response call?"
+    options:
+      - "Whenever the two services are written in different programming languages"
+      - "When the caller does not need an immediate result, or processing takes too long to block the user"
+      - "Only when there are more than 100 requests per second"
+      - "When the downstream service is in a different data center"
+    correct: 1
+    explanation: "Use async when the caller can proceed without the result: sending an email, resizing an image, generating a report. Use sync when the user needs the answer before the next step (e.g., checking if a username is available before creating an account). Adding a queue when sync suffices adds complexity and failure modes without benefit."
+
+  - question: "What is a dead letter queue (DLQ) and what problem does it solve?"
+    options:
+      - "A queue for messages that have not yet been processed"
+      - "A separate queue that receives messages that fail processing after maximum retry attempts, preventing them from blocking the main queue"
+      - "A queue for archiving successfully processed messages"
+      - "A backup queue used when the primary queue is full"
+    correct: 1
+    explanation: "Without a DLQ, a poison message (malformed data or a bug that crashes the consumer) causes infinite retries. It blocks the queue and prevents healthy messages from being processed. A DLQ isolates poison messages after N failures. The main queue continues; engineers inspect the DLQ to diagnose and fix the root cause."
+
+  - question: "What must a consumer implement to safely use at-least-once delivery?"
+    options:
+      - "A circuit breaker to stop processing after too many failures"
+      - "Idempotency -- processing the same message twice must produce the same result as processing it once"
+      - "A DLQ to handle duplicate messages"
+      - "Exactly-once semantics at the broker level"
+    correct: 1
+    explanation: "At-least-once delivery guarantees no message is lost, but the broker may redeliver if the consumer crashes after processing but before acknowledging. The consumer may process the same message multiple times. Idempotency is the required countermeasure: track a unique message ID and skip duplicates, or design the operation so repeating it has no additional effect."
+
+  - question: "When is pub/sub messaging preferable to point-to-point queuing?"
+    options:
+      - "When a single consumer needs to process each message exactly once"
+      - "When multiple independent systems need to react to the same event simultaneously"
+      - "When message ordering must be guaranteed"
+      - "When messages are too large for a single queue"
+    correct: 1
+    explanation: "Pub/sub broadcasts each message to all subscribers. It is ideal for fanout: user signup triggers welcome email service AND analytics service AND fraud detection -- all receive the same event. Point-to-point is for work distribution: each message represents one task that should be done exactly once by one of N competing consumers."
+
+  - question: "What does backpressure mean in the context of a message queue?"
+    options:
+      - "The pressure on consumers to process messages faster"
+      - "A mechanism by which a slow consumer signals the producer to slow down, preventing queue overflow"
+      - "The latency added by serializing messages to disk"
+      - "Retrying failed messages back into the queue"
+    correct: 1
+    explanation: "When consumers are slower than producers, messages accumulate. Backpressure is the signal or mechanism that tells producers to slow down before the queue overflows and messages are dropped. Without it, an overwhelmed system degrades unpredictably. Explicit: producers check queue depth. Implicit: the producer's send call blocks when the queue is full."
+
+  - question: "What is the primary use case difference between Kafka and RabbitMQ?"
+    options:
+      - "Kafka is for small messages; RabbitMQ is for large binary payloads"
+      - "Kafka is a durable, replayable log for event streaming; RabbitMQ is a traditional broker for task queues that deletes messages after acknowledgment"
+      - "Kafka supports pub/sub; RabbitMQ only supports point-to-point"
+      - "Kafka is for cloud deployments; RabbitMQ is for on-premises"
+    correct: 1
+    explanation: "Kafka retains messages on disk for a configurable period and lets consumers replay from any offset. This makes it ideal for event streaming, audit logs, and data pipelines. RabbitMQ deletes messages after acknowledgment -- it is a traditional broker optimized for work distribution and complex routing. Choose Kafka when you need replay; choose RabbitMQ when you need flexible routing and task-queue semantics."

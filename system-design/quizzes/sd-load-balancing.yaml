@@ -1,0 +1,56 @@
+title: "Load Balancing"
+lesson_slug: "sd-load-balancing"
+questions:
+  - question: "When does round-robin load balancing break down?"
+    options:
+      - "When there are more than 10 backend servers"
+      - "When servers have unequal capacity or requests have wildly different costs"
+      - "When the load balancer uses HTTP instead of TCP"
+      - "When backend servers are in different data centers"
+    correct: 1
+    explanation: "Round-robin distributes requests equally regardless of server capacity or request cost. A slow reporting query gets the same weight as a fast health check. A 2-core machine gets the same share as a 16-core machine. Weighted round robin and least connections address these shortcomings."
+
+  - question: "What is the key difference between L4 and L7 load balancing?"
+    options:
+      - "L4 is faster but only works with UDP; L7 works with TCP"
+      - "L4 routes by IP and port only; L7 can route by URL path, headers, and cookies"
+      - "L4 is for internal traffic; L7 is for external traffic"
+      - "L4 supports SSL termination; L7 does not"
+    correct: 1
+    explanation: "L4 (Transport layer) sees only TCP/UDP headers -- source/destination IP and port. It cannot inspect the payload. L7 (Application layer) parses the full HTTP request and can route based on URL path, headers, cookies, and request body. L7 also supports SSL termination because it can decrypt and inspect the content."
+
+  - question: "What do active health checks do, and how do they differ from passive health checks?"
+    options:
+      - "Active checks run during peak hours; passive checks run at night"
+      - "Active checks probe servers periodically; passive checks monitor error rates from real traffic"
+      - "Active checks require application code changes; passive checks are automatic"
+      - "Active checks restart failed servers; passive checks only log failures"
+    correct: 1
+    explanation: "Active health checks: the load balancer periodically sends probes (HTTP GET /health, TCP connect) to each server. Faster detection of full outages. Passive health checks: the load balancer monitors real request error rates -- if too many 5xx errors, the server is pulled. No extra probe traffic, but detection is slower. Production setups use both."
+
+  - question: "Why are sticky sessions (session affinity) a problem in load-balanced systems?"
+    options:
+      - "They require a special cookie library"
+      - "They are too slow for high-traffic applications"
+      - "They cause uneven load distribution and lose session state if that server fails"
+      - "They only work with L4 load balancers"
+    correct: 2
+    explanation: "Sticky sessions bind a user to one server. A server handling a popular session gets disproportionate load. Worse, if that server goes down, the session state it holds is lost -- there is no failover. The production-grade solution is to externalize session state to Redis or a database, making all servers stateless and interchangeable."
+
+  - question: "Which load balancing algorithm adapts to real-time differences in request processing time?"
+    options:
+      - "Round robin"
+      - "Weighted round robin"
+      - "Least connections"
+      - "IP hash"
+    correct: 2
+    explanation: "Least connections routes each new request to the server with the fewest active connections. Fast servers finish requests sooner, freeing connection slots, so they naturally receive more traffic. This adapts to both server capacity differences and request duration differences -- unlike round robin, which ignores both."
+
+  - question: "What does SSL termination at the load balancer mean?"
+    options:
+      - "The load balancer blocks all SSL traffic"
+      - "SSL certificates are managed by each backend server independently"
+      - "The load balancer decrypts HTTPS, inspects the request, and forwards plain HTTP to backends"
+      - "The load balancer upgrades HTTP connections to HTTPS before forwarding"
+    correct: 2
+    explanation: "SSL termination means the load balancer handles the TLS handshake and decryption. Backends receive plain HTTP. This centralizes certificate management, reduces CPU load on backends, and enables the load balancer to inspect request content (necessary for L7 routing, WAF rules, and authentication)."
