@@ -1,0 +1,56 @@
+title: "Stacks and Queues"
+lesson_slug: "ds-stacks-and-queues"
+questions:
+  - question: "A function calls itself recursively. Which data structure is the operating system using to manage these calls?"
+    options:
+      - "Queue -- calls are processed in FIFO order"
+      - "Stack -- the most recent call must return before earlier calls resume"
+      - "Heap -- calls are prioritized by depth"
+      - "Hash map -- calls are indexed by function name"
+    correct: 1
+    explanation: "The call stack is a LIFO structure. Each function call pushes a frame; returning pops it. The most recent call always completes first -- exactly stack semantics."
+
+  - question: "You want to check if a string of brackets like `({[]})` is balanced. Which data structure and why?"
+    options:
+      - "Queue -- process brackets in order of appearance"
+      - "Stack -- the most recently opened bracket must be closed first (LIFO)"
+      - "Array -- index each bracket by position"
+      - "Hash map -- map openers to their closers"
+    correct: 1
+    explanation: "Nested brackets follow LIFO order: the innermost bracket must close before outer ones. Push openers onto a stack; when a closer appears, check that it matches the top."
+
+  - question: "What is the hidden problem with implementing a queue as `q = q[1:]` in Go?"
+    options:
+      - "It reverses the queue order"
+      - "It is O(n) per dequeue because elements shift"
+      - "The backing array is never freed, causing a memory leak over many dequeues"
+      - "It panics on empty queues"
+    correct: 2
+    explanation: "Reslicing advances the slice header without releasing the underlying array. Old elements are unreachable but not garbage-collected. Over time, the backing array grows unboundedly. Fix: use a ring buffer or linked list."
+
+  - question: "You implement a queue using two stacks. What is the amortized time complexity per operation?"
+    options:
+      - "O(n) -- every dequeue transfers all elements"
+      - "O(1) -- each element is transferred from 'in' to 'out' at most once"
+      - "O(log n) -- elements are split between the stacks like a balanced tree"
+      - "O(n^2) -- elements may be transferred back and forth"
+    correct: 1
+    explanation: "Each element enters the 'in' stack once and is transferred to the 'out' stack at most once. Even though a single dequeue can be O(n) when 'out' is empty, that cost is spread across the n preceding pushes."
+
+  - question: "What happens if you replace the queue with a stack in a BFS algorithm?"
+    options:
+      - "Nothing changes -- both explore all nodes"
+      - "The algorithm becomes DFS -- it explores one branch deeply before backtracking"
+      - "The algorithm explores nodes in reverse order"
+      - "The algorithm skips nodes at odd depths"
+    correct: 1
+    explanation: "A queue processes the oldest frontier node first (breadth). A stack processes the newest (depth). Swapping the data structure fundamentally changes the exploration order from BFS to DFS."
+
+  - question: "Which data structure supports push and pop at BOTH ends in O(1)?"
+    options:
+      - "Stack"
+      - "Queue"
+      - "Deque (double-ended queue)"
+      - "Priority queue"
+    correct: 2
+    explanation: "A deque supports O(1) push and pop at both the front and back. It generalizes both stacks (use one end) and queues (push at one end, pop at the other)."

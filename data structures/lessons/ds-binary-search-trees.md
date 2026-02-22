@@ -1,7 +1,8 @@
 ---
 title: "Binary Search Trees"
-order: 1
+order: 6
 summary: "BST properties and invariants, core operations (search, insert, delete), why balance matters, and when to reach for a BST over other data structures."
+reading_time_minutes: 5
 ---
 
 ## Why This Matters

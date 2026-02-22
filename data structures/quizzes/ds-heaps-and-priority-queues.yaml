@@ -1,0 +1,47 @@
+title: "Heaps and Priority Queues"
+lesson_slug: "ds-heaps-and-priority-queues"
+questions:
+  - question: "In a min-heap stored as an array, what are the indices of the children of the node at index i?"
+    options:
+      - "i+1 and i+2"
+      - "2i and 2i+1"
+      - "2i+1 and 2i+2"
+      - "i/2 and i/2+1"
+    correct: 2
+    explanation: "For a 0-indexed array, the left child is at 2i+1 and the right child is at 2i+2. The parent of node i is at (i-1)/2. This arithmetic works because the heap is a complete binary tree with no gaps."
+
+  - question: "You want to build a heap from an unsorted array of n elements. What is the optimal time complexity?"
+    options:
+      - "O(n log n) -- insert each element one by one"
+      - "O(n) -- sift down from the last non-leaf node to the root"
+      - "O(n^2) -- compare every pair of elements"
+      - "O(log n) -- only the root needs to be fixed"
+    correct: 1
+    explanation: "Heapify starts at the last non-leaf node and sifts down. Leaf nodes (half the array) need no work. Nodes near the bottom sift down 1 level; only the root sifts down log n levels. The total work sums to O(n), not O(n log n)."
+
+  - question: "You need the 10 largest elements from a stream of 1 million numbers. Which heap type and size?"
+    options:
+      - "Max-heap of size 1 million"
+      - "Min-heap of size 10 -- replace the root when a larger element arrives"
+      - "Max-heap of size 10 -- always keep the largest at the root"
+      - "Min-heap of size 1 million"
+    correct: 1
+    explanation: "Maintain a min-heap of size 10. The root is the smallest of your top-10 candidates. When a new number exceeds the root, replace the root and sift down. Time: O(n log k). A min-heap lets you quickly discard the weakest candidate."
+
+  - question: "What is the time complexity of extracting the minimum from a min-heap?"
+    options:
+      - "O(1) -- the minimum is always at the root"
+      - "O(n) -- must search the entire array"
+      - "O(log n) -- replace root with last element and sift down"
+      - "O(n log n) -- must re-sort the array"
+    correct: 2
+    explanation: "Peeking is O(1), but extracting removes the root. The last element replaces the root, then sifts down through at most log n levels to restore the heap property."
+
+  - question: "Why can a heap be stored in an array without pointers?"
+    options:
+      - "Heap elements are always sorted"
+      - "Heaps are always complete binary trees, so there are no gaps in the array representation"
+      - "Heaps never have more than 10 elements"
+      - "The heap property eliminates the need for child references"
+    correct: 1
+    explanation: "Completeness means every level is filled left to right. This guarantees a compact array representation with no wasted slots. Parent-child relationships are computed via index arithmetic (2i+1, 2i+2, (i-1)/2) instead of pointers."

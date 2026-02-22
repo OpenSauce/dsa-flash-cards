@@ -1,0 +1,47 @@
+title: "Arrays and Strings"
+lesson_slug: "ds-arrays-and-strings"
+questions:
+  - question: "Why is array access by index O(1)?"
+    options:
+      - "The array is sorted, so binary search finds the element instantly"
+      - "Elements are stored contiguously, so the address is computed directly as base + index * element_size"
+      - "The CPU caches all array elements on first access"
+      - "Arrays use a hash function to map indices to memory locations"
+    correct: 1
+    explanation: "Contiguous memory layout means the CPU calculates the exact memory address of any element with simple arithmetic -- no traversal needed."
+
+  - question: "You insert an element at the beginning of an array with n elements. What is the time complexity and why?"
+    options:
+      - "O(1) -- the element is placed at the start directly"
+      - "O(log n) -- binary search finds the insertion point"
+      - "O(n) -- every existing element must shift one position to make room"
+      - "O(n^2) -- each shift requires copying the entire array"
+    correct: 2
+    explanation: "Inserting at position 0 requires shifting all n elements one position to the right, making it O(n)."
+
+  - question: "A dynamic array doubles its capacity when full. You append n elements one by one. What is the amortized cost per append?"
+    options:
+      - "O(n) -- each resize copies all elements"
+      - "O(log n) -- doubling happens log n times"
+      - "O(1) -- the O(n) copy cost is spread over the n cheap appends between resizes"
+      - "O(n log n) -- each of the log n resizes costs O(n)"
+    correct: 2
+    explanation: "After doubling from capacity k to 2k, the next resize won't happen until k more appends. The total copy work across all resizes sums to about 2n, so the amortized cost per append is O(1)."
+
+  - question: "You concatenate strings in a loop: `result += s` for n iterations, where each string has length m. What is the total time complexity?"
+    options:
+      - "O(n) -- each concatenation is O(1)"
+      - "O(n * m) -- each concatenation copies m characters"
+      - "O(n^2 * m) -- each concatenation copies the entire accumulated string plus the new one"
+      - "O(m) -- only the final string matters"
+    correct: 2
+    explanation: "In languages with immutable strings, each concatenation creates a new string by copying the entire accumulated result. After i iterations, the result has length i*m, so the i-th copy costs O(i*m). Summing over all iterations gives O(n^2 * m). Use a string builder to avoid this."
+
+  - question: "When does an array beat a linked list?"
+    options:
+      - "When you need O(1) insertion at the head"
+      - "When memory is fragmented and cache locality doesn't matter"
+      - "When you need fast random access by index and will iterate sequentially"
+      - "When you frequently insert and delete from the middle"
+    correct: 2
+    explanation: "Arrays provide O(1) index access and excellent cache locality for sequential iteration. Linked lists win on head insertion (O(1) vs O(n)) but lose on access and cache performance."

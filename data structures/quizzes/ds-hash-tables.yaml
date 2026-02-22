@@ -1,0 +1,47 @@
+title: "Hash Tables"
+lesson_slug: "ds-hash-tables"
+questions:
+  - question: "What does a hash function do in the context of a hash table?"
+    options:
+      - "It sorts the keys before storing them"
+      - "It encrypts the keys for security"
+      - "It converts a key into an integer, which is mapped to a bucket index"
+      - "It compresses the values to save memory"
+    correct: 2
+    explanation: "A hash function converts an arbitrary key into an integer. The table maps this to a bucket index (typically via modulo). This mapping is what enables O(1) average-case access."
+
+  - question: "Two different keys map to the same bucket. What is this called, and what are the two main strategies for handling it?"
+    options:
+      - "A deadlock, resolved by retrying or timeout"
+      - "A collision, resolved by chaining (linked list per bucket) or open addressing (probing for empty slots)"
+      - "A hash overflow, resolved by increasing the hash function's output size"
+      - "A race condition, resolved by locking the bucket"
+    correct: 1
+    explanation: "A collision occurs when two keys hash to the same bucket index. Chaining stores multiple key-value pairs in a list at that bucket. Open addressing searches for the next available slot in the array."
+
+  - question: "The load factor of a hash table is 0.9. What does this mean and what should happen?"
+    options:
+      - "90% of keys have been deleted -- compact the table"
+      - "The hash function has a 90% collision rate -- switch functions"
+      - "90% of buckets are occupied -- rehash to a larger array to reduce collisions"
+      - "90% of lookups miss the cache -- no action needed"
+    correct: 2
+    explanation: "Load factor = n / num_buckets. At 0.9, the table is nearly full, which makes collisions frequent and operations slow. Rehashing (doubling the array and reinserting all keys) restores performance. The typical threshold is 0.7-0.75."
+
+  - question: "What is the relationship between a hash map and a hash set?"
+    options:
+      - "A hash set stores key-value pairs; a hash map stores only keys"
+      - "A hash set is a hash map where every value is effectively 'true' -- it stores keys only for membership testing"
+      - "A hash set maintains sorted order; a hash map does not"
+      - "They are completely different data structures with different implementations"
+    correct: 1
+    explanation: "A hash set is a hash map without values. It uses the same hash function, buckets, and collision resolution. The only operation difference: a set answers 'is this element present?' while a map answers 'what value is associated with this key?'"
+
+  - question: "When should you use a BST instead of a hash table?"
+    options:
+      - "When you need O(1) average-case lookup"
+      - "When you need sorted traversal, range queries, or guaranteed worst-case performance"
+      - "When you need to store more elements than a hash table can handle"
+      - "When your keys are integers rather than strings"
+    correct: 1
+    explanation: "Hash tables cannot provide sorted iteration or efficient range queries. A balanced BST gives O(log n) guaranteed operations with in-order traversal and range support. Use a hash table when ordering doesn't matter and you want raw speed."
