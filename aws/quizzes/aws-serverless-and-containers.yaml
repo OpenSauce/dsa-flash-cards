@@ -1,0 +1,56 @@
+title: "Serverless and Containers"
+lesson_slug: "aws-serverless-and-containers"
+questions:
+  - question: "What causes a Lambda cold start?"
+    options:
+      - "The Lambda function has a bug that crashes it on the first invocation"
+      - "Lambda must create a new execution environment: download the package, start the runtime, and run initialization code"
+      - "The function's memory limit is set too low, causing it to restart"
+      - "Lambda cold starts occur when the function has not been invoked in over 24 hours"
+    correct: 1
+    explanation: "A cold start happens when Lambda must create a fresh execution environment from scratch: downloading the deployment package, starting the runtime (Node.js, Python, Java, etc.), and executing initialization code outside the handler. Once the environment is warm, subsequent invocations reuse it with no startup overhead."
+
+  - question: "What is the maximum execution duration for a single Lambda invocation?"
+    options:
+      - "5 minutes"
+      - "30 minutes"
+      - "15 minutes"
+      - "60 minutes"
+    correct: 2
+    explanation: "Lambda has a hard maximum of 15 minutes per invocation. If your function needs to run longer than 15 minutes, it is not a fit for Lambda -- use ECS/Fargate or EC2 instead."
+
+  - question: "What is the difference between ECS on EC2 and ECS on Fargate?"
+    options:
+      - "ECS on EC2 runs containers in a VPC; Fargate runs containers outside any VPC"
+      - "ECS on EC2 requires you to manage the EC2 host fleet; Fargate runs containers without any host infrastructure to manage"
+      - "ECS on EC2 supports Docker containers; Fargate only supports proprietary AWS container images"
+      - "They are identical -- the launch type only affects billing"
+    correct: 1
+    explanation: "With ECS on EC2, you provision and manage the EC2 instances that host your containers -- patching, scaling, and capacity planning. With Fargate, you define the container (CPU, memory, image) and AWS runs it without any EC2 host infrastructure for you to manage. Fargate is serverless containers."
+
+  - question: "A web service receives 3 requests per day on average but must respond within 200ms. Which compute option is the worst fit?"
+    options:
+      - "EC2 with an always-on instance"
+      - "Lambda with Provisioned Concurrency"
+      - "Lambda without Provisioned Concurrency"
+      - "ECS Fargate with a always-running task"
+    correct: 2
+    explanation: "Standard Lambda without Provisioned Concurrency has cold starts -- the first invocation after a period of inactivity creates a new environment, adding 100ms–10s of latency. For a low-frequency, latency-sensitive service, cold starts will frequently breach the 200ms target. Provisioned Concurrency, EC2, or Fargate keep compute always warm."
+
+  - question: "What is the trade-off of using Provisioned Concurrency in Lambda?"
+    options:
+      - "Provisioned Concurrency makes functions slower because they skip initialization"
+      - "You pay for the provisioned environments even when they are idle, adding cost when traffic is low"
+      - "Provisioned Concurrency only works with Java and .NET runtimes"
+      - "Enabling Provisioned Concurrency disables Lambda's auto-scaling"
+    correct: 1
+    explanation: "Provisioned Concurrency pre-warms execution environments so they are always ready, eliminating cold starts for that capacity. The cost is that you pay per provisioned environment per hour regardless of traffic. This undermines Lambda's pay-per-invocation pricing advantage and is only worthwhile for latency-sensitive, consistently-loaded functions."
+
+  - question: "Which is the best fit for Lambda?"
+    options:
+      - "A long-running image processing job that can take up to 2 hours per image"
+      - "A stateful workflow that must track progress across multiple processing steps"
+      - "A webhook handler that validates a payload and writes a row to DynamoDB"
+      - "A database that must serve read queries with sub-millisecond latency"
+    correct: 2
+    explanation: "Lambda excels at short-lived, stateless, event-triggered functions. A webhook handler validates a payload and writes to DynamoDB -- stateless, event-triggered, sub-15-minute execution. Long-running jobs violate Lambda's 15-minute limit. Stateful workflows need external state management. Sub-millisecond DB latency is a database concern, not compute."

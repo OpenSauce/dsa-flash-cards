@@ -1,0 +1,56 @@
+title: "Compute Fundamentals"
+lesson_slug: "aws-compute-fundamentals"
+questions:
+  - question: "What does an EC2 instance type define?"
+    options:
+      - "The region and Availability Zone where the instance runs"
+      - "The operating system and pre-installed software"
+      - "The CPU, memory, storage, and networking capacity of the virtual machine"
+      - "The IAM permissions the instance has"
+    correct: 2
+    explanation: "An instance type defines the hardware profile: vCPU count, memory, storage options, and network bandwidth. The OS comes from the AMI. IAM permissions come from an instance profile. Region and AZ come from your launch configuration."
+
+  - question: "A batch processing job is CPU-bound and needs no special memory or storage. Which EC2 instance family is the best match?"
+    options:
+      - "r (memory optimized)"
+      - "c (compute optimized)"
+      - "i (storage optimized)"
+      - "t (general purpose burstable)"
+    correct: 1
+    explanation: "The 'c' (compute optimized) family has a high CPU-to-memory ratio, making it ideal for CPU-bound workloads like batch processing, video encoding, and scientific modeling. 'r' is memory-optimized, 'i' is storage-optimized, and 't' is burstable general-purpose."
+
+  - question: "What does an AMI (Amazon Machine Image) contain?"
+    options:
+      - "Runtime billing information for a running instance"
+      - "The VPC configuration and security group rules for an instance"
+      - "A snapshot of a root volume plus launch metadata, defining the OS and pre-installed software"
+      - "The Auto Scaling Group configuration for a fleet of instances"
+    correct: 2
+    explanation: "An AMI is a snapshot of a root volume plus launch metadata (block device mapping, architecture). It defines the OS, configuration, and any pre-installed software. When you launch an instance from an AMI, AWS creates a new volume from that snapshot."
+
+  - question: "What are the three components of an Auto Scaling Group?"
+    options:
+      - "Load balancer, target group, and health check"
+      - "Launch template, capacity settings (min/max/desired), and scaling policy"
+      - "AMI, instance type, and Availability Zone"
+      - "CloudWatch alarm, SNS topic, and Lambda function"
+    correct: 1
+    explanation: "An ASG has: a launch template (what to scale -- AMI, instance type, security groups), capacity settings (minimum, maximum, desired count), and a scaling policy (when to scale -- target tracking, step scaling, or scheduled). The load balancer is a separate component that the ASG registers with."
+
+  - question: "What is the difference between target tracking and step scaling policies?"
+    options:
+      - "Target tracking scales on a schedule; step scaling reacts to CloudWatch alarms"
+      - "Target tracking scales only EC2; step scaling works with any AWS resource"
+      - "Target tracking maintains a target metric value; step scaling adds capacity in discrete steps when thresholds are crossed"
+      - "They are the same -- 'target tracking' and 'step scaling' are two names for the same feature"
+    correct: 2
+    explanation: "Target tracking says 'keep average CPU at 60%' and the ASG adds or removes instances automatically to hit that target. Step scaling says 'add 2 instances when CPU > 70%, add 4 more when CPU > 90%' -- discrete steps triggered by threshold crossings."
+
+  - question: "What is the purpose of the cooldown period in an Auto Scaling Group?"
+    options:
+      - "It sets the maximum time an instance can run before being terminated"
+      - "It defines how long health checks wait before marking an instance unhealthy"
+      - "It prevents the ASG from repeatedly scaling in and out due to a fluctuating metric"
+      - "It pauses traffic to an instance so in-flight requests can complete before scale-in"
+    correct: 2
+    explanation: "The cooldown period (default 300 seconds) prevents thrashing. After a scaling action, the ASG waits before acting again. This gives the new instances time to start handling load before the metric is re-evaluated. Without it, a metric fluctuating around the threshold could trigger repeated add/remove cycles."
