@@ -1,0 +1,56 @@
+title: "TLS and HTTPS"
+lesson_slug: net-tls-and-https
+questions:
+  - question: "What is the key difference between symmetric and asymmetric encryption?"
+    options:
+      - "Symmetric uses public/private key pairs; asymmetric uses a single shared key"
+      - "Symmetric uses one shared key for both encryption and decryption; asymmetric uses a public/private key pair"
+      - "Symmetric is used for authentication; asymmetric is used for confidentiality"
+      - "Symmetric requires a certificate authority; asymmetric does not"
+    correct: 1
+    explanation: "Symmetric encryption (AES, ChaCha20) uses one shared key -- both parties need the same key to encrypt and decrypt. It is fast (gigabytes per second). Asymmetric encryption (RSA, ECDH) uses a public/private key pair: encrypt with the public key, decrypt with the private key. It is slow but solves key distribution -- the public key can be shared openly."
+
+  - question: "What does the TLS handshake establish between client and server?"
+    options:
+      - "A symmetric session key that will be used to encrypt all subsequent data"
+      - "A shared asymmetric key pair that both sides use for bulk encryption"
+      - "A certificate authority trust chain that authenticates both client and server"
+      - "A session token that replaces the need for authentication on subsequent connections"
+    correct: 0
+    explanation: "The TLS handshake's purpose is to establish a shared symmetric session key (typically AES). Asymmetric cryptography (ECDHE key exchange) is used during the handshake to agree on this key securely over an untrusted channel. Once the session key is established, all application data is encrypted with the fast symmetric cipher, not asymmetric encryption."
+
+  - question: "What three guarantees does HTTPS provide that plain HTTP does not?"
+    options:
+      - "Speed, reliability, and compression"
+      - "Anonymity, integrity, and performance"
+      - "Confidentiality, integrity, and authentication"
+      - "Authorization, non-repudiation, and availability"
+    correct: 2
+    explanation: "HTTPS (HTTP over TLS) provides: Confidentiality (traffic is encrypted, attackers see ciphertext), Integrity (a message authentication code detects any tampering in transit), and Authentication (the server's certificate, signed by a trusted CA, proves you are connected to the real server). These three properties are often summarized as CIA without availability."
+
+  - question: "Why is TLS 1.3 faster than TLS 1.2 for establishing a new connection?"
+    options:
+      - "TLS 1.3 uses faster encryption algorithms that reduce CPU time"
+      - "TLS 1.3 skips certificate verification for trusted domains"
+      - "TLS 1.3 completes the handshake in one round trip instead of two"
+      - "TLS 1.3 uses UDP instead of TCP for the handshake phase"
+    correct: 2
+    explanation: "TLS 1.2 required two round trips before application data could flow. TLS 1.3 reduced this to one: the client sends its key share immediately in the ClientHello, and the server responds with its key share, certificate, and Finished in a single message. This saves one full round-trip time (RTT), which matters especially over high-latency networks."
+
+  - question: "What is the role of a Certificate Authority (CA) in HTTPS?"
+    options:
+      - "It stores and manages the server's private key to prevent theft"
+      - "It routes HTTPS traffic between clients and servers"
+      - "It signs server certificates to verify that the certificate owner controls the claimed domain"
+      - "It generates the session keys used to encrypt HTTPS connections"
+    correct: 2
+    explanation: "A Certificate Authority (CA) is a trusted third party that verifies domain ownership and signs server certificates. When your browser connects to a server, it checks that the server's certificate is signed by a CA in its trust store (built-in set of ~130 trusted root CAs). This signature is what proves you are connected to the real server, not an impersonator."
+
+  - question: "What does HTTPS NOT hide from a network observer?"
+    options:
+      - "The contents of the HTTP request body"
+      - "The HTTP response status code and headers"
+      - "The domain name being connected to (sent in the TLS SNI extension)"
+      - "The URL path and query parameters of the request"
+    correct: 2
+    explanation: "The SNI (Server Name Indication) extension sends the target hostname in plaintext during the TLS handshake, before encryption is established. A network observer (ISP, attacker on Wi-Fi) can see which domain you are connecting to but not what you send or receive. The URL path, query parameters, headers, and body are all encrypted. ECH (Encrypted Client Hello) is an emerging extension that would encrypt the SNI."

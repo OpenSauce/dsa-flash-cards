@@ -1,0 +1,56 @@
+title: "DNS: The Internet's Phone Book"
+lesson_slug: net-dns
+questions:
+  - question: "On a full DNS cache miss, what is the correct order of servers contacted by the recursive resolver?"
+    options:
+      - "TLD server → Root server → Authoritative server"
+      - "Root server → Authoritative server → TLD server"
+      - "Root server → TLD server → Authoritative server"
+      - "Authoritative server → TLD server → Root server"
+    correct: 2
+    explanation: "On a cache miss, the recursive resolver asks the root server first ('which TLD server handles .com?'), then the TLD server ('which authoritative nameserver handles example.com?'), then the authoritative nameserver ('what is the A record for api.example.com?'). The hierarchy goes from general to specific."
+
+  - question: "What does an A record map?"
+    options:
+      - "A domain name to another domain name (alias)"
+      - "A domain name to an IPv4 address"
+      - "A domain name to an IPv6 address"
+      - "A domain name to a mail server hostname"
+    correct: 1
+    explanation: "An A record maps a domain to an IPv4 address (e.g., api.example.com → 93.184.216.34). AAAA records map to IPv6 addresses. CNAME records are aliases from one domain to another. MX records point to mail servers. A records are the most common record type."
+
+  - question: "What does DNS TTL control?"
+    options:
+      - "The maximum size of a DNS response packet before falling back to TCP"
+      - "How long recursive resolvers cache a DNS record before re-querying the authoritative server"
+      - "The timeout before a DNS query is retried if no response is received"
+      - "How many hops a DNS query can traverse before being discarded"
+    correct: 1
+    explanation: "TTL (Time to Live) is a per-record value that tells recursive resolvers how many seconds to cache the answer. A high TTL (86400 = 24 hours) reduces lookup latency but slows propagation of changes. A low TTL (60 seconds) propagates changes quickly but increases load on the authoritative server."
+
+  - question: "What is the key constraint on CNAME records?"
+    options:
+      - "A CNAME target must be in the same domain as the source"
+      - "A CNAME record cannot coexist with other record types on the same name"
+      - "A CNAME chain cannot exceed three hops to the final A record"
+      - "A CNAME record must have a TTL at least as high as the record it points to"
+    correct: 1
+    explanation: "A CNAME record cannot coexist with any other record type on the same name. This prevents using a CNAME at the zone apex (example.com), because the zone apex must have an SOA record and often an NS record. Subdomains (blog.example.com) can be CNAMEs freely, since they don't carry zone-level records."
+
+  - question: "What is the role of the recursive resolver in DNS?"
+    options:
+      - "It stores the authoritative records for a specific domain and serves responses to registered users"
+      - "It caches DNS responses from other resolvers to reduce global query volume"
+      - "It walks the DNS hierarchy on behalf of the client, contacting root, TLD, and authoritative servers, then caches the result"
+      - "It validates DNSSEC signatures to ensure records have not been tampered with"
+    correct: 2
+    explanation: "The recursive resolver (run by your ISP, or public resolvers like 8.8.8.8 or 1.1.1.1) does the heavy lifting of DNS resolution. It contacts root, TLD, and authoritative servers in sequence, assembles the final answer, caches it for the TTL duration, and returns it to the client. Without caching, the root servers would be overwhelmed."
+
+  - question: "Why should you lower a record's TTL days before a migration, not hours before?"
+    options:
+      - "DNS changes require 48 hours for registry processing regardless of TTL"
+      - "The old high TTL may still be cached by resolvers worldwide -- you must wait for those caches to expire before a low TTL takes effect"
+      - "Lowering TTL requires a zone file reload that can take several hours to propagate"
+      - "ICANN enforces a minimum 24-hour window between TTL changes for stability"
+    correct: 1
+    explanation: "If your current TTL is 86400 (24 hours), resolvers worldwide have cached the record with that TTL. Lowering the TTL doesn't help until those caches expire -- which takes up to 24 hours. To ensure quick failover during a migration, you must lower the TTL days in advance, wait for the old cached entries to expire, then perform the migration."

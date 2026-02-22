@@ -1,6 +1,7 @@
 ---
 title: "TCP vs UDP"
-order: 1
+order: 2
+reading_time_minutes: 5
 summary: "TCP's connection-oriented reliability model, UDP's connectionless speed, the three-way handshake, and how to choose between them for different workloads."
 ---
 
