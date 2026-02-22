@@ -1,0 +1,56 @@
+title: "String DP"
+lesson_slug: "dp-string-dp"
+questions:
+  - question: "In LCS, what happens when characters s1[i-1] and s2[j-1] match vs when they don't?"
+    options:
+      - "Match: dp[i][j] = max(dp[i-1][j], dp[i][j-1]). No match: dp[i][j] = dp[i-1][j-1] + 1"
+      - "Match: dp[i][j] = dp[i-1][j-1] + 1. No match: dp[i][j] = max(dp[i-1][j], dp[i][j-1])"
+      - "Match: dp[i][j] = dp[i-1][j-1] + 1. No match: dp[i][j] = 0"
+      - "Match: dp[i][j] = dp[i][j-1] + 1. No match: dp[i][j] = dp[i-1][j]"
+    correct: 1
+    explanation: "When characters match, both strings advance together: dp[i][j] = dp[i-1][j-1] + 1 (one more character added to the common subsequence). When they don't match, try skipping one character from either string and keep the better result: max(dp[i-1][j], dp[i][j-1])."
+
+  - question: "In the edit distance table, which direction corresponds to 'delete a character from s1'?"
+    options:
+      - "Move left (i, j-1)"
+      - "Move diagonally (i-1, j-1)"
+      - "Move up (i-1, j)"
+      - "Move right (i, j+1)"
+    correct: 2
+    explanation: "dp[i-1][j] means 'cost to align the first i-1 characters of s1 with the first j characters of s2'. Moving up (one fewer s1 character) corresponds to deleting s1[i-1]. Moving left (j-1) is insert. Moving diagonally (i-1, j-1) is replace."
+
+  - question: "How do you reconstruct the actual LCS string (not just its length) from the DP table?"
+    options:
+      - "Read the diagonal entries of the table from top-left to bottom-right"
+      - "Backtrack from dp[m][n]: if s1[i-1] == s2[j-1], record the character and move to dp[i-1][j-1]; otherwise move to the larger neighbor (dp[i-1][j] or dp[i][j-1])"
+      - "Run a second pass of the LCS algorithm on the DP table itself"
+      - "The DP table automatically stores the actual subsequence in the last row"
+    correct: 1
+    explanation: "Reconstruction backtracks from the bottom-right. At each cell, if characters match, that character is in the LCS -- move diagonally and record it. Otherwise, follow the larger of the left and top neighbors (they represent the two skip options). Reverse the recorded characters at the end."
+
+  - question: "What is the key difference between the longest common subsequence and the longest common substring?"
+    options:
+      - "Subsequence requires sorted characters; substring does not"
+      - "Subsequence must be contiguous; substring only needs to preserve relative order"
+      - "In the DP recurrence, substring resets to 0 on mismatch (no gap allowed); subsequence takes max(dp[i-1][j], dp[i][j-1]) on mismatch (gaps allowed)"
+      - "Subsequence and substring use identical recurrences but different base cases"
+    correct: 2
+    explanation: "Subsequence preserves relative order but allows gaps. Substring must be contiguous. The recurrence differs only on mismatch: substring sets dp[i][j] = 0 (a gap breaks the substring, restart), while subsequence takes max of the skip options. The match case (dp[i-1][j-1] + 1) is identical. Substring answer is max over all cells; subsequence answer is dp[m][n]."
+
+  - question: "How can you find the longest palindromic subsequence of string s using LCS?"
+    options:
+      - "Run LCS on s and its sorted version"
+      - "Run LCS on s with itself"
+      - "Run LCS on s and its reverse -- any subsequence common to both appears in forward and backward order in s, making it a palindrome"
+      - "Run edit distance between s and its reverse, then subtract from the string length"
+    correct: 2
+    explanation: "A palindromic subsequence reads the same forwards and backwards. Any subsequence common to s and reverse(s) must appear in order in s and in reverse order in s -- it is therefore a palindrome. LCS(s, reverse(s)) gives the longest such subsequence."
+
+  - question: "Why is the state for two-string DP problems typically dp[i][j] (indexing into both strings)?"
+    options:
+      - "Two indices are needed because string problems always require O(n^2) time"
+      - "The state captures which prefix of each string has been processed -- dp[i][j] is the answer for the first i characters of s1 and first j characters of s2, encoding all choices made so far for both strings independently"
+      - "It allows the algorithm to process both strings simultaneously with a single loop"
+      - "One index tracks the current character, the other tracks the number of edits remaining"
+    correct: 1
+    explanation: "When processing two strings, the subproblem at any point is defined by how much of each string has been consumed. dp[i][j] captures exactly this: the optimal answer when aligning s1[0..i-1] with s2[0..j-1]. A single index would lose track of one string's position."

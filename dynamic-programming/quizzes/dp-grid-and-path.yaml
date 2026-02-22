@@ -1,0 +1,56 @@
+title: "Grid and Path DP"
+lesson_slug: "dp-grid-and-path"
+questions:
+  - question: "In minimum path sum, why does DP work when movement is restricted to right and down only?"
+    options:
+      - "Right-and-down movement guarantees the shortest path is always along the main diagonal"
+      - "Restricted movement eliminates cycles, creating a DAG where each cell can be computed once from already-computed predecessors"
+      - "Right-and-down movement means the grid can be solved greedily"
+      - "Restricting movement reduces the state space from exponential to polynomial"
+    correct: 1
+    explanation: "Without cycles, the grid is a DAG. Every cell (i, j) can only be reached from (i-1, j) or (i, j-1) -- both already computed when you process cells in row-major order. This topological ordering guarantees each subproblem is available when needed. Arbitrary movement would create cycles and break tabulation."
+
+  - question: "How do obstacles affect the unique paths recurrence?"
+    options:
+      - "Obstacles add 1 to the path count (you must go around them)"
+      - "Obstacles are treated as walls -- dp[i][j] = 0 if grid[i][j] is blocked; otherwise dp[i][j] = dp[i-1][j] + dp[i][j-1]"
+      - "Obstacles require switching to a shortest-path algorithm like BFS"
+      - "Obstacles only affect paths along the first row or first column"
+    correct: 1
+    explanation: "An obstacle means no path passes through that cell: dp[i][j] = 0. Other cells use the standard recurrence. If an obstacle is in the first row or column, all cells beyond it also get 0 (no path can reach them -- the only route is blocked)."
+
+  - question: "When can you solve a grid DP problem with O(1) extra space?"
+    options:
+      - "Only when the grid is square (m == n)"
+      - "When the problem only requires counting paths, not minimizing a sum"
+      - "When you are allowed to modify the input grid in-place -- overwrite each cell with its DP value as you compute it"
+      - "When movement is allowed in all four directions"
+    correct: 2
+    explanation: "Modifying the grid in-place eliminates the need for a separate DP table. Since cells are computed in row-major order and each cell only reads from already-updated neighbors, the in-place update is safe. This gives O(1) extra space (excluding the input grid itself)."
+
+  - question: "What is the base case pattern for the first row and first column in grid DP (minimum path sum)?"
+    options:
+      - "dp[0][j] = dp[i][0] = 0 for all i and j"
+      - "The first row and column are prefix sums -- only one direction arrives from (left for first row, above for first column), so each cell is the cumulative sum of all cells before it in that row/column"
+      - "dp[0][j] = j and dp[i][0] = i (same as edit distance base cases)"
+      - "The base cases are the same as all other cells -- the recurrence handles boundaries automatically"
+    correct: 1
+    explanation: "Cells in the first row can only be reached from the left (no cell above them). Cells in the first column can only be reached from above (no cell to their left). So dp[0][j] = dp[0][j-1] + grid[0][j] and dp[i][0] = dp[i-1][0] + grid[i][0]. They are running totals along their respective edges."
+
+  - question: "Why does 'longest increasing path in a matrix' require memoized DFS rather than tabulation?"
+    options:
+      - "Tabulation cannot handle negative numbers in the matrix"
+      - "The matrix is always too large for a 2D DP table"
+      - "The topological order for tabulation depends on matrix values (you must process smaller values before larger ones), but this order isn't known until runtime -- memoized DFS discovers it dynamically"
+      - "Memoized DFS runs in O(n) time, faster than tabulation's O(mn)"
+    correct: 2
+    explanation: "In standard grid DP, position determines order (row-major). For longest increasing path, the order depends on values -- a cell at (2, 3) might need results from (0, 0) or (4, 4) depending on the matrix values. Memoized DFS handles this by computing each cell's result lazily, only when first visited. No cycles exist because each step requires a strictly larger value."
+
+  - question: "For the triangle problem (find minimum path sum from apex to base), which traversal direction avoids boundary handling for adjacent elements?"
+    options:
+      - "Top-down (apex to base), because you always know the value above"
+      - "Bottom-up (base to apex), because each cell always has two valid children to choose from (the two adjacent values in the row below)"
+      - "Left-to-right row traversal, because you process each row completely before moving to the next"
+      - "Both directions require the same amount of boundary handling"
+    correct: 1
+    explanation: "Bottom-up: for each cell in row i, the two adjacent cells in row i+1 always exist (the triangle widens as you go down). There's never a boundary issue. Top-down requires handling the leftmost cell in each row (only one valid path from above-left) and rightmost cell (only from above-right)."
