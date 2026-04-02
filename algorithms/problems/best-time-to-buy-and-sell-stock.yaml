@@ -1,6 +1,6 @@
 title: Best Time to Buy and Sell Stock
 difficulty: easy
-tags: [array, sliding-window]
+tags: [array, greedy]
 description: |
   You are given an array `prices` where `prices[i]` is the price of a
   stock on the i-th day. You want to maximise your profit by choosing
@@ -31,6 +31,8 @@ test_cases:
     expected: 2
   - input: { prices: [1] }
     expected: 0
+  - input: { prices: [1, 2, 3, 4, 5] }
+    expected: 4
 solution:
   python: |
     def max_profit(prices: list[int]) -> int:

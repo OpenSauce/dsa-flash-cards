@@ -6,7 +6,9 @@ description: |
   merge all overlapping intervals and return a list of the non-overlapping
   intervals that cover all the input ranges.
 
-  Two intervals overlap if one starts before or when the other ends.
+  After sorting by start time, two consecutive intervals overlap if
+  the later interval's start is less than or equal to the earlier
+  interval's end.
 examples:
   - input: "intervals = [[1,3],[2,6],[8,10],[15,18]]"
     output: "[[1,6],[8,10],[15,18]]"

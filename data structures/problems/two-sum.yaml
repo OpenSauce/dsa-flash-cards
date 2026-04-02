@@ -29,6 +29,10 @@ test_cases:
     expected: [1, 2]
   - input: { nums: [3, 3], target: 6 }
     expected: [0, 1]
+  - input: { nums: [-1, -2, -3, -4, -5], target: -8 }
+    expected: [2, 4]
+  - input: { nums: [1, -1], target: 0 }
+    expected: [0, 1]
 solution:
   python: |
     def two_sum(nums: list[int], target: int) -> list[int]:

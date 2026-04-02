@@ -27,6 +27,8 @@ test_cases:
     expected: true
   - input: { nums: [7] }
     expected: false
+  - input: { nums: [-1, -2, -3, -1] }
+    expected: true
 solution:
   python: |
     def contains_duplicate(nums: list[int]) -> bool:

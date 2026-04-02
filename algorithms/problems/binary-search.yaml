@@ -16,7 +16,7 @@ examples:
     explanation: "The value 2 is not in the array."
 constraints:
   - "1 <= nums.length <= 10^4"
-  - "-10^4 < nums[i], target < 10^4"
+  - "-10^4 <= nums[i], target <= 10^4"
   - "All values in nums are unique."
   - "nums is sorted in ascending order."
 starter_code:
