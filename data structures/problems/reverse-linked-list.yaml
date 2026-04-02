@@ -1,0 +1,58 @@
+title: Reverse Linked List
+difficulty: easy
+tags: [linked-list]
+description: |
+  Given the head of a singly linked list, reverse the list and return
+  the new head. Each node contains an integer value and a pointer to
+  the next node. The last node points to `None`.
+examples:
+  - input: "head = [1,2,3,4,5]"
+    output: "[5,4,3,2,1]"
+    explanation: "The list is reversed from 1->2->3->4->5 to 5->4->3->2->1."
+  - input: "head = [1,2]"
+    output: "[2,1]"
+    explanation: "The two-node list is reversed."
+  - input: "head = []"
+    output: "[]"
+    explanation: "An empty list stays empty."
+constraints:
+  - "0 <= number of nodes <= 5000"
+  - "-5000 <= Node.val <= 5000"
+starter_code:
+  python: |
+    class ListNode:
+        def __init__(self, val=0, next=None):
+            self.val = val
+            self.next = next
+
+    def reverse_list(head: ListNode) -> ListNode:
+        pass
+test_cases:
+  - input: { head: [1, 2, 3, 4, 5] }
+    expected: [5, 4, 3, 2, 1]
+  - input: { head: [1, 2] }
+    expected: [2, 1]
+  - input: { head: [] }
+    expected: []
+  - input: { head: [42] }
+    expected: [42]
+solution:
+  python: |
+    class ListNode:
+        def __init__(self, val=0, next=None):
+            self.val = val
+            self.next = next
+
+    def reverse_list(head: ListNode) -> ListNode:
+        prev = None
+        current = head
+        while current:
+            next_node = current.next
+            current.next = prev
+            prev = current
+            current = next_node
+        return prev
+hints:
+  - "You need to change each node's next pointer to point to the previous node instead."
+  - "Keep track of three pointers: the previous node, the current node, and the next node. At each step, reverse the current node's pointer, then advance all three."
+  - "Initialize prev as None. When current becomes None, prev is the new head."

@@ -1,0 +1,52 @@
+title: Binary Search
+difficulty: easy
+tags: [binary-search, array]
+description: |
+  Given a sorted array of integers `nums` in ascending order and an
+  integer `target`, write a function to search for `target` in `nums`.
+  If the target exists, return its index. Otherwise, return -1.
+
+  Your solution must run in O(log n) time.
+examples:
+  - input: "nums = [-1,0,3,5,9,12], target = 9"
+    output: "4"
+    explanation: "The value 9 is at index 4."
+  - input: "nums = [-1,0,3,5,9,12], target = 2"
+    output: "-1"
+    explanation: "The value 2 is not in the array."
+constraints:
+  - "1 <= nums.length <= 10^4"
+  - "-10^4 < nums[i], target < 10^4"
+  - "All values in nums are unique."
+  - "nums is sorted in ascending order."
+starter_code:
+  python: |
+    def search(nums: list[int], target: int) -> int:
+        pass
+test_cases:
+  - input: { nums: [-1, 0, 3, 5, 9, 12], target: 9 }
+    expected: 4
+  - input: { nums: [-1, 0, 3, 5, 9, 12], target: 2 }
+    expected: -1
+  - input: { nums: [5], target: 5 }
+    expected: 0
+  - input: { nums: [2, 5], target: 5 }
+    expected: 1
+  - input: { nums: [2, 5], target: 0 }
+    expected: -1
+solution:
+  python: |
+    def search(nums: list[int], target: int) -> int:
+        left, right = 0, len(nums) - 1
+        while left <= right:
+            mid = (left + right) // 2
+            if nums[mid] == target:
+                return mid
+            elif nums[mid] < target:
+                left = mid + 1
+            else:
+                right = mid - 1
+        return -1
+hints:
+  - "Since the array is sorted, you can eliminate half the search space with each comparison."
+  - "Maintain two pointers for the search range. Compare the middle element to the target: if it is too small, search the right half; if too large, search the left half."

@@ -1,0 +1,41 @@
+title: Contains Duplicate
+difficulty: easy
+tags: [hash-map, array]
+description: |
+  Given an integer array `nums`, return `true` if any value appears
+  at least twice in the array, and `false` if every element is distinct.
+examples:
+  - input: "nums = [1,2,3,1]"
+    output: "true"
+    explanation: "The value 1 appears at index 0 and index 3."
+  - input: "nums = [1,2,3,4]"
+    output: "false"
+    explanation: "All elements are unique."
+constraints:
+  - "1 <= nums.length <= 10^5"
+  - "-10^9 <= nums[i] <= 10^9"
+starter_code:
+  python: |
+    def contains_duplicate(nums: list[int]) -> bool:
+        pass
+test_cases:
+  - input: { nums: [1, 2, 3, 1] }
+    expected: true
+  - input: { nums: [1, 2, 3, 4] }
+    expected: false
+  - input: { nums: [1, 1, 1, 3, 3, 4, 3, 2, 4, 2] }
+    expected: true
+  - input: { nums: [7] }
+    expected: false
+solution:
+  python: |
+    def contains_duplicate(nums: list[int]) -> bool:
+        seen = set()
+        for num in nums:
+            if num in seen:
+                return True
+            seen.add(num)
+        return False
+hints:
+  - "What data structure can tell you whether you have seen a value before in O(1) time?"
+  - "Iterate through the array, adding each element to a set. If an element is already in the set, you have found a duplicate."

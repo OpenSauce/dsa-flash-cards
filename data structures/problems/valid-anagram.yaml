@@ -1,0 +1,48 @@
+title: Valid Anagram
+difficulty: easy
+tags: [hash-map, string]
+description: |
+  Given two strings `s` and `t`, return `true` if `t` is an anagram of `s`,
+  and `false` otherwise.
+
+  An anagram is a word formed by rearranging the letters of another word,
+  using every letter exactly once.
+examples:
+  - input: "s = 'anagram', t = 'nagaram'"
+    output: "true"
+    explanation: "Both strings contain the same letters with the same frequencies."
+  - input: "s = 'rat', t = 'car'"
+    output: "false"
+    explanation: "The letter counts differ between the two strings."
+constraints:
+  - "1 <= s.length, t.length <= 5 * 10^4"
+  - "s and t consist of lowercase English letters."
+starter_code:
+  python: |
+    def is_anagram(s: str, t: str) -> bool:
+        pass
+test_cases:
+  - input: { s: "anagram", t: "nagaram" }
+    expected: true
+  - input: { s: "rat", t: "car" }
+    expected: false
+  - input: { s: "a", t: "a" }
+    expected: true
+  - input: { s: "ab", t: "a" }
+    expected: false
+solution:
+  python: |
+    def is_anagram(s: str, t: str) -> bool:
+        if len(s) != len(t):
+            return False
+        counts = {}
+        for char in s:
+            counts[char] = counts.get(char, 0) + 1
+        for char in t:
+            counts[char] = counts.get(char, 0) - 1
+            if counts[char] < 0:
+                return False
+        return True
+hints:
+  - "If two strings are anagrams, what must be true about the frequency of each letter?"
+  - "Count the occurrences of each character in both strings and compare the counts. A hash map works well for this."

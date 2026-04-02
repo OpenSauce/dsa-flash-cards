@@ -1,0 +1,45 @@
+title: Climbing Stairs
+difficulty: easy
+tags: [dynamic-programming]
+description: |
+  You are climbing a staircase that has `n` steps. Each time you can
+  climb either 1 or 2 steps. Return the number of distinct ways you
+  can reach the top.
+examples:
+  - input: "n = 2"
+    output: "2"
+    explanation: "Two ways: (1+1) or (2)."
+  - input: "n = 3"
+    output: "3"
+    explanation: "Three ways: (1+1+1), (1+2), or (2+1)."
+constraints:
+  - "1 <= n <= 45"
+starter_code:
+  python: |
+    def climb_stairs(n: int) -> int:
+        pass
+test_cases:
+  - input: { n: 2 }
+    expected: 2
+  - input: { n: 3 }
+    expected: 3
+  - input: { n: 1 }
+    expected: 1
+  - input: { n: 5 }
+    expected: 8
+  - input: { n: 10 }
+    expected: 89
+solution:
+  python: |
+    def climb_stairs(n: int) -> int:
+        if n <= 2:
+            return n
+        prev2, prev1 = 1, 2
+        for _ in range(3, n + 1):
+            current = prev1 + prev2
+            prev2 = prev1
+            prev1 = current
+        return prev1
+hints:
+  - "The number of ways to reach step n depends on how many ways you can reach the two steps before it."
+  - "This follows the Fibonacci pattern: ways(n) = ways(n-1) + ways(n-2). You can compute it iteratively with two variables instead of an array."

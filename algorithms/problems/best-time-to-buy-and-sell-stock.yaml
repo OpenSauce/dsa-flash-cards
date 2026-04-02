@@ -1,0 +1,47 @@
+title: Best Time to Buy and Sell Stock
+difficulty: easy
+tags: [array, sliding-window]
+description: |
+  You are given an array `prices` where `prices[i]` is the price of a
+  stock on the i-th day. You want to maximise your profit by choosing
+  a single day to buy and a different later day to sell.
+
+  Return the maximum profit you can achieve. If no profit is possible,
+  return 0.
+examples:
+  - input: "prices = [7,1,5,3,6,4]"
+    output: "5"
+    explanation: "Buy on day 2 (price 1) and sell on day 5 (price 6) for a profit of 5."
+  - input: "prices = [7,6,4,3,1]"
+    output: "0"
+    explanation: "Prices only decrease, so no profitable transaction exists."
+constraints:
+  - "1 <= prices.length <= 10^5"
+  - "0 <= prices[i] <= 10^4"
+starter_code:
+  python: |
+    def max_profit(prices: list[int]) -> int:
+        pass
+test_cases:
+  - input: { prices: [7, 1, 5, 3, 6, 4] }
+    expected: 5
+  - input: { prices: [7, 6, 4, 3, 1] }
+    expected: 0
+  - input: { prices: [2, 4, 1] }
+    expected: 2
+  - input: { prices: [1] }
+    expected: 0
+solution:
+  python: |
+    def max_profit(prices: list[int]) -> int:
+        min_price = float('inf')
+        max_profit = 0
+        for price in prices:
+            if price < min_price:
+                min_price = price
+            elif price - min_price > max_profit:
+                max_profit = price - min_price
+        return max_profit
+hints:
+  - "You need to find the largest difference between a later element and an earlier element."
+  - "Track the minimum price seen so far as you scan left to right. At each position, calculate the profit if you sold today and update your best result."

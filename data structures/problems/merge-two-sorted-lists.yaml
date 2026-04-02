@@ -1,0 +1,60 @@
+title: Merge Two Sorted Lists
+difficulty: easy
+tags: [linked-list]
+description: |
+  You are given the heads of two sorted singly linked lists. Merge them
+  into a single sorted linked list by splicing the nodes together, and
+  return the head of the merged list.
+examples:
+  - input: "list1 = [1,2,4], list2 = [1,3,4]"
+    output: "[1,1,2,3,4,4]"
+    explanation: "Nodes from both lists are interleaved in sorted order."
+  - input: "list1 = [], list2 = [0]"
+    output: "[0]"
+    explanation: "Merging an empty list with a non-empty list returns the non-empty list."
+constraints:
+  - "0 <= list length <= 50"
+  - "-100 <= Node.val <= 100"
+  - "Both lists are sorted in non-decreasing order."
+starter_code:
+  python: |
+    class ListNode:
+        def __init__(self, val=0, next=None):
+            self.val = val
+            self.next = next
+
+    def merge_two_lists(list1: ListNode, list2: ListNode) -> ListNode:
+        pass
+test_cases:
+  - input: { list1: [1, 2, 4], list2: [1, 3, 4] }
+    expected: [1, 1, 2, 3, 4, 4]
+  - input: { list1: [], list2: [] }
+    expected: []
+  - input: { list1: [], list2: [0] }
+    expected: [0]
+  - input: { list1: [5], list2: [1, 2, 3] }
+    expected: [1, 2, 3, 5]
+solution:
+  python: |
+    class ListNode:
+        def __init__(self, val=0, next=None):
+            self.val = val
+            self.next = next
+
+    def merge_two_lists(list1: ListNode, list2: ListNode) -> ListNode:
+        dummy = ListNode(0)
+        current = dummy
+        while list1 and list2:
+            if list1.val <= list2.val:
+                current.next = list1
+                list1 = list1.next
+            else:
+                current.next = list2
+                list2 = list2.next
+            current = current.next
+        current.next = list1 if list1 else list2
+        return dummy.next
+hints:
+  - "Use a dummy head node so you do not need special logic for the first element."
+  - "Compare the values at the front of both lists. Attach the smaller one to your result and advance that list's pointer. Repeat until one list is exhausted."
+  - "When one list runs out, attach the remainder of the other list directly."
