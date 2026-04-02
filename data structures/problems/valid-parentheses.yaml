@@ -1,0 +1,56 @@
+title: Valid Parentheses
+difficulty: easy
+tags: [stack, string]
+description: |
+  Given a string `s` containing only the characters `(`, `)`, `{`, `}`,
+  `[` and `]`, determine if the input string has valid bracket pairing.
+
+  A string is valid if every opening bracket has a corresponding closing
+  bracket of the same type, and brackets are closed in the correct order.
+examples:
+  - input: "s = '()'"
+    output: "true"
+    explanation: "Single pair of matching parentheses."
+  - input: "s = '([)]'"
+    output: "false"
+    explanation: "Brackets are closed in the wrong order."
+  - input: "s = '{[]}'"
+    output: "true"
+    explanation: "Nested brackets are properly matched."
+constraints:
+  - "0 <= s.length <= 10^4"
+  - "s consists only of parentheses characters: ()[]{}."
+starter_code:
+  python: |
+    def is_valid(s: str) -> bool:
+        pass
+test_cases:
+  - input: { s: "()" }
+    expected: true
+  - input: { s: "()[]{}" }
+    expected: true
+  - input: { s: "(]" }
+    expected: false
+  - input: { s: "([)]" }
+    expected: false
+  - input: { s: "{[]}" }
+    expected: true
+  - input: { s: "" }
+    expected: true
+solution:
+  python: |
+    def is_valid(s: str) -> bool:
+        stack = []
+        pairs = {')': '(', ']': '[', '}': '{'}
+        for char in s:
+            if char in pairs:
+                if not stack or stack[-1] != pairs[char]:
+                    return False
+                stack.pop()
+            else:
+                stack.append(char)
+        return len(stack) == 0
+hints:
+  - "What data structure follows a last-in, first-out order?"
+  - "Push opening brackets onto a stack. When you encounter a closing bracket, check if the top of the stack is the matching opener."
+  - "After processing all characters, the stack should be empty if the string is valid."

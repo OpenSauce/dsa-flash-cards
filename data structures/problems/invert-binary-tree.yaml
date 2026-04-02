@@ -1,0 +1,65 @@
+title: Invert Binary Tree
+difficulty: easy
+tags: [tree, recursion]
+description: |
+  Given the root of a binary tree, invert the tree so that every node's
+  left and right children are swapped, and return the root.
+
+  Inverting a tree means producing its mirror image: the left subtree
+  becomes the right subtree and vice versa, applied recursively to
+  every node.
+examples:
+  - input: "root = [4,2,7,1,3,6,9]"
+    output: "[4,7,2,9,6,3,1]"
+    explanation: "Every node's left and right children are swapped."
+  - input: "root = [2,1,3]"
+    output: "[2,3,1]"
+    explanation: "The children of the root are swapped."
+  - input: "root = []"
+    output: "[]"
+    explanation: "An empty tree stays empty."
+constraints:
+  - "0 <= number of nodes <= 100"
+  - "-100 <= Node.val <= 100"
+starter_code:
+  python: |
+    from typing import Optional
+
+    class TreeNode:
+        def __init__(self, val=0, left=None, right=None):
+            self.val = val
+            self.left = left
+            self.right = right
+
+    def invert_tree(root: Optional[TreeNode]) -> Optional[TreeNode]:
+        pass
+test_cases:
+  - input: { root: [4, 2, 7, 1, 3, 6, 9] }
+    expected: [4, 7, 2, 9, 6, 3, 1]
+  - input: { root: [2, 1, 3] }
+    expected: [2, 3, 1]
+  - input: { root: [] }
+    expected: []
+  - input: { root: [1] }
+    expected: [1]
+solution:
+  python: |
+    from typing import Optional
+
+    class TreeNode:
+        def __init__(self, val=0, left=None, right=None):
+            self.val = val
+            self.left = left
+            self.right = right
+
+    def invert_tree(root: Optional[TreeNode]) -> Optional[TreeNode]:
+        if root is None:
+            return None
+        root.left, root.right = root.right, root.left
+        invert_tree(root.left)
+        invert_tree(root.right)
+        return root
+hints:
+  - "What is the simplest operation you can do at a single node to start mirroring the tree?"
+  - "Swap the left and right children of the current node, then recursively invert each subtree."
+  - "The base case is a None node — there is nothing to swap."
