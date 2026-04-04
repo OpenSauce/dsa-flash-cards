@@ -1,7 +1,7 @@
 ---
 title: "Linked Lists"
 summary: "Pointer-based node chains, singly vs doubly linked, O(1) head/tail operations, O(n) search, and common interview patterns like reversal and two-pointer techniques."
-reading_time_minutes: 4
+reading_time_minutes: 6
 order: 2
 ---
 
@@ -11,7 +11,17 @@ Linked lists test your ability to manipulate pointers -- a skill that transfers 
 
 ## Structure
 
-A linked list is a sequence of **nodes**, each containing a value and a pointer to the next node. The list is accessed through a `head` pointer. The last node points to `nil`.
+A linked list is a sequence of **nodes** -- small objects that each contain a value and a reference (pointer) to the next node. Think of a scavenger hunt: each clue tells you where to find the next one. The list is accessed through a `head` pointer. The last node points to `None` (nil).
+
+```python
+class ListNode:
+    def __init__(self, val=0, next=None):
+        self.val = val
+        self.next = next
+
+# Build: 10 -> 20 -> 30 -> None
+head = ListNode(10, ListNode(20, ListNode(30)))
+```
 
 ```
 head -> [10 | *] -> [20 | *] -> [30 | nil]
@@ -58,6 +68,18 @@ Use three pointers: `prev`, `cur`, and `next`. At each step, save `cur.Next`, po
 
 This is O(n) time, O(1) space, and one of the most frequently asked interview questions.
 
+```python
+def reverse_list(head):
+    prev = None
+    cur = head
+    while cur:
+        nxt = cur.next   # save next
+        cur.next = prev  # reverse pointer
+        prev = cur       # advance prev
+        cur = nxt        # advance cur
+    return prev          # prev is new head
+```
+
 ### Two-Pointer Technique
 
 Many linked list problems use two pointers moving at different speeds:
@@ -67,6 +89,17 @@ Many linked list problems use two pointers moving at different speeds:
 **Detecting a cycle (Floyd's algorithm):** Same setup. If there is a cycle, the fast pointer laps the slow pointer and they meet inside the cycle. If there is no cycle, fast reaches nil. O(n) time, O(1) space.
 
 **Finding the cycle start:** After detection, reset one pointer to head. Advance both one step at a time. They meet at the cycle entry point.
+
+```python
+def has_cycle(head):
+    slow = fast = head
+    while fast and fast.next:
+        slow = slow.next
+        fast = fast.next.next
+        if slow is fast:
+            return True  # cycle detected
+    return False
+```
 
 ### Merging Two Sorted Lists
 
@@ -79,3 +112,8 @@ Use a **dummy head node** to avoid special-casing the first insertion. Compare t
 - A tail pointer turns append from O(n) to O(1).
 - Floyd's cycle detection uses slow/fast pointers for O(n) time, O(1) space.
 - The dummy head node pattern simplifies edge cases in merge and insert operations.
+
+## Related Problems
+
+- **Reverse Linked List** -- the three-pointer reversal pattern
+- **Merge Two Sorted Lists** -- dummy head + compare-and-attach pattern

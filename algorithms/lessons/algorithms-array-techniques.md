@@ -1,7 +1,7 @@
 ---
 title: "Array Techniques"
 summary: "Three interview staple patterns for array problems: two-pointer, sliding window, and prefix sum. How each reduces brute force O(n^2) to O(n)."
-reading_time_minutes: 5
+reading_time_minutes: 7
 order: 5
 ---
 
@@ -30,6 +30,22 @@ while left < right:
 ```
 
 **Classic problem:** find a pair in a sorted array that sums to a target. If the sum is too small, advance the left pointer (increase). If too large, advance the right pointer (decrease). O(n) instead of O(n^2).
+
+```python
+def two_sum_sorted(nums, target):
+    left, right = 0, len(nums) - 1
+    while left < right:
+        s = nums[left] + nums[right]
+        if s == target:
+            return [left, right]
+        elif s < target:
+            left += 1
+        else:
+            right -= 1
+    return []
+
+print(two_sum_sorted([1, 3, 5, 7, 11], 10))  # [1, 3] (3 + 7)
+```
 
 **Precondition:** the array must be sorted (or the structure must give a monotonic property that tells you which pointer to move).
 
@@ -66,6 +82,18 @@ for i from k to n - 1:
 
 O(n) instead of O(nk). Each element enters and leaves the window exactly once.
 
+```python
+def max_sum_subarray_k(arr, k):
+    window_sum = sum(arr[:k])
+    best = window_sum
+    for i in range(k, len(arr)):
+        window_sum += arr[i] - arr[i - k]  # slide: add new, remove old
+        best = max(best, window_sum)
+    return best
+
+print(max_sum_subarray_k([2, 1, 5, 1, 3, 2], 3))  # 9 (5+1+3)
+```
+
 **Classic problem:** maximum sum subarray of size k.
 
 ### Variable-Size Window
@@ -83,6 +111,22 @@ for right from 0 to n - 1:
 ```
 
 O(n) because left and right each advance at most n times total.
+
+```python
+def longest_unique_substring(s):
+    seen = set()
+    left = 0
+    best = 0
+    for right in range(len(s)):
+        while s[right] in seen:
+            seen.remove(s[left])
+            left += 1
+        seen.add(s[right])
+        best = max(best, right - left + 1)
+    return best
+
+print(longest_unique_substring("abcabcbb"))  # 3 ("abc")
+```
 
 **Classic problems:** longest substring without repeating characters, minimum window substring containing all target characters.
 
@@ -114,6 +158,21 @@ sum(l, r) = prefix[r + 1] - prefix[l]
 
 O(n) build, O(1) per query. Worth it when you have many range queries on static data.
 
+```python
+def build_prefix_sum(arr):
+    prefix = [0]
+    for x in arr:
+        prefix.append(prefix[-1] + x)
+    return prefix
+
+def range_sum(prefix, l, r):
+    return prefix[r + 1] - prefix[l]
+
+arr = [3, 1, 4, 1, 5]
+prefix = build_prefix_sum(arr)
+print(range_sum(prefix, 1, 3))  # 1 + 4 + 1 = 6
+```
+
 ### Applications Beyond Range Sums
 
 - **Subarray sum equals k:** for each index, check if `prefix[i] - k` exists in a hash set of previously seen prefix sums. O(n) total.
@@ -129,3 +188,9 @@ Prefix sum assumes the underlying array is static. If the array is updated betwe
 - Sliding window handles contiguous subarray/substring problems in O(n) by incrementally updating window state. Fixed-size for known k, variable-size for constraint-based problems.
 - Prefix sum precomputes cumulative sums for O(1) range queries after O(n) build. Extend with hash sets for subarray-sum-equals-k problems.
 - All three techniques exploit structure (sorting, contiguity, cumulative sums) to avoid nested loops.
+
+## Related Problems
+
+- **Maximum Subarray** -- Kadane's algorithm (extend-or-restart, related to sliding window)
+- **Best Time to Buy and Sell Stock** -- single-pass with a running minimum (two-pointer variant)
+- **Merge Intervals** -- sort then greedy merge (precondition for two-pointer)

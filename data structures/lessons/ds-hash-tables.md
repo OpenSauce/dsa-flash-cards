@@ -1,7 +1,7 @@
 ---
 title: "Hash Tables"
 summary: "Hash functions, buckets, collision resolution via chaining and open addressing, load factor and rehashing, and the relationship between hash maps and hash sets."
-reading_time_minutes: 4
+reading_time_minutes: 6
 order: 4
 ---
 
@@ -11,7 +11,7 @@ Hash tables power the most common data structures in practical programming: dict
 
 ## How Hash Tables Work
 
-A hash table is an array of **buckets**. To store a key-value pair:
+A hash table is like a library filing system -- instead of searching every shelf, you use a formula to jump directly to the right shelf. Technically, it is an array of **buckets**. To store a key-value pair:
 
 1. Compute `hash(key)` -- a function that converts the key into an integer.
 2. Map the hash to a bucket index: `index = hash(key) % num_buckets`.
@@ -25,6 +25,16 @@ hash("alice") = 42
 ```
 
 When the hash function distributes keys evenly across buckets, each bucket holds at most one or two items, and operations are O(1).
+
+```python
+# Python's dict IS a hash table
+scores = {}
+scores["alice"] = 100  # O(1) insert
+scores["bob"] = 85     # O(1) insert
+print(scores["alice"])  # O(1) lookup -> 100
+print("bob" in scores)  # O(1) membership test -> True
+del scores["bob"]       # O(1) delete
+```
 
 ## Collisions
 
@@ -76,6 +86,22 @@ Both have the same performance characteristics: O(1) average insert, delete, and
 
 Sets are the go-to structure for deduplication and fast membership testing.
 
+```python
+# Hash set for deduplication
+nums = [1, 2, 2, 3, 3, 3]
+unique = set(nums)  # {1, 2, 3}
+
+# Membership test is O(1)
+print(2 in unique)  # True
+
+# Set operations
+a = {1, 2, 3}
+b = {2, 3, 4}
+print(a & b)  # intersection: {2, 3}
+print(a | b)  # union: {1, 2, 3, 4}
+print(a - b)  # difference: {1}
+```
+
 ## Hash Tables vs BSTs
 
 | | Hash Table | BST (balanced) |
@@ -95,3 +121,9 @@ Use a hash table when you need raw speed and don't care about ordering. Use a BS
 - Load factor triggers rehashing: double the buckets and reinsert all keys. Amortized cost stays O(1).
 - A hash set is a hash map with keys only -- same performance, used for membership testing and deduplication.
 - Choose hash tables for speed; choose BSTs when you need ordering or guaranteed worst-case performance.
+
+## Related Problems
+
+- **Two Sum** -- use a hash map to find complement values in O(n)
+- **Valid Anagram** -- count character frequencies with a hash map
+- **Contains Duplicate** -- use a hash set for O(n) duplicate detection

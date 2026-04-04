@@ -1,7 +1,7 @@
 ---
 title: "Grid and Path DP"
 summary: "DP on grids: minimum path sum, unique paths, obstacle handling, in-place space optimization, and longest increasing path."
-reading_time_minutes: 4
+reading_time_minutes: 6
 order: 5
 ---
 
@@ -52,6 +52,25 @@ for i from 0 to m-1:
 
 The answer is `grid[m-1][n-1]`. This works because each cell is only needed after its value has been updated.
 
+```python
+def min_path_sum(grid):
+    m, n = len(grid), len(grid[0])
+    for i in range(m):
+        for j in range(n):
+            if i == 0 and j == 0:
+                continue
+            elif i == 0:
+                grid[i][j] += grid[i][j - 1]
+            elif j == 0:
+                grid[i][j] += grid[i - 1][j]
+            else:
+                grid[i][j] += min(grid[i - 1][j], grid[i][j - 1])
+    return grid[m - 1][n - 1]
+
+grid = [[1, 3, 1], [1, 5, 1], [4, 2, 1]]
+print(min_path_sum(grid))  # 7 (1->3->1->1->1)
+```
+
 ## Unique Paths
 
 **Problem:** Count the number of distinct paths from top-left to bottom-right of an m x n grid, moving only right or down.
@@ -66,6 +85,17 @@ Each cell is the sum of paths arriving from above and from the left (counting, n
 **Base cases:** `dp[0][j] = 1` and `dp[i][0] = 1` (only one way to traverse any first row or column).
 
 **Mathematical shortcut:** You must make exactly (m-1) down moves and (n-1) right moves in any order. The answer is C(m+n-2, m-1) -- choose which steps are "down" from total steps.
+
+```python
+def unique_paths(m, n):
+    dp = [[1] * n for _ in range(m)]
+    for i in range(1, m):
+        for j in range(1, n):
+            dp[i][j] = dp[i - 1][j] + dp[i][j - 1]
+    return dp[m - 1][n - 1]
+
+print(unique_paths(3, 7))  # 28
+```
 
 ## Unique Paths with Obstacles
 
@@ -128,3 +158,7 @@ No cycle is possible because each step must go strictly upward in value. This gu
 - **In-place grid modification** gives O(1) extra space when the original values aren't needed.
 - **Unique paths** counts (addition) rather than optimizes (min/max); answer is also C(m+n-2, m-1).
 - **Longest increasing path** requires memoized DFS, not tabulation, because the topological order depends on values, not positions.
+
+## Related Problems
+
+- **Climbing Stairs** -- 1D version of the grid path-counting pattern

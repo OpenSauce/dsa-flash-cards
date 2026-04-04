@@ -1,7 +1,7 @@
 ---
 title: "Graph Traversal"
 summary: "Graph representations (adjacency list vs matrix), BFS with queues, DFS with stacks/recursion, BFS vs DFS trade-offs, and topological sort on DAGs."
-reading_time_minutes: 5
+reading_time_minutes: 7
 order: 4
 ---
 
@@ -15,7 +15,19 @@ Before traversing a graph, you need to store it. The two standard representation
 
 ### Adjacency List
 
-For each vertex, store a list of its neighbors. Typically implemented as an array of lists (or a hash map of lists for sparse, non-integer vertices).
+For each vertex, store a list of its neighbors. In Python, use a dictionary of lists (or a `defaultdict(list)`).
+
+```python
+from collections import defaultdict
+
+# Build an adjacency list from an edge list
+graph = defaultdict(list)
+edges = [(0, 1), (0, 2), (1, 3), (2, 3)]
+for u, v in edges:
+    graph[u].append(v)
+    graph[v].append(u)  # omit for directed graphs
+# {0: [1, 2], 1: [0, 3], 2: [0, 3], 3: [1, 2]}
+```
 
 - **Space:** O(V + E).
 - **Check if edge (u, v) exists:** O(degree(u)) -- scan u's neighbor list.
@@ -55,6 +67,21 @@ while queue is not empty:
 - **Time:** O(V + E). Every vertex is enqueued once, every edge is examined once.
 - **Space:** O(V) for the visited set and queue.
 
+```python
+from collections import deque
+
+def bfs(graph, start):
+    visited = {start}
+    queue = deque([start])
+    while queue:
+        v = queue.popleft()
+        for u in graph[v]:
+            if u not in visited:
+                visited.add(u)
+                queue.append(u)
+    return visited
+```
+
 ### BFS and Shortest Paths
 
 In an **unweighted** graph, BFS finds the shortest path (fewest edges) from the source to every reachable vertex. The distance to each vertex equals the level at which BFS first discovers it.
@@ -77,6 +104,18 @@ function dfs(v):
 
 - **Time:** O(V + E). Same as BFS.
 - **Space:** O(V) for the visited set, plus O(V) worst-case stack depth (a path graph).
+
+```python
+def dfs(graph, start):
+    visited = set()
+    def _dfs(v):
+        visited.add(v)
+        for u in graph[v]:
+            if u not in visited:
+                _dfs(u)
+    _dfs(start)
+    return visited
+```
 
 ### DFS Applications
 
@@ -111,6 +150,22 @@ Run DFS. When a vertex finishes (all neighbors explored), push it to a stack. Th
 
 The intuition: a vertex finishes only after all its dependencies have finished, so it appears after them when reading the stack.
 
+```python
+def topological_sort_dfs(graph, num_vertices):
+    visited = set()
+    order = []
+    def _dfs(v):
+        visited.add(v)
+        for u in graph[v]:
+            if u not in visited:
+                _dfs(u)
+        order.append(v)  # add after all neighbors explored
+    for v in range(num_vertices):
+        if v not in visited:
+            _dfs(v)
+    return order[::-1]  # reverse finish order
+```
+
 ### Kahn's Algorithm (BFS-Based)
 
 Start with all vertices that have zero in-degree (no incoming edges). Remove them from the graph, decrement in-degrees of their neighbors, and repeat. Vertices are output in the order they reach zero in-degree.
@@ -118,6 +173,24 @@ Start with all vertices that have zero in-degree (no incoming edges). Remove the
 Kahn's algorithm also detects cycles: if the output contains fewer than V vertices, the graph has a cycle.
 
 Both approaches run in O(V + E).
+
+```python
+from collections import deque
+
+def kahns_algorithm(graph, in_degree, num_vertices):
+    queue = deque(v for v in range(num_vertices) if in_degree[v] == 0)
+    order = []
+    while queue:
+        v = queue.popleft()
+        order.append(v)
+        for u in graph[v]:
+            in_degree[u] -= 1
+            if in_degree[u] == 0:
+                queue.append(u)
+    if len(order) < num_vertices:
+        return None  # cycle detected
+    return order
+```
 
 **Use cases:** build systems (compile dependencies in order), task scheduling, course prerequisite planning.
 

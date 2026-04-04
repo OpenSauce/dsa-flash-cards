@@ -1,7 +1,7 @@
 ---
 title: "Heaps and Priority Queues"
 summary: "Min/max heap property, array-based representation, sift-up and sift-down operations, O(n) heapify, and the priority queue abstraction with top-k patterns."
-reading_time_minutes: 4
+reading_time_minutes: 6
 order: 7
 ---
 
@@ -13,10 +13,10 @@ Heaps are the standard implementation of priority queues -- any problem that ask
 
 A **binary heap** is a complete binary tree where every parent satisfies an ordering constraint:
 
-- **Min-heap:** every parent is less than or equal to its children. The root is the minimum.
+- **Min-heap:** every parent is less than or equal to its children. The root is the minimum. Think of it as a tournament bracket where the best player always rises to the top.
 - **Max-heap:** every parent is greater than or equal to its children. The root is the maximum.
 
-The heap property applies only between parent and child -- siblings have no ordering relationship.
+The heap property applies only between parent and child -- siblings have no ordering relationship. This is weaker than a BST, which fully orders left and right.
 
 ## Array Representation
 
@@ -54,6 +54,19 @@ Replace the root with the last element in the array (maintaining completeness), 
 
 Maximum swaps = height = O(log n).
 
+```python
+import heapq
+
+# Python's heapq module provides a min-heap
+nums = [5, 3, 7, 1, 4]
+heapq.heapify(nums)         # O(n) -- build heap in place
+print(nums[0])              # O(1) peek -> 1 (smallest)
+
+heapq.heappush(nums, 2)     # O(log n) insert
+smallest = heapq.heappop(nums)  # O(log n) extract-min -> 1
+print(smallest)
+```
+
 ### Peek -- O(1)
 
 The root (index 0) is always the min or max. No computation needed.
@@ -76,7 +89,16 @@ A **priority queue** is an abstract data type: insert elements with priorities, 
 | Extract-min/max | O(log n) |
 | Peek | O(1) |
 
-Go provides `container/heap` -- you implement the `heap.Interface` on a slice to get a priority queue.
+Python provides the `heapq` module for min-heaps. For a max-heap, negate the values on insert and negate again on extract.
+
+```python
+# Max-heap via negation
+import heapq
+max_heap = []
+for val in [5, 3, 7, 1]:
+    heapq.heappush(max_heap, -val)  # negate to simulate max-heap
+largest = -heapq.heappop(max_heap)  # negate back -> 7
+```
 
 ## The Top-K Pattern
 
@@ -87,6 +109,21 @@ Go provides `container/heap` -- you implement the `heap.Interface` on a slice to
 Why a min-heap for the *largest* elements? Because you want to quickly discard the smallest of your k candidates. The root of a min-heap gives you that smallest candidate in O(1).
 
 Time: O(n log k) for n elements. Space: O(k).
+
+```python
+import heapq
+
+def top_k_largest(nums, k):
+    # Min-heap of size k holds the k largest elements
+    heap = nums[:k]
+    heapq.heapify(heap)
+    for num in nums[k:]:
+        if num > heap[0]:  # larger than smallest of our top-k
+            heapq.heapreplace(heap, num)
+    return sorted(heap, reverse=True)
+
+print(top_k_largest([3, 1, 5, 12, 2, 11], 3))  # [12, 11, 5]
+```
 
 ## Heap Sort
 
@@ -101,3 +138,7 @@ In practice, quicksort is faster due to better cache behavior, but heap sort has
 - Insert (sift-up) and extract (sift-down) are both O(log n). Peek is O(1).
 - Building a heap from an unsorted array is O(n), not O(n log n).
 - Priority queues are the main abstraction. The top-k pattern uses a min-heap of size k.
+
+## Related Problems
+
+- **Merge Two Sorted Lists** -- heaps generalize the two-list merge to k-way merge; use a min-heap to always extract the smallest head across k lists in O(log k)

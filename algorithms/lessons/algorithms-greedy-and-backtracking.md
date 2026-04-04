@@ -1,7 +1,7 @@
 ---
 title: "Greedy Algorithms and Backtracking"
 summary: "Two algorithmic strategies: greedy (always pick the local optimum) and backtracking (explore and undo). When each works, classic examples, and their relationship to dynamic programming."
-reading_time_minutes: 5
+reading_time_minutes: 7
 order: 6
 ---
 
@@ -29,11 +29,41 @@ Given a set of activities with start and end times, select the maximum number of
 
 **Greedy strategy:** always pick the activity that finishes earliest. This leaves the most room for remaining activities.
 
+```python
+def max_activities(activities):
+    # Sort by end time
+    activities.sort(key=lambda x: x[1])
+    count = 1
+    last_end = activities[0][1]
+    for start, end in activities[1:]:
+        if start >= last_end:  # no overlap
+            count += 1
+            last_end = end
+    return count
+
+# (start, end) pairs
+print(max_activities([(1, 3), (2, 5), (4, 7), (8, 10), (5, 9)]))  # 3
+```
+
 **Why it works:** choosing the earliest-finishing activity never eliminates a better option. Any solution that picks a later-finishing activity could swap in the earlier one without reducing the count.
 
 ### Classic Example: Interval Scheduling / Merge Intervals
 
 Sort intervals by start time. Merge overlapping intervals by extending the current interval's end when the next interval overlaps. This is greedy because processing intervals in sorted order and merging greedily produces the correct merged set in O(n log n).
+
+```python
+def merge_intervals(intervals):
+    intervals.sort()
+    merged = [intervals[0]]
+    for start, end in intervals[1:]:
+        if start <= merged[-1][1]:  # overlapping
+            merged[-1] = (merged[-1][0], max(merged[-1][1], end))
+        else:
+            merged.append((start, end))
+    return merged
+
+print(merge_intervals([(1, 3), (2, 6), (8, 10)]))  # [(1, 6), (8, 10)]
+```
 
 ### Greedy vs Dynamic Programming
 
@@ -75,7 +105,41 @@ Example: in N-queens, if placing a queen on row i creates a conflict, you skip a
 
 **Generating permutations:** build each permutation by choosing one unused element at a time. Backtrack by unmarking the element as used.
 
+```python
+def permutations(nums):
+    result = []
+    def backtrack(path, remaining):
+        if not remaining:
+            result.append(path[:])
+            return
+        for i in range(len(remaining)):
+            path.append(remaining[i])
+            backtrack(path, remaining[:i] + remaining[i+1:])
+            path.pop()  # undo choice
+    backtrack([], nums)
+    return result
+
+print(permutations([1, 2, 3]))
+# [[1,2,3], [1,3,2], [2,1,3], [2,3,1], [3,1,2], [3,2,1]]
+```
+
 **Generating subsets:** for each element, choose to include it or not. This generates all 2^n subsets.
+
+```python
+def subsets(nums):
+    result = []
+    def backtrack(start, path):
+        result.append(path[:])
+        for i in range(start, len(nums)):
+            path.append(nums[i])
+            backtrack(i + 1, path)
+            path.pop()  # undo choice
+    backtrack(0, [])
+    return result
+
+print(subsets([1, 2, 3]))
+# [[], [1], [1,2], [1,2,3], [1,3], [2], [2,3], [3]]
+```
 
 **N-queens:** place queens row by row. At each row, try each column. If the placement conflicts with an existing queen (same column, same diagonal), skip it. Otherwise, recurse to the next row and backtrack.
 
@@ -106,3 +170,8 @@ Without pruning, backtracking on n choices with branching factor b has O(b^n) ti
 - Backtracking explores all candidates incrementally, abandoning (pruning) branches that violate constraints.
 - Backtracking is exponential but pruning makes it practical for many constraint satisfaction and enumeration problems.
 - Greedy decides once per step. Backtracking tries everything and undoes. DP tries everything and remembers.
+
+## Related Problems
+
+- **Merge Intervals** -- classic greedy: sort then merge
+- **Best Time to Buy and Sell Stock** -- greedy single-pass with running minimum

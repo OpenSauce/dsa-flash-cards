@@ -1,7 +1,7 @@
 ---
 title: "Sorting Fundamentals"
 summary: "What sorting means, stability, in-place vs extra space, adaptive behavior, and the three elementary sorts: bubble, selection, and insertion."
-reading_time_minutes: 4
+reading_time_minutes: 6
 order: 1
 ---
 
@@ -38,6 +38,22 @@ Repeatedly swaps adjacent out-of-order elements. Each pass "bubbles" the largest
 
 Bubble sort's only real-world use is teaching. It does more swaps than insertion sort and has no advantage over it. If someone asks "which simple sort is strictly worse than the others in practice," the answer is bubble sort.
 
+```python
+def bubble_sort(arr):
+    n = len(arr)
+    for i in range(n):
+        swapped = False
+        for j in range(n - 1 - i):
+            if arr[j] > arr[j + 1]:
+                arr[j], arr[j + 1] = arr[j + 1], arr[j]
+                swapped = True
+        if not swapped:  # early exit if no swaps
+            break
+    return arr
+
+print(bubble_sort([5, 3, 8, 1, 2]))  # [1, 2, 3, 5, 8]
+```
+
 ## Selection Sort
 
 Finds the minimum unsorted element and swaps it into position. Repeats until sorted.
@@ -49,6 +65,20 @@ Finds the minimum unsorted element and swaps it into position. Repeats until sor
 
 Selection sort's one advantage: it does at most n swaps. On hardware where writes are expensive (e.g., flash memory), minimizing swaps matters. Otherwise, insertion sort is preferred.
 
+```python
+def selection_sort(arr):
+    n = len(arr)
+    for i in range(n):
+        min_idx = i
+        for j in range(i + 1, n):
+            if arr[j] < arr[min_idx]:
+                min_idx = j
+        arr[i], arr[min_idx] = arr[min_idx], arr[i]
+    return arr
+
+print(selection_sort([29, 10, 14, 37, 13]))  # [10, 13, 14, 29, 37]
+```
+
 ## Insertion Sort
 
 Builds the sorted array one element at a time. Takes each element and shifts larger elements right to make room.
@@ -59,6 +89,20 @@ Builds the sorted array one element at a time. Takes each element and shifts lar
 - **Adaptive:** Yes -- performance scales with how far each element is from its sorted position.
 
 Insertion sort is the most practical of the three elementary sorts. Real-world sorting libraries (Python's Timsort, Go's sort package) switch to insertion sort for small subarrays (typically below 12-32 elements) because its low overhead beats the constant factors of more complex algorithms at small n.
+
+```python
+def insertion_sort(arr):
+    for i in range(1, len(arr)):
+        key = arr[i]
+        j = i - 1
+        while j >= 0 and arr[j] > key:
+            arr[j + 1] = arr[j]  # shift right
+            j -= 1
+        arr[j + 1] = key
+    return arr
+
+print(insertion_sort([12, 11, 13, 5, 6]))  # [5, 6, 11, 12, 13]
+```
 
 ## Real-World Hybrid Sorts
 
@@ -74,3 +118,8 @@ No production sorting library uses a single algorithm. The two most common hybri
 - The comparison-based sorting lower bound is O(n log n). Elementary O(n^2) sorts cannot beat this for large inputs.
 - Insertion sort is the best elementary sort in practice -- adaptive, stable, and used as a building block inside Timsort and introsort.
 - Selection sort minimizes swaps (at most n). Bubble sort has no practical advantage.
+
+## Related Problems
+
+- **Merge Intervals** -- sorting by start time is the first step
+- **Maximum Subarray** -- Kadane's algorithm often follows a sorting-related discussion

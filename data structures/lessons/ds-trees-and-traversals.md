@@ -1,7 +1,7 @@
 ---
 title: "Trees and Traversals"
 summary: "Binary tree properties, full/complete/balanced/perfect definitions, in-order/pre-order/post-order/level-order traversals, and DFS vs BFS space trade-offs."
-reading_time_minutes: 4
+reading_time_minutes: 6
 order: 5
 ---
 
@@ -11,7 +11,20 @@ Trees are the backbone of hierarchical data: file systems, DOM elements, org cha
 
 ## Binary Tree Basics
 
-A **binary tree** is a hierarchical structure where each node has at most two children, called **left** and **right**. The topmost node is the **root**. A node with no children is a **leaf**.
+A **binary tree** is a hierarchical structure where each node has at most two children, called **left** and **right**. Think of a family tree that branches into two at each generation. The topmost node is the **root**. A node with no children is a **leaf**.
+
+```python
+class TreeNode:
+    def __init__(self, val=0, left=None, right=None):
+        self.val = val
+        self.left = left
+        self.right = right
+
+# Build the tree from the diagram below
+root = TreeNode(1,
+    TreeNode(2, TreeNode(4), TreeNode(5)),
+    TreeNode(3, None, TreeNode(6)))
+```
 
 ```
         1
@@ -55,6 +68,28 @@ DFS explores one branch fully before backtracking. The three DFS orders differ o
 
 All three use O(h) space for the recursion stack, where h is the tree height. On a balanced tree, h = O(log n). On a skewed tree, h = O(n).
 
+```python
+def inorder(node):
+    if node is None:
+        return []
+    return inorder(node.left) + [node.val] + inorder(node.right)
+
+def preorder(node):
+    if node is None:
+        return []
+    return [node.val] + preorder(node.left) + preorder(node.right)
+
+def postorder(node):
+    if node is None:
+        return []
+    return postorder(node.left) + postorder(node.right) + [node.val]
+
+# Using the tree: 1(2(4,5), 3(None,6))
+print(inorder(root))    # [4, 2, 5, 1, 3, 6]
+print(preorder(root))   # [1, 2, 4, 5, 3, 6]
+print(postorder(root))  # [4, 5, 2, 6, 3, 1]
+```
+
 ### Breadth-First Traversal (BFS)
 
 **Level-order:** Uses a queue to visit nodes level by level, left to right. At each step, dequeue a node, process it, and enqueue its children.
@@ -64,6 +99,26 @@ Visit order: 1, 2, 3, 4, 5, 6
 ```
 
 Space is O(w), where w is the maximum width. For a complete binary tree, the last level holds about n/2 nodes, so BFS uses O(n) space. On a skewed tree, width is 1, so BFS uses O(1) extra space.
+
+```python
+from collections import deque
+
+def level_order(root):
+    if not root:
+        return []
+    result = []
+    queue = deque([root])
+    while queue:
+        node = queue.popleft()
+        result.append(node.val)
+        if node.left:
+            queue.append(node.left)
+        if node.right:
+            queue.append(node.right)
+    return result
+
+print(level_order(root))  # [1, 2, 3, 4, 5, 6]
+```
 
 ## DFS vs BFS Space Trade-off
 
@@ -91,7 +146,16 @@ Most tree problems follow a single recursive template:
 2. **Recurse** on left and right subtrees.
 3. **Combine** the results.
 
-Maximum depth, for example: `depth(node) = 1 + max(depth(left), depth(right))`, with base case `depth(nil) = 0`. This visits every node once (O(n)) and uses O(h) stack space.
+Maximum depth, for example: `depth(node) = 1 + max(depth(left), depth(right))`, with base case `depth(None) = 0`. This visits every node once (O(n)) and uses O(h) stack space.
+
+```python
+def max_depth(node):
+    if node is None:
+        return 0
+    return 1 + max(max_depth(node.left), max_depth(node.right))
+
+print(max_depth(root))  # 3
+```
 
 ## Key Takeaways
 
@@ -99,3 +163,7 @@ Maximum depth, for example: `depth(node) = 1 + max(depth(left), depth(right))`, 
 - Four traversals: in-order (sorted on BST), pre-order (serialize), post-order (delete/evaluate), level-order (by depth).
 - DFS uses O(h) space; BFS uses O(w) space. DFS is better on balanced trees; BFS when you need level information.
 - Most tree problems reduce to: base case, recurse, combine.
+
+## Related Problems
+
+- **Invert Binary Tree** -- swap left and right children recursively (base case, recurse, combine)

@@ -1,7 +1,7 @@
 ---
 title: "Graphs"
 summary: "Vertices and edges, directed vs undirected, weighted vs unweighted, adjacency list vs adjacency matrix, BFS and DFS on graphs, and connected components."
-reading_time_minutes: 5
+reading_time_minutes: 7
 order: 8
 ---
 
@@ -11,7 +11,7 @@ Graphs model relationships: social networks, road maps, dependency chains, web l
 
 ## What Is a Graph?
 
-A graph is a set of **vertices** (nodes) connected by **edges** (links). Unlike trees, graphs have no root, can contain cycles, and a vertex can have any number of connections.
+A graph is a set of **vertices** (also called nodes) connected by **edges** (also called links). Think of a city map: intersections are vertices, and roads between them are edges. Unlike trees, graphs have no root, can contain cycles (circular paths), and a vertex can have any number of connections.
 
 ### Directed vs Undirected
 
@@ -27,7 +27,21 @@ A graph is a set of **vertices** (nodes) connected by **edges** (links). Unlike 
 
 ### Adjacency List
 
-Each vertex stores a list of its neighbors.
+Each vertex stores a list of its neighbors. In Python, a dictionary of lists is the standard approach.
+
+```python
+# Adjacency list: each key maps to its list of neighbors
+graph = {
+    0: [1, 2],
+    1: [0, 3],
+    2: [0],
+    3: [1],
+}
+# Vertex 0 connects to vertices 1 and 2
+```
+
+<details>
+<summary>Go equivalent</summary>
 
 ```go
 graph := map[int][]int{
@@ -37,6 +51,8 @@ graph := map[int][]int{
     3: {1},
 }
 ```
+
+</details>
 
 - **Space:** O(V + E). Efficient for sparse graphs.
 - **Check if edge exists:** O(degree(v)) -- walk the neighbor list.
@@ -91,6 +107,25 @@ Algorithm:
 
 Mark vertices visited **before** enqueuing, not after dequeuing. Otherwise you may enqueue the same vertex multiple times.
 
+```python
+from collections import deque
+
+def bfs(graph, start):
+    visited = {start}
+    queue = deque([start])
+    order = []
+    while queue:
+        v = queue.popleft()
+        order.append(v)
+        for neighbor in graph[v]:
+            if neighbor not in visited:
+                visited.add(neighbor)
+                queue.append(neighbor)
+    return order
+
+# bfs(graph, 0) -> [0, 1, 2, 3]
+```
+
 ### DFS (Depth-First Search)
 
 Uses a stack (or recursion). Explores one branch as deeply as possible before backtracking.
@@ -108,6 +143,22 @@ Algorithm:
 **Space:** O(V) for the visited set and stack/recursion depth.
 
 DFS is used for: cycle detection, topological sorting, finding connected components, and maze solving.
+
+```python
+def dfs(graph, start):
+    visited = set()
+    order = []
+    def _dfs(v):
+        visited.add(v)
+        order.append(v)
+        for neighbor in graph[v]:
+            if neighbor not in visited:
+                _dfs(neighbor)
+    _dfs(start)
+    return order
+
+# dfs(graph, 0) -> [0, 1, 3, 2]
+```
 
 ## Connected Components
 

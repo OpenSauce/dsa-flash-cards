@@ -1,7 +1,7 @@
 ---
 title: "Interval DP and Advanced Patterns"
 summary: "Interval DP (matrix chain, burst balloons), LIS in O(n log n), state machine DP (stock cooldown), bitmask DP, and pattern recognition heuristics."
-reading_time_minutes: 5
+reading_time_minutes: 7
 order: 6
 ---
 
@@ -83,6 +83,22 @@ return len(tails)
 
 **Time:** O(n log n), **Space:** O(n). Note: `tails` is not the actual LIS, just its length. Reconstructing the actual subsequence requires additional bookkeeping.
 
+```python
+from bisect import bisect_left
+
+def length_of_lis(nums):
+    tails = []
+    for x in nums:
+        pos = bisect_left(tails, x)
+        if pos == len(tails):
+            tails.append(x)
+        else:
+            tails[pos] = x
+    return len(tails)
+
+print(length_of_lis([10, 9, 2, 5, 3, 7, 101, 18]))  # 4
+```
+
 ## State Machine DP
 
 **Pattern:** Model a problem as a set of distinct states with transitions between them. `dp[state]` = optimal value when currently in that state.
@@ -102,6 +118,23 @@ Transitions:
 **Base cases:** `held[-1] = -infinity`, `sold[-1] = 0`, `rest[-1] = 0`.
 
 Answer: `max(sold[n-1], rest[n-1])` (can't end while holding for maximum profit).
+
+```python
+def max_profit_cooldown(prices):
+    if len(prices) < 2:
+        return 0
+    held = float('-inf')
+    sold = 0
+    rest = 0
+    for price in prices:
+        prev_held = held
+        held = max(held, rest - price)      # buy or keep holding
+        rest = max(rest, sold)              # rest or finish cooldown
+        sold = prev_held + price            # sell what we held
+    return max(sold, rest)
+
+print(max_profit_cooldown([1, 2, 3, 0, 2]))  # 3
+```
 
 **When to use:** problems with phases or modes that constrain what you can do next, especially "stock" problems, lock/unlock states, or cooldown constraints.
 
@@ -146,3 +179,7 @@ If none fit, look for the decision tree: what choices do you make at each step? 
 - **State machine DP:** define states explicitly, write transition equations between states.
 - **Bitmask DP:** bitmask encodes which items are in the current subset; practical for n <= 20.
 - Pattern recognition: check linear -> knapsack -> two-string -> grid -> interval -> state machine -> bitmask in order.
+
+## Related Problems
+
+- **Climbing Stairs** -- the simplest linear DP that this lesson builds upon
