@@ -263,4 +263,3 @@ An alternative: perform an in-order traversal and check that the output is stric
 ## Related Problems
 
 - **Invert Binary Tree** -- swap left and right children recursively
-- **Merge Two Sorted Lists** -- similar merge logic to BST in-order output

@@ -181,8 +181,3 @@ Time: O(V + E) total across all BFS/DFS runs.
 - BFS uses a queue, explores level by level, and finds shortest paths in unweighted graphs.
 - DFS uses a stack/recursion, explores depth-first, and is used for cycle detection and topological sort.
 - Both traversals run in O(V + E) time.
-
-## Related Problems
-
-- **Two Sum** -- can be modeled as a graph of index relationships
-- **Valid Parentheses** -- stack-based, but graph cycle detection uses similar visited-set logic

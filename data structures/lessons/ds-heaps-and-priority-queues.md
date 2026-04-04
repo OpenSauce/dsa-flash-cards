@@ -141,5 +141,4 @@ In practice, quicksort is faster due to better cache behavior, but heap sort has
 
 ## Related Problems
 
-- **Merge Two Sorted Lists** -- heaps generalize this to merging k sorted lists
-- **Invert Binary Tree** -- both involve tree-based data structures
+- **Merge Two Sorted Lists** -- heaps generalize the two-list merge to k-way merge; use a min-heap to always extract the smallest head across k lists in O(log k)

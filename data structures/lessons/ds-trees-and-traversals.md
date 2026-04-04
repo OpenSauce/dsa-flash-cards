@@ -167,4 +167,3 @@ print(max_depth(root))  # 3
 ## Related Problems
 
 - **Invert Binary Tree** -- swap left and right children recursively (base case, recurse, combine)
-- **Merge Two Sorted Lists** -- recursive structure mirrors tree traversal patterns

@@ -200,8 +200,3 @@ def kahns_algorithm(graph, in_degree, num_vertices):
 - BFS uses a queue, visits level by level, and finds shortest paths in unweighted graphs. Time: O(V + E).
 - DFS uses a stack or recursion, explores depth-first, and is used for cycle detection and topological sort. Time: O(V + E).
 - Topological sort orders a DAG so every edge points forward. DFS-based (finish order) and Kahn's (in-degree reduction) both work in O(V + E).
-
-## Related Problems
-
-- **Binary Search** -- BFS on a sorted structure shares the "halving" intuition
-- **Merge Intervals** -- graph connectivity problems often reduce to interval merging
