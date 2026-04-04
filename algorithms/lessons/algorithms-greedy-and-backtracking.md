@@ -42,7 +42,7 @@ def max_activities(activities):
     return count
 
 # (start, end) pairs
-print(max_activities([(1, 3), (2, 5), (4, 7), (1, 8), (5, 9)]))  # 3
+print(max_activities([(1, 3), (2, 5), (4, 7), (8, 10), (5, 9)]))  # 3
 ```
 
 **Why it works:** choosing the earliest-finishing activity never eliminates a better option. Any solution that picks a later-finishing activity could swap in the earlier one without reducing the count.
