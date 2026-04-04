@@ -1,7 +1,7 @@
 ---
 title: "Divide-and-Conquer Sorts"
 summary: "The divide-and-conquer paradigm applied to sorting: merge sort, quick sort, and heap sort, with their trade-offs in time, space, stability, and cache performance."
-reading_time_minutes: 5
+reading_time_minutes: 7
 order: 2
 ---
 
@@ -17,7 +17,7 @@ Divide-and-conquer solves a problem in three steps:
 2. **Conquer** each subproblem recursively (or directly if small enough).
 3. **Combine** the subproblem solutions into a solution for the original problem.
 
-Merge sort and quick sort are both divide-and-conquer, but they divide differently. Merge sort splits in the middle (easy divide, hard combine). Quick sort partitions around a pivot (hard divide, easy combine).
+Merge sort and quick sort are both divide-and-conquer, but they divide differently. Merge sort splits in the middle (easy divide, hard combine). Quick sort partitions around a pivot (hard divide, easy combine). Think of it like sorting a deck of cards: merge sort splits the deck in half first and reassembles in order, while quick sort picks a card and puts everything smaller to the left.
 
 ## Merge Sort
 
@@ -29,6 +29,30 @@ Split the array in half, recursively sort each half, then merge the two sorted h
 - **Cache performance:** Moderate. Sequential access during merge, but the auxiliary array causes extra memory traffic.
 
 The merge step walks two sorted arrays with two pointers, picking the smaller element each time. This takes O(n) per level, and there are log(n) levels, giving O(n log n) total.
+
+```python
+def merge_sort(arr):
+    if len(arr) <= 1:
+        return arr
+    mid = len(arr) // 2
+    left = merge_sort(arr[:mid])
+    right = merge_sort(arr[mid:])
+    return merge(left, right)
+
+def merge(left, right):
+    result = []
+    i = j = 0
+    while i < len(left) and j < len(right):
+        if left[i] <= right[j]:
+            result.append(left[i]); i += 1
+        else:
+            result.append(right[j]); j += 1
+    result.extend(left[i:])
+    result.extend(right[j:])
+    return result
+
+print(merge_sort([38, 27, 43, 3, 9]))  # [3, 9, 27, 38, 43]
+```
 
 **When to use merge sort:** when you need a worst-case guarantee and stability. External sorting (data too large for RAM) is naturally merge-based -- merge sorted chunks from disk.
 
@@ -47,6 +71,21 @@ Pick a pivot element, partition the array so everything less than the pivot is o
 - **Median-of-three:** take the median of the first, middle, and last elements. Handles sorted input well.
 
 Quick sort is typically the fastest general-purpose sort in practice due to small constant factors and cache-friendly access patterns, even though merge sort has a better worst case.
+
+```python
+import random
+
+def quick_sort(arr):
+    if len(arr) <= 1:
+        return arr
+    pivot = random.choice(arr)  # random pivot avoids worst case
+    left = [x for x in arr if x < pivot]
+    mid = [x for x in arr if x == pivot]
+    right = [x for x in arr if x > pivot]
+    return quick_sort(left) + mid + quick_sort(right)
+
+print(quick_sort([10, 7, 8, 9, 1, 5]))  # [1, 5, 7, 8, 9, 10]
+```
 
 ## Heap Sort
 
@@ -79,3 +118,8 @@ Heap sort combines merge sort's worst-case guarantee with quick sort's O(1) spac
 - Quick sort averages O(n log n) with excellent cache performance, but O(n^2) worst case with bad pivot choice. Randomized or median-of-three pivot selection avoids this in practice.
 - Heap sort is O(n log n) guaranteed and in-place, but poor cache locality makes it slower than quick sort on modern hardware.
 - Quick sort is typically fastest in practice. Merge sort is preferred when stability or worst-case guarantees matter. Heap sort is a fallback for worst-case safety without extra memory.
+
+## Related Problems
+
+- **Merge Intervals** -- uses the merge step logic from merge sort
+- **Maximum Subarray** -- divide-and-conquer is an alternative approach to Kadane's
