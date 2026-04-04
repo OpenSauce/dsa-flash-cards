@@ -1,0 +1,99 @@
+title: Remove Duplicates from Sorted Array
+difficulty: easy
+tags: [two-pointers, array]
+description: |
+  Given a sorted integer array `nums` in non-decreasing order, remove the
+  duplicates in-place so that each unique element appears only once. Return
+  the number of unique elements.
+
+  The first `k` elements of `nums` should contain the unique values in their
+  original order. The remaining elements are not important. Return `k`.
+examples:
+  - input: "nums = [1,1,2]"
+    output: "2"
+    explanation: "After removing duplicates, the first 2 elements are [1,2]."
+  - input: "nums = [0,0,1,1,1,2,2,3,3,4]"
+    output: "5"
+    explanation: "After removing duplicates, the first 5 elements are [0,1,2,3,4]."
+constraints:
+  - "1 <= nums.length <= 3 * 10^4"
+  - "-100 <= nums[i] <= 100"
+  - "nums is sorted in non-decreasing order."
+starter_code:
+  python: |
+    def remove_duplicates(nums: list[int]) -> int:
+        pass
+  javascript: |
+    function removeDuplicates(nums) {
+    }
+  go: |
+    func removeDuplicates(nums []int) int {
+        return 0
+    }
+  java: |
+    public int removeDuplicates(int[] nums) {
+        return 0;
+    }
+test_cases:
+  - input: { nums: [1, 1, 2] }
+    expected: 2
+  - input: { nums: [0, 0, 1, 1, 1, 2, 2, 3, 3, 4] }
+    expected: 5
+  - input: { nums: [1] }
+    expected: 1
+  - input: { nums: [1, 2, 3] }
+    expected: 3
+  - input: { nums: [-3, -3, -1, 0, 0, 0, 5] }
+    expected: 4
+solution:
+  python: |
+    def remove_duplicates(nums: list[int]) -> int:
+        if not nums:
+            return 0
+        write = 1
+        for read in range(1, len(nums)):
+            if nums[read] != nums[write - 1]:
+                nums[write] = nums[read]
+                write += 1
+        return write
+  javascript: |
+    function removeDuplicates(nums) {
+        if (nums.length === 0) return 0;
+        let write = 1;
+        for (let read = 1; read < nums.length; read++) {
+            if (nums[read] !== nums[write - 1]) {
+                nums[write] = nums[read];
+                write++;
+            }
+        }
+        return write;
+    }
+  go: |
+    func removeDuplicates(nums []int) int {
+        if len(nums) == 0 {
+            return 0
+        }
+        write := 1
+        for read := 1; read < len(nums); read++ {
+            if nums[read] != nums[write-1] {
+                nums[write] = nums[read]
+                write++
+            }
+        }
+        return write
+    }
+  java: |
+    public int removeDuplicates(int[] nums) {
+        if (nums.length == 0) return 0;
+        int write = 1;
+        for (int read = 1; read < nums.length; read++) {
+            if (nums[read] != nums[write - 1]) {
+                nums[write] = nums[read];
+                write++;
+            }
+        }
+        return write;
+    }
+hints:
+  - "Use a slow pointer to track where the next unique element should be placed."
+  - "Walk a fast pointer through the array. Whenever you see a value different from the last written value, copy it to the slow pointer's position and advance the slow pointer."

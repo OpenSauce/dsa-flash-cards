@@ -1,0 +1,92 @@
+title: Best Time to Buy and Sell Stock II
+difficulty: medium
+tags: [sliding-window, greedy]
+description: |
+  You are given an array `prices` where `prices[i]` is the price of a stock
+  on day `i`. You can buy and sell the stock multiple times, but you may
+  only hold one share at a time. You can buy and sell on the same day.
+
+  Return the maximum total profit you can achieve. If no profit is possible,
+  return 0.
+examples:
+  - input: "prices = [7,1,5,3,6,4]"
+    output: "7"
+    explanation: "Buy on day 2 (price 1), sell on day 3 (price 5) for profit 4. Then buy on day 4 (price 3), sell on day 5 (price 6) for profit 3. Total profit = 7."
+  - input: "prices = [1,2,3,4,5]"
+    output: "4"
+    explanation: "Buy on day 1 (price 1), sell on day 5 (price 5) for profit 4."
+  - input: "prices = [7,6,4,3,1]"
+    output: "0"
+    explanation: "Prices only decrease, so no profitable transaction is possible."
+constraints:
+  - "1 <= prices.length <= 3 * 10^4"
+  - "0 <= prices[i] <= 10^4"
+starter_code:
+  python: |
+    def max_profit(prices: list[int]) -> int:
+        pass
+  javascript: |
+    function maxProfit(prices) {
+    }
+  go: |
+    func maxProfit(prices []int) int {
+        return 0
+    }
+  java: |
+    public int maxProfit(int[] prices) {
+        return 0;
+    }
+test_cases:
+  - input: { prices: [7, 1, 5, 3, 6, 4] }
+    expected: 7
+  - input: { prices: [1, 2, 3, 4, 5] }
+    expected: 4
+  - input: { prices: [7, 6, 4, 3, 1] }
+    expected: 0
+  - input: { prices: [2, 4, 1] }
+    expected: 2
+  - input: { prices: [3, 3, 3] }
+    expected: 0
+  - input: { prices: [1] }
+    expected: 0
+solution:
+  python: |
+    def max_profit(prices: list[int]) -> int:
+        profit = 0
+        for i in range(1, len(prices)):
+            if prices[i] > prices[i - 1]:
+                profit += prices[i] - prices[i - 1]
+        return profit
+  javascript: |
+    function maxProfit(prices) {
+        let profit = 0;
+        for (let i = 1; i < prices.length; i++) {
+            if (prices[i] > prices[i - 1]) {
+                profit += prices[i] - prices[i - 1];
+            }
+        }
+        return profit;
+    }
+  go: |
+    func maxProfit(prices []int) int {
+        profit := 0
+        for i := 1; i < len(prices); i++ {
+            if prices[i] > prices[i-1] {
+                profit += prices[i] - prices[i-1]
+            }
+        }
+        return profit
+    }
+  java: |
+    public int maxProfit(int[] prices) {
+        int profit = 0;
+        for (int i = 1; i < prices.length; i++) {
+            if (prices[i] > prices[i - 1]) {
+                profit += prices[i] - prices[i - 1];
+            }
+        }
+        return profit;
+    }
+hints:
+  - "You want to capture every upward price movement."
+  - "Add up every consecutive day-over-day gain. Buying at every local minimum and selling at every local maximum is equivalent to collecting all positive differences between consecutive days."

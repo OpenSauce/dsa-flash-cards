@@ -1,0 +1,91 @@
+title: Move Zeroes
+difficulty: easy
+tags: [two-pointers, array]
+description: |
+  Given an integer array `nums`, move all zeroes to the end of the array
+  while maintaining the relative order of the non-zero elements.
+
+  You must modify the array in-place and return the resulting array.
+examples:
+  - input: "nums = [0,1,0,3,12]"
+    output: "[1,3,12,0,0]"
+    explanation: "Non-zero elements 1, 3, 12 keep their order and zeroes move to the end."
+  - input: "nums = [0]"
+    output: "[0]"
+    explanation: "A single zero stays in place."
+constraints:
+  - "1 <= nums.length <= 10^4"
+  - "-2^31 <= nums[i] <= 2^31 - 1"
+starter_code:
+  python: |
+    def move_zeroes(nums: list[int]) -> list[int]:
+        pass
+  javascript: |
+    function moveZeroes(nums) {
+    }
+  go: |
+    func moveZeroes(nums []int) []int {
+        return nil
+    }
+  java: |
+    public int[] moveZeroes(int[] nums) {
+        return nums;
+    }
+test_cases:
+  - input: { nums: [0, 1, 0, 3, 12] }
+    expected: [1, 3, 12, 0, 0]
+  - input: { nums: [0] }
+    expected: [0]
+  - input: { nums: [1, 2, 3] }
+    expected: [1, 2, 3]
+  - input: { nums: [0, 0, 0, 1] }
+    expected: [1, 0, 0, 0]
+  - input: { nums: [4, 0, 5, 0, 0, 6] }
+    expected: [4, 5, 6, 0, 0, 0]
+solution:
+  python: |
+    def move_zeroes(nums: list[int]) -> list[int]:
+        write = 0
+        for read in range(len(nums)):
+            if nums[read] != 0:
+                nums[write], nums[read] = nums[read], nums[write]
+                write += 1
+        return nums
+  javascript: |
+    function moveZeroes(nums) {
+        let write = 0;
+        for (let read = 0; read < nums.length; read++) {
+            if (nums[read] !== 0) {
+                [nums[write], nums[read]] = [nums[read], nums[write]];
+                write++;
+            }
+        }
+        return nums;
+    }
+  go: |
+    func moveZeroes(nums []int) []int {
+        write := 0
+        for read := 0; read < len(nums); read++ {
+            if nums[read] != 0 {
+                nums[write], nums[read] = nums[read], nums[write]
+                write++
+            }
+        }
+        return nums
+    }
+  java: |
+    public int[] moveZeroes(int[] nums) {
+        int write = 0;
+        for (int read = 0; read < nums.length; read++) {
+            if (nums[read] != 0) {
+                int tmp = nums[write];
+                nums[write] = nums[read];
+                nums[read] = tmp;
+                write++;
+            }
+        }
+        return nums;
+    }
+hints:
+  - "Think of this as partitioning: all non-zero values go first, then zeroes fill the rest."
+  - "Use a write pointer that tracks where the next non-zero should go. Swap each non-zero element to the write position and advance. Everything behind the write pointer is finalized."

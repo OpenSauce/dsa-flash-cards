@@ -1,0 +1,151 @@
+title: Remove Nth Node From End
+difficulty: medium
+tags: [linked-list, two-pointers]
+description: |
+  Given the head of a singly linked list, remove the nth node from the end
+  of the list and return the updated head.
+
+  The list is guaranteed to have at least n nodes.
+examples:
+  - input: "head = [1,2,3,4,5], n = 2"
+    output: "[1,2,3,5]"
+    explanation: "The 2nd node from the end is 4, which is removed."
+  - input: "head = [1], n = 1"
+    output: "[]"
+    explanation: "Removing the only node results in an empty list."
+constraints:
+  - "1 <= number of nodes <= 30"
+  - "0 <= Node.val <= 100"
+  - "1 <= n <= number of nodes"
+starter_code:
+  python: |
+    from typing import Optional
+
+    class ListNode:
+        def __init__(self, val=0, next=None):
+            self.val = val
+            self.next = next
+
+    def remove_nth_from_end(head: Optional[ListNode], n: int) -> Optional[ListNode]:
+        pass
+  javascript: |
+    class ListNode {
+        constructor(val = 0, next = null) {
+            this.val = val;
+            this.next = next;
+        }
+    }
+
+    function removeNthFromEnd(head, n) {
+    }
+  go: |
+    type ListNode struct {
+        Val  int
+        Next *ListNode
+    }
+
+    func removeNthFromEnd(head *ListNode, n int) *ListNode {
+        return nil
+    }
+  java: |
+    class ListNode {
+        int val;
+        ListNode next;
+        ListNode(int x) { val = x; }
+    }
+
+    public ListNode removeNthFromEnd(ListNode head, int n) {
+        return null;
+    }
+test_cases:
+  - input: { head: [1, 2, 3, 4, 5], n: 2 }
+    expected: [1, 2, 3, 5]
+  - input: { head: [1], n: 1 }
+    expected: []
+  - input: { head: [1, 2], n: 1 }
+    expected: [1]
+  - input: { head: [1, 2], n: 2 }
+    expected: [2]
+  - input: { head: [1, 2, 3], n: 3 }
+    expected: [2, 3]
+solution:
+  python: |
+    from typing import Optional
+
+    class ListNode:
+        def __init__(self, val=0, next=None):
+            self.val = val
+            self.next = next
+
+    def remove_nth_from_end(head: Optional[ListNode], n: int) -> Optional[ListNode]:
+        dummy = ListNode(0, head)
+        fast = dummy
+        slow = dummy
+        for _ in range(n + 1):
+            fast = fast.next
+        while fast:
+            fast = fast.next
+            slow = slow.next
+        slow.next = slow.next.next
+        return dummy.next
+  javascript: |
+    class ListNode {
+        constructor(val = 0, next = null) {
+            this.val = val;
+            this.next = next;
+        }
+    }
+
+    function removeNthFromEnd(head, n) {
+        const dummy = new ListNode(0, head);
+        let fast = dummy, slow = dummy;
+        for (let i = 0; i <= n; i++) fast = fast.next;
+        while (fast !== null) {
+            fast = fast.next;
+            slow = slow.next;
+        }
+        slow.next = slow.next.next;
+        return dummy.next;
+    }
+  go: |
+    type ListNode struct {
+        Val  int
+        Next *ListNode
+    }
+
+    func removeNthFromEnd(head *ListNode, n int) *ListNode {
+        dummy := &ListNode{0, head}
+        fast := dummy
+        slow := dummy
+        for i := 0; i <= n; i++ {
+            fast = fast.Next
+        }
+        for fast != nil {
+            fast = fast.Next
+            slow = slow.Next
+        }
+        slow.Next = slow.Next.Next
+        return dummy.Next
+    }
+  java: |
+    class ListNode {
+        int val;
+        ListNode next;
+        ListNode(int x) { val = x; }
+    }
+
+    public ListNode removeNthFromEnd(ListNode head, int n) {
+        ListNode dummy = new ListNode(0);
+        dummy.next = head;
+        ListNode fast = dummy, slow = dummy;
+        for (int i = 0; i <= n; i++) fast = fast.next;
+        while (fast != null) {
+            fast = fast.next;
+            slow = slow.next;
+        }
+        slow.next = slow.next.next;
+        return dummy.next;
+    }
+hints:
+  - "If you knew the total length, removing the nth from end is straightforward. Can you find the target node in a single pass?"
+  - "Use two pointers separated by exactly n nodes. Advance both until the lead pointer reaches the end — the trailing pointer is now just before the node to remove. A dummy head simplifies edge cases where the head itself is removed."
