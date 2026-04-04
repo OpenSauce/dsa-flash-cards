@@ -1,7 +1,7 @@
 ---
 title: "Linear DP and Counting"
 summary: "1D DP where the state is a single index: Kadane's extend-or-restart pattern, house robber's skip-or-take pattern, and counting ways problems."
-reading_time_minutes: 5
+reading_time_minutes: 7
 order: 2
 ---
 
@@ -37,6 +37,17 @@ for i from 1 to n-1:
 
 Time: O(n), Space: O(1).
 
+```python
+def max_subarray(nums):
+    curr_max = global_max = nums[0]
+    for num in nums[1:]:
+        curr_max = max(num, curr_max + num)
+        global_max = max(global_max, curr_max)
+    return global_max
+
+print(max_subarray([-2, 1, -3, 4, -1, 2, 1, -5, 4]))  # 6 (subarray [4,-1,2,1])
+```
+
 **When to restart vs extend:** Restart when `dp[i-1] < 0`. Extending a negative running sum only makes the new subarray worse.
 
 ## The Skip-or-Take Pattern: House Robber
@@ -55,6 +66,20 @@ dp[i] = max(dp[i-1], dp[i-2] + nums[i])
 **Why greedy fails:** Consider the greedy rule "take every other house starting from the first". On `[5, 1, 1, 5]`, this rule picks houses at indices 0 and 2 for a total of 6, but the optimal choice is indices 0 and 3 for a total of 10. A simple local or fixed pattern rule can miss the best non-adjacent combination, which is why we need the skip-or-take DP recurrence.
 
 **Space optimization:** Like Kadane's, only the two previous values are needed. Reduce to O(1) with `prev2` and `prev1` variables.
+
+```python
+def house_robber(nums):
+    if len(nums) == 1:
+        return nums[0]
+    prev2, prev1 = nums[0], max(nums[0], nums[1])
+    for i in range(2, len(nums)):
+        curr = max(prev1, prev2 + nums[i])
+        prev2 = prev1
+        prev1 = curr
+    return prev1
+
+print(house_robber([2, 7, 9, 3, 1]))  # 12 (rob houses 0, 2, 4)
+```
 
 ## Counting DP vs Optimization DP
 
@@ -96,6 +121,25 @@ Base case: `dp[0] = 1` (one way to decode the empty string), `dp[1] = 1` if firs
 
 The '0' case is critical: '0' alone is invalid, so it contributes nothing as a single digit.
 
+```python
+def num_decodings(s):
+    if not s or s[0] == '0':
+        return 0
+    n = len(s)
+    dp = [0] * (n + 1)
+    dp[0] = 1  # empty string
+    dp[1] = 1  # first char is non-zero (checked above)
+    for i in range(2, n + 1):
+        if s[i - 1] != '0':
+            dp[i] += dp[i - 1]  # single digit decode
+        two_digit = int(s[i - 2:i])
+        if 10 <= two_digit <= 26:
+            dp[i] += dp[i - 2]  # two-digit decode
+    return dp[n]
+
+print(num_decodings("226"))  # 3: "BZ", "VF", "BBF"
+```
+
 ## Rolling Variable Optimization for 1D DP
 
 Any 1D DP where `dp[i]` depends only on the previous one or two entries can be reduced from O(n) space to O(1):
@@ -113,3 +157,7 @@ The pattern: before updating, save what you'll need for the next iteration.
 - **Counting vs optimization:** counting adds subproblem answers; optimization takes max/min. Base cases differ accordingly.
 - **Rolling variables:** if `dp[i]` depends on a constant number of previous entries, reduce space to O(1) by keeping only those entries.
 - Identify which pattern applies before writing the recurrence -- the two patterns have different base cases and different answers (max over all i vs value at i=n).
+
+## Related Problems
+
+- **Climbing Stairs** -- counting DP with the same Fibonacci-like recurrence

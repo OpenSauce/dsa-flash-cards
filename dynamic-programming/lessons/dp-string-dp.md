@@ -1,7 +1,7 @@
 ---
 title: "String DP"
 summary: "Two-string DP problems: LCS, edit distance, longest common substring vs subsequence, and longest palindromic subsequence."
-reading_time_minutes: 5
+reading_time_minutes: 7
 order: 4
 ---
 
@@ -38,6 +38,21 @@ else:
 **Base cases:** `dp[0][j] = 0` and `dp[i][0] = 0` (LCS with an empty string is 0).
 
 **Time:** O(m * n), **Space:** O(m * n), reducible to O(min(m, n)) by keeping only two rows.
+
+```python
+def lcs(s1, s2):
+    m, n = len(s1), len(s2)
+    dp = [[0] * (n + 1) for _ in range(m + 1)]
+    for i in range(1, m + 1):
+        for j in range(1, n + 1):
+            if s1[i - 1] == s2[j - 1]:
+                dp[i][j] = dp[i - 1][j - 1] + 1
+            else:
+                dp[i][j] = max(dp[i - 1][j], dp[i][j - 1])
+    return dp[m][n]
+
+print(lcs("abcde", "ace"))  # 3 ("ace")
+```
 
 ### Reconstructing the Actual LCS
 
@@ -95,6 +110,29 @@ else:
 
 **Time:** O(m * n), **Space:** O(m * n), reducible to O(min(m, n)).
 
+```python
+def edit_distance(s1, s2):
+    m, n = len(s1), len(s2)
+    dp = [[0] * (n + 1) for _ in range(m + 1)]
+    for i in range(m + 1):
+        dp[i][0] = i  # delete all from s1
+    for j in range(n + 1):
+        dp[0][j] = j  # insert all from s2
+    for i in range(1, m + 1):
+        for j in range(1, n + 1):
+            if s1[i - 1] == s2[j - 1]:
+                dp[i][j] = dp[i - 1][j - 1]
+            else:
+                dp[i][j] = 1 + min(
+                    dp[i - 1][j],      # delete
+                    dp[i][j - 1],      # insert
+                    dp[i - 1][j - 1],  # replace
+                )
+    return dp[m][n]
+
+print(edit_distance("kitten", "sitting"))  # 3
+```
+
 ## Longest Palindromic Subsequence
 
 **Problem:** Find the longest subsequence of a string that is also a palindrome.
@@ -118,3 +156,7 @@ No new recurrence needed -- just recognize the reduction.
 - **Edit distance:** three operations map to three table directions: up (delete), left (insert), diagonal (replace).
 - **Reconstruct LCS** by backtracking through the table from `dp[m][n]`, following the path that produced each value.
 - **Longest palindromic subsequence** = LCS of the string with its own reverse.
+
+## Related Problems
+
+- **Climbing Stairs** -- 1D DP foundation that generalizes to 2D string problems

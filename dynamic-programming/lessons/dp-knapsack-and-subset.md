@@ -1,7 +1,7 @@
 ---
 title: "Knapsack and Subset Problems"
 summary: "The knapsack pattern family: 0/1 knapsack, unbounded knapsack (coin change), subset sum, and partition equal subset sum."
-reading_time_minutes: 5
+reading_time_minutes: 7
 order: 3
 ---
 
@@ -43,6 +43,19 @@ for each item i:
 
 If you iterate left-to-right, `dp[w - weight[i]]` may already be updated in this pass, effectively counting item i twice -- turning 0/1 knapsack into unbounded knapsack.
 
+```python
+def knapsack_01(weights, values, capacity):
+    dp = [0] * (capacity + 1)
+    for i in range(len(weights)):
+        for w in range(capacity, weights[i] - 1, -1):  # right-to-left
+            dp[w] = max(dp[w], dp[w - weights[i]] + values[i])
+    return dp[capacity]
+
+weights = [2, 3, 4, 5]
+values  = [3, 4, 5, 6]
+print(knapsack_01(weights, values, 8))  # 10
+```
+
 ## Unbounded Knapsack
 
 **Problem:** Same as 0/1 knapsack, but each item can be used unlimited times.
@@ -67,6 +80,18 @@ for each coin:
 ```
 
 Answer: `dp[amount]` (or -1/infinity if unreachable).
+
+```python
+def coin_change(coins, amount):
+    dp = [float('inf')] * (amount + 1)
+    dp[0] = 0
+    for coin in coins:
+        for a in range(coin, amount + 1):  # left-to-right: reuse allowed
+            dp[a] = min(dp[a], dp[a - coin] + 1)
+    return dp[amount] if dp[amount] != float('inf') else -1
+
+print(coin_change([1, 5, 10, 25], 30))  # 2 (25 + 5)
+```
 
 **Coin change -- number of combinations (unbounded):**
 Count distinct combinations (not permutations -- order doesn't matter).
@@ -120,6 +145,23 @@ return dp[target]
 
 The ability to recognize and articulate this reduction chain ("partition -> subset sum -> 0/1 knapsack") is what interviewers are testing.
 
+```python
+def can_partition(nums):
+    total = sum(nums)
+    if total % 2 != 0:
+        return False
+    target = total // 2
+    dp = [False] * (target + 1)
+    dp[0] = True
+    for num in nums:
+        for j in range(target, num - 1, -1):  # right-to-left
+            dp[j] = dp[j] or dp[j - num]
+    return dp[target]
+
+print(can_partition([1, 5, 11, 5]))  # True (1+5+5 = 11)
+print(can_partition([1, 2, 3, 5]))   # False
+```
+
 ## Recognizing Knapsack Variants
 
 A problem is a knapsack variant when:
@@ -144,3 +186,7 @@ The key question to ask: "Can I use each item at most once (0/1), or unlimited t
 - **Subset sum** is boolean 0/1 knapsack: replace max/value with OR/feasibility.
 - **Partition equal subset sum** reduces to: odd total -> false; even total -> subset sum with target = total/2.
 - Recognize the pattern by asking: items chosen with a capacity constraint? -> knapsack family.
+
+## Related Problems
+
+- **Climbing Stairs** -- unbounded knapsack variant (steps are "coins" of size 1 and 2)

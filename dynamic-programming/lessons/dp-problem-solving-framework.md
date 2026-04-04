@@ -1,7 +1,7 @@
 ---
 title: "The DP Problem-Solving Framework"
 summary: "A systematic 5-step approach to any DP problem: state definition, recurrence, base cases, iteration order, and space optimization."
-reading_time_minutes: 5
+reading_time_minutes: 7
 order: 1
 ---
 
@@ -20,7 +20,7 @@ This lesson teaches that framework. Every DP problem in the remaining lessons is
 A **state** is a minimal set of variables that uniquely describes a subproblem. The state answers: "What do I need to know to solve a subproblem?"
 
 For the climbing stairs problem (reach step n taking 1 or 2 steps at a time):
-- The only thing that matters is which step you're currently on.
+- The only thing that matters is which step you're currently on. Think of it like knowing your current floor in a building -- you do not need to remember the exact route you took.
 - State: `dp[i]` = number of ways to reach step i.
 
 Ask yourself: "If I'm solving a subproblem, what information do I need -- and nothing more?" Extra variables in the state inflate the table size; missing variables make the recurrence wrong.
@@ -79,6 +79,23 @@ return prev1
 
 Space drops from O(n) to O(1).
 
+Here is the complete climbing stairs solution showing all five steps:
+
+```python
+def climb_stairs(n):
+    if n <= 1:
+        return 1
+    # Step 5: space-optimized -- only keep two previous values
+    prev2, prev1 = 1, 1  # dp[0], dp[1]
+    for i in range(2, n + 1):
+        curr = prev1 + prev2  # Step 2: recurrence
+        prev2 = prev1
+        prev1 = curr
+    return prev1
+
+print(climb_stairs(5))  # 8 ways
+```
+
 **Row compression:** For 2D DP where each row depends only on the previous row, keep a single 1D array and update it in-place (iterating carefully to avoid using updated values prematurely).
 
 ## Converting Memoization to Tabulation
@@ -91,16 +108,30 @@ Every memoized solution can be mechanically converted to tabulation:
 4. The recurrence stays the same.
 
 The climbing stairs memoized version:
-```
+
+```python
 memo = {}
 def ways(n):
-    if n <= 1: return 1
-    if n in memo: return memo[n]
-    memo[n] = ways(n-1) + ways(n-2)
+    if n <= 1:
+        return 1
+    if n in memo:
+        return memo[n]
+    memo[n] = ways(n - 1) + ways(n - 2)
     return memo[n]
+
+print(ways(10))  # 89
 ```
 
 Becomes the tabulation version by iterating i from 2 to n and filling `dp[i]` directly.
+
+```python
+def ways_tabulation(n):
+    dp = [0] * (n + 1)
+    dp[0] = dp[1] = 1  # base cases
+    for i in range(2, n + 1):
+        dp[i] = dp[i - 1] + dp[i - 2]  # same recurrence
+    return dp[n]
+```
 
 ## When NOT to Use DP
 
@@ -119,3 +150,7 @@ Draw the recursion tree for a small input. If you see repeated nodes, DP applies
 - The recurrence comes from asking "what decision was made last, and what did it cost?"
 - Convert memoization to tabulation by iterating in topological order.
 - DP only applies when subproblems overlap. When greedy works, use greedy.
+
+## Related Problems
+
+- **Climbing Stairs** -- the canonical example of this 5-step framework
