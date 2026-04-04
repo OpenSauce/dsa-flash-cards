@@ -1,0 +1,113 @@
+title: Longest Increasing Subsequence
+difficulty: medium
+tags: [dynamic-programming]
+description: |
+  Given an array of integers `nums`, return the length of the longest
+  strictly increasing subsequence.
+
+  A subsequence is derived from the array by deleting some or no elements
+  without changing the order of the remaining elements. For example,
+  `[3,6,7]` is a subsequence of `[0,3,1,6,2,7]`.
+examples:
+  - input: "nums = [10,9,2,5,3,7,101,18]"
+    output: "4"
+    explanation: "One longest increasing subsequence is [2,3,7,101], which has length 4."
+  - input: "nums = [0,1,0,3,2,3]"
+    output: "4"
+    explanation: "One longest increasing subsequence is [0,1,2,3]."
+  - input: "nums = [7,7,7,7,7]"
+    output: "1"
+    explanation: "The sequence must be strictly increasing, so each element alone is the longest."
+constraints:
+  - "1 <= nums.length <= 2500"
+  - "-10^4 <= nums[i] <= 10^4"
+starter_code:
+  python: |
+    def length_of_lis(nums: list[int]) -> int:
+        pass
+  javascript: |
+    function lengthOfLIS(nums) {
+    }
+  go: |
+    package main
+
+    func lengthOfLIS(nums []int) int {
+        return 0
+    }
+  java: |
+    public int lengthOfLIS(int[] nums) {
+        return 0;
+    }
+test_cases:
+  - input: { nums: [10, 9, 2, 5, 3, 7, 101, 18] }
+    expected: 4
+  - input: { nums: [0, 1, 0, 3, 2, 3] }
+    expected: 4
+  - input: { nums: [7, 7, 7, 7, 7] }
+    expected: 1
+  - input: { nums: [1] }
+    expected: 1
+  - input: { nums: [1, 3, 6, 7, 9, 4, 10, 5, 6] }
+    expected: 6
+solution:
+  python: |
+    def length_of_lis(nums: list[int]) -> int:
+        dp = [1] * len(nums)
+        for i in range(1, len(nums)):
+            for j in range(i):
+                if nums[j] < nums[i]:
+                    dp[i] = max(dp[i], dp[j] + 1)
+        return max(dp)
+  javascript: |
+    function lengthOfLIS(nums) {
+      const dp = new Array(nums.length).fill(1);
+      for (let i = 1; i < nums.length; i++) {
+        for (let j = 0; j < i; j++) {
+          if (nums[j] < nums[i]) {
+            dp[i] = Math.max(dp[i], dp[j] + 1);
+          }
+        }
+      }
+      return Math.max(...dp);
+    }
+  go: |
+    package main
+
+    func lengthOfLIS(nums []int) int {
+        n := len(nums)
+        dp := make([]int, n)
+        for i := range dp {
+            dp[i] = 1
+        }
+        best := 1
+        for i := 1; i < n; i++ {
+            for j := 0; j < i; j++ {
+                if nums[j] < nums[i] && dp[j]+1 > dp[i] {
+                    dp[i] = dp[j] + 1
+                }
+            }
+            if dp[i] > best {
+                best = dp[i]
+            }
+        }
+        return best
+    }
+  java: |
+    public int lengthOfLIS(int[] nums) {
+        int n = nums.length;
+        int[] dp = new int[n];
+        java.util.Arrays.fill(dp, 1);
+        int best = 1;
+        for (int i = 1; i < n; i++) {
+            for (int j = 0; j < i; j++) {
+                if (nums[j] < nums[i]) {
+                    dp[i] = Math.max(dp[i], dp[j] + 1);
+                }
+            }
+            if (dp[i] > best) best = dp[i];
+        }
+        return best;
+    }
+hints:
+  - "For each element, think about the longest increasing subsequence that ends at that element."
+  - "Let dp[i] = length of the longest increasing subsequence ending at index i. For each j < i where nums[j] < nums[i], dp[i] = max(dp[i], dp[j] + 1). The answer is max(dp)."

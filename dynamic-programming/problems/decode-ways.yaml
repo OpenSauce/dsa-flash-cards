@@ -1,0 +1,133 @@
+title: Decode Ways
+difficulty: medium
+tags: [dynamic-programming]
+description: |
+  A message containing letters A-Z can be encoded as numbers using
+  the mapping: 'A' = 1, 'B' = 2, ..., 'Z' = 26.
+
+  Given a string `s` containing only digits, return the number of
+  ways to decode it back into letters. A digit sequence may have
+  multiple valid decodings. For example, "11" can be decoded as
+  "AA" (1,1) or "K" (11).
+
+  Note that groupings with a leading zero (like "06") are invalid.
+  A '0' can only appear as part of "10" or "20".
+examples:
+  - input: 's = "12"'
+    output: "2"
+    explanation: '"12" can be decoded as "AB" (1,2) or "L" (12).'
+  - input: 's = "226"'
+    output: "3"
+    explanation: '"226" can be decoded as "BZ" (2,26), "VF" (22,6), or "BBF" (2,2,6).'
+  - input: 's = "06"'
+    output: "0"
+    explanation: '"06" cannot be decoded because 0 has no letter mapping and "06" is not a valid grouping.'
+constraints:
+  - "1 <= s.length <= 100"
+  - "s contains only digits and may contain leading zeros."
+starter_code:
+  python: |
+    def num_decodings(s: str) -> int:
+        pass
+  javascript: |
+    function numDecodings(s) {
+    }
+  go: |
+    package main
+
+    func numDecodings(s string) int {
+        return 0
+    }
+  java: |
+    public int numDecodings(String s) {
+        return 0;
+    }
+test_cases:
+  - input: { s: "12" }
+    expected: 2
+  - input: { s: "226" }
+    expected: 3
+  - input: { s: "06" }
+    expected: 0
+  - input: { s: "10" }
+    expected: 1
+  - input: { s: "1" }
+    expected: 1
+  - input: { s: "27" }
+    expected: 1
+solution:
+  python: |
+    def num_decodings(s: str) -> int:
+        if not s or s[0] == '0':
+            return 0
+        n = len(s)
+        prev2 = 1
+        prev1 = 1
+        for i in range(1, n):
+            current = 0
+            if s[i] != '0':
+                current = prev1
+            two_digit = int(s[i-1:i+1])
+            if 10 <= two_digit <= 26:
+                current += prev2
+            prev2 = prev1
+            prev1 = current
+        return prev1
+  javascript: |
+    function numDecodings(s) {
+      if (s.length === 0 || s[0] === '0') return 0;
+      let prev2 = 1;
+      let prev1 = 1;
+      for (let i = 1; i < s.length; i++) {
+        let current = 0;
+        if (s[i] !== '0') current = prev1;
+        const twoDigit = parseInt(s.substring(i - 1, i + 1));
+        if (twoDigit >= 10 && twoDigit <= 26) current += prev2;
+        prev2 = prev1;
+        prev1 = current;
+      }
+      return prev1;
+    }
+  go: |
+    package main
+
+    import "strconv"
+
+    func numDecodings(s string) int {
+        if len(s) == 0 || s[0] == '0' {
+            return 0
+        }
+        prev2 := 1
+        prev1 := 1
+        for i := 1; i < len(s); i++ {
+            current := 0
+            if s[i] != '0' {
+                current = prev1
+            }
+            twoDigit, _ := strconv.Atoi(s[i-1 : i+1])
+            if twoDigit >= 10 && twoDigit <= 26 {
+                current += prev2
+            }
+            prev2 = prev1
+            prev1 = current
+        }
+        return prev1
+    }
+  java: |
+    public int numDecodings(String s) {
+        if (s.length() == 0 || s.charAt(0) == '0') return 0;
+        int prev2 = 1;
+        int prev1 = 1;
+        for (int i = 1; i < s.length(); i++) {
+            int current = 0;
+            if (s.charAt(i) != '0') current = prev1;
+            int twoDigit = Integer.parseInt(s.substring(i - 1, i + 1));
+            if (twoDigit >= 10 && twoDigit <= 26) current += prev2;
+            prev2 = prev1;
+            prev1 = current;
+        }
+        return prev1;
+    }
+hints:
+  - "At each position, you can decode one digit (if it is not '0') or two digits (if they form a number between 10 and 26)."
+  - "Let dp[i] = number of ways to decode s[0..i]. dp[i] += dp[i-1] if s[i] is valid as a single digit, and dp[i] += dp[i-2] if s[i-1..i] is a valid two-digit number. You only need two variables."

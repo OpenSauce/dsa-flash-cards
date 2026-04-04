@@ -1,0 +1,174 @@
+title: Subtree of Another Tree
+difficulty: easy
+tags: [tree, dfs]
+description: |
+  Given the roots of two binary trees `root` and `sub_root`, determine
+  whether `sub_root` is a subtree of `root`.
+
+  A subtree of a binary tree is a tree that consists of a node in `root`
+  and all of that node's descendants. The tree `root` is also considered
+  a subtree of itself.
+examples:
+  - input: "root = [3,4,5,1,2], sub_root = [4,1,2]"
+    output: "true"
+    explanation: "The left subtree rooted at 4 matches sub_root exactly."
+  - input: "root = [3,4,5,1,2,null,null,null,null,0], sub_root = [4,1,2]"
+    output: "false"
+    explanation: "The node 2 in root has a left child 0, but in sub_root it does not."
+  - input: "root = [1,1], sub_root = [1]"
+    output: "true"
+    explanation: "The left child of root is a single node 1, which matches sub_root."
+constraints:
+  - "1 <= number of nodes in root <= 2000"
+  - "1 <= number of nodes in sub_root <= 1000"
+  - "-10^4 <= Node.val <= 10^4"
+starter_code:
+  python: |
+    from typing import Optional
+
+    class TreeNode:
+        def __init__(self, val=0, left=None, right=None):
+            self.val = val
+            self.left = left
+            self.right = right
+
+    def is_subtree(root: Optional[TreeNode], sub_root: Optional[TreeNode]) -> bool:
+        pass
+  javascript: |
+    class TreeNode {
+      constructor(val = 0, left = null, right = null) {
+        this.val = val;
+        this.left = left;
+        this.right = right;
+      }
+    }
+
+    function isSubtree(root, subRoot) {
+    }
+  go: |
+    package main
+
+    type TreeNode struct {
+        Val   int
+        Left  *TreeNode
+        Right *TreeNode
+    }
+
+    func isSubtree(root *TreeNode, subRoot *TreeNode) bool {
+        return false
+    }
+  java: |
+    class TreeNode {
+        int val;
+        TreeNode left;
+        TreeNode right;
+        TreeNode(int val) { this.val = val; }
+    }
+
+    public boolean isSubtree(TreeNode root, TreeNode subRoot) {
+        return false;
+    }
+test_cases:
+  - input: { root: [3, 4, 5, 1, 2], sub_root: [4, 1, 2] }
+    expected: true
+  - input: { root: [3, 4, 5, 1, 2, null, null, null, null, 0], sub_root: [4, 1, 2] }
+    expected: false
+  - input: { root: [1, 1], sub_root: [1] }
+    expected: true
+  - input: { root: [1], sub_root: [1] }
+    expected: true
+  - input: { root: [1, 2, 3], sub_root: [2] }
+    expected: true
+solution:
+  python: |
+    from typing import Optional
+
+    class TreeNode:
+        def __init__(self, val=0, left=None, right=None):
+            self.val = val
+            self.left = left
+            self.right = right
+
+    def is_subtree(root: Optional[TreeNode], sub_root: Optional[TreeNode]) -> bool:
+        def is_same(p, q):
+            if p is None and q is None:
+                return True
+            if p is None or q is None:
+                return False
+            return p.val == q.val and is_same(p.left, q.left) and is_same(p.right, q.right)
+
+        if root is None:
+            return False
+        if is_same(root, sub_root):
+            return True
+        return is_subtree(root.left, sub_root) or is_subtree(root.right, sub_root)
+  javascript: |
+    class TreeNode {
+      constructor(val = 0, left = null, right = null) {
+        this.val = val;
+        this.left = left;
+        this.right = right;
+      }
+    }
+
+    function isSubtree(root, subRoot) {
+      function isSame(p, q) {
+        if (p === null && q === null) return true;
+        if (p === null || q === null) return false;
+        return p.val === q.val && isSame(p.left, q.left) && isSame(p.right, q.right);
+      }
+      if (root === null) return false;
+      if (isSame(root, subRoot)) return true;
+      return isSubtree(root.left, subRoot) || isSubtree(root.right, subRoot);
+    }
+  go: |
+    package main
+
+    type TreeNode struct {
+        Val   int
+        Left  *TreeNode
+        Right *TreeNode
+    }
+
+    func isSubtree(root *TreeNode, subRoot *TreeNode) bool {
+        if root == nil {
+            return false
+        }
+        if isSameTree(root, subRoot) {
+            return true
+        }
+        return isSubtree(root.Left, subRoot) || isSubtree(root.Right, subRoot)
+    }
+
+    func isSameTree(p *TreeNode, q *TreeNode) bool {
+        if p == nil && q == nil {
+            return true
+        }
+        if p == nil || q == nil {
+            return false
+        }
+        return p.Val == q.Val && isSameTree(p.Left, q.Left) && isSameTree(p.Right, q.Right)
+    }
+  java: |
+    class TreeNode {
+        int val;
+        TreeNode left;
+        TreeNode right;
+        TreeNode(int val) { this.val = val; }
+    }
+
+    public boolean isSubtree(TreeNode root, TreeNode subRoot) {
+        if (root == null) return false;
+        if (isSame(root, subRoot)) return true;
+        return isSubtree(root.left, subRoot) || isSubtree(root.right, subRoot);
+    }
+
+    private boolean isSame(TreeNode p, TreeNode q) {
+        if (p == null && q == null) return true;
+        if (p == null || q == null) return false;
+        return p.val == q.val && isSame(p.left, q.left) && isSame(p.right, q.right);
+    }
+hints:
+  - "At each node in root, you can check whether the subtree starting there matches sub_root entirely."
+  - "Write a helper that checks if two trees are identical, then traverse root and call it at every node."
+  - "The base case for the traversal: if root is null, sub_root cannot be found."

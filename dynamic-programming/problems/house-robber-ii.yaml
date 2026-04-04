@@ -1,0 +1,138 @@
+title: House Robber II
+difficulty: medium
+tags: [dynamic-programming]
+description: |
+  This is a follow-up to the House Robber problem. All houses are now
+  arranged in a circle, meaning the first and last houses are adjacent.
+  You still cannot rob two adjacent houses.
+
+  Given a list of non-negative integers representing the money in each
+  house, return the maximum amount you can rob without triggering
+  the alarm.
+examples:
+  - input: "nums = [2,3,2]"
+    output: "3"
+    explanation: "You cannot rob house 0 and house 2 because they are adjacent in the circle. The best option is house 1 (3)."
+  - input: "nums = [1,2,3,1]"
+    output: "4"
+    explanation: "Rob house 0 (1) and house 2 (3) for a total of 4."
+  - input: "nums = [1,2,3]"
+    output: "3"
+    explanation: "Rob house 2 (3). Robbing houses 0 and 2 is not allowed since they are neighbors in the circle."
+constraints:
+  - "1 <= nums.length <= 100"
+  - "0 <= nums[i] <= 1000"
+starter_code:
+  python: |
+    def rob(nums: list[int]) -> int:
+        pass
+  javascript: |
+    function rob(nums) {
+    }
+  go: |
+    package main
+
+    func rob(nums []int) int {
+        return 0
+    }
+  java: |
+    public int rob(int[] nums) {
+        return 0;
+    }
+test_cases:
+  - input: { nums: [2, 3, 2] }
+    expected: 3
+  - input: { nums: [1, 2, 3, 1] }
+    expected: 4
+  - input: { nums: [1, 2, 3] }
+    expected: 3
+  - input: { nums: [5] }
+    expected: 5
+  - input: { nums: [1, 1] }
+    expected: 1
+  - input: { nums: [1, 3, 1, 3, 100] }
+    expected: 103
+solution:
+  python: |
+    def rob(nums: list[int]) -> int:
+        if len(nums) == 1:
+            return nums[0]
+
+        def rob_linear(houses):
+            prev2 = 0
+            prev1 = 0
+            for h in houses:
+                current = max(prev1, prev2 + h)
+                prev2 = prev1
+                prev1 = current
+            return prev1
+
+        return max(rob_linear(nums[:-1]), rob_linear(nums[1:]))
+  javascript: |
+    function rob(nums) {
+      if (nums.length === 1) return nums[0];
+
+      function robLinear(houses) {
+        let prev2 = 0;
+        let prev1 = 0;
+        for (const h of houses) {
+          const current = Math.max(prev1, prev2 + h);
+          prev2 = prev1;
+          prev1 = current;
+        }
+        return prev1;
+      }
+
+      return Math.max(robLinear(nums.slice(0, -1)), robLinear(nums.slice(1)));
+    }
+  go: |
+    package main
+
+    func rob(nums []int) int {
+        if len(nums) == 1 {
+            return nums[0]
+        }
+
+        robLinear := func(houses []int) int {
+            prev2 := 0
+            prev1 := 0
+            for _, h := range houses {
+                current := prev2 + h
+                if prev1 > current {
+                    current = prev1
+                }
+                prev2 = prev1
+                prev1 = current
+            }
+            return prev1
+        }
+
+        a := robLinear(nums[:len(nums)-1])
+        b := robLinear(nums[1:])
+        if a > b {
+            return a
+        }
+        return b
+    }
+  java: |
+    public int rob(int[] nums) {
+        if (nums.length == 1) return nums[0];
+        return Math.max(
+            robLinear(nums, 0, nums.length - 2),
+            robLinear(nums, 1, nums.length - 1)
+        );
+    }
+
+    private int robLinear(int[] nums, int start, int end) {
+        int prev2 = 0;
+        int prev1 = 0;
+        for (int i = start; i <= end; i++) {
+            int current = Math.max(prev1, prev2 + nums[i]);
+            prev2 = prev1;
+            prev1 = current;
+        }
+        return prev1;
+    }
+hints:
+  - "Since the houses form a circle, you cannot rob both the first and last house. How can you reduce this to the linear version?"
+  - "Run the linear House Robber algorithm twice: once excluding the last house, once excluding the first house. The answer is the maximum of the two results."

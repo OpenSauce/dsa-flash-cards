@@ -1,0 +1,113 @@
+title: Coin Change
+difficulty: medium
+tags: [dynamic-programming]
+description: |
+  You are given an array of coin denominations and a target amount.
+  Return the fewest number of coins needed to make up that amount.
+  You may use each denomination as many times as you like.
+
+  If the amount cannot be made up by any combination of the given coins,
+  return -1.
+examples:
+  - input: "coins = [1,5,10], amount = 12"
+    output: "3"
+    explanation: "12 = 10 + 1 + 1 uses three coins."
+  - input: "coins = [2], amount = 3"
+    output: "-1"
+    explanation: "There is no way to make 3 with only coins of value 2."
+  - input: "coins = [1], amount = 0"
+    output: "0"
+    explanation: "No coins are needed to make amount 0."
+constraints:
+  - "1 <= coins.length <= 12"
+  - "1 <= coins[i] <= 2^31 - 1"
+  - "0 <= amount <= 10^4"
+starter_code:
+  python: |
+    def coin_change(coins: list[int], amount: int) -> int:
+        pass
+  javascript: |
+    function coinChange(coins, amount) {
+    }
+  go: |
+    package main
+
+    func coinChange(coins []int, amount int) int {
+        return 0
+    }
+  java: |
+    public int coinChange(int[] coins, int amount) {
+        return 0;
+    }
+test_cases:
+  - input: { coins: [1, 5, 10], amount: 12 }
+    expected: 3
+  - input: { coins: [2], amount: 3 }
+    expected: -1
+  - input: { coins: [1], amount: 0 }
+    expected: 0
+  - input: { coins: [1, 2, 5], amount: 11 }
+    expected: 3
+  - input: { coins: [2, 5, 10, 1], amount: 27 }
+    expected: 4
+solution:
+  python: |
+    def coin_change(coins: list[int], amount: int) -> int:
+        dp = [amount + 1] * (amount + 1)
+        dp[0] = 0
+        for i in range(1, amount + 1):
+            for coin in coins:
+                if coin <= i:
+                    dp[i] = min(dp[i], dp[i - coin] + 1)
+        return dp[amount] if dp[amount] <= amount else -1
+  javascript: |
+    function coinChange(coins, amount) {
+      const dp = new Array(amount + 1).fill(amount + 1);
+      dp[0] = 0;
+      for (let i = 1; i <= amount; i++) {
+        for (const coin of coins) {
+          if (coin <= i) {
+            dp[i] = Math.min(dp[i], dp[i - coin] + 1);
+          }
+        }
+      }
+      return dp[amount] > amount ? -1 : dp[amount];
+    }
+  go: |
+    package main
+
+    func coinChange(coins []int, amount int) int {
+        dp := make([]int, amount+1)
+        for i := range dp {
+            dp[i] = amount + 1
+        }
+        dp[0] = 0
+        for i := 1; i <= amount; i++ {
+            for _, coin := range coins {
+                if coin <= i && dp[i-coin]+1 < dp[i] {
+                    dp[i] = dp[i-coin] + 1
+                }
+            }
+        }
+        if dp[amount] > amount {
+            return -1
+        }
+        return dp[amount]
+    }
+  java: |
+    public int coinChange(int[] coins, int amount) {
+        int[] dp = new int[amount + 1];
+        java.util.Arrays.fill(dp, amount + 1);
+        dp[0] = 0;
+        for (int i = 1; i <= amount; i++) {
+            for (int coin : coins) {
+                if (coin <= i) {
+                    dp[i] = Math.min(dp[i], dp[i - coin] + 1);
+                }
+            }
+        }
+        return dp[amount] > amount ? -1 : dp[amount];
+    }
+hints:
+  - "Think about building up the solution for every amount from 0 to the target. For each amount, what is the minimum coins if you knew the answer for all smaller amounts?"
+  - "Let dp[i] = minimum coins to make amount i. For each coin denomination c, dp[i] = min(dp[i], dp[i-c] + 1). Initialize dp[0] = 0 and all others to infinity."

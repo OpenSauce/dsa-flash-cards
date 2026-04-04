@@ -1,0 +1,196 @@
+title: Binary Tree Level Order Traversal
+difficulty: medium
+tags: [tree, bfs]
+description: |
+  Given the root of a binary tree, return a list of lists containing
+  the node values at each level, from left to right, top to bottom.
+
+  Level 0 is the root, level 1 is the root's children, and so on.
+  An empty tree should return an empty list.
+examples:
+  - input: "root = [3,9,20,null,null,15,7]"
+    output: "[[3],[9,20],[15,7]]"
+    explanation: "Level 0 has 3, level 1 has 9 and 20, level 2 has 15 and 7."
+  - input: "root = [1]"
+    output: "[[1]]"
+    explanation: "A single node produces one level."
+  - input: "root = []"
+    output: "[]"
+    explanation: "An empty tree has no levels."
+constraints:
+  - "0 <= number of nodes <= 2000"
+  - "-1000 <= Node.val <= 1000"
+starter_code:
+  python: |
+    from typing import Optional
+
+    class TreeNode:
+        def __init__(self, val=0, left=None, right=None):
+            self.val = val
+            self.left = left
+            self.right = right
+
+    def level_order(root: Optional[TreeNode]) -> list[list[int]]:
+        pass
+  javascript: |
+    class TreeNode {
+      constructor(val = 0, left = null, right = null) {
+        this.val = val;
+        this.left = left;
+        this.right = right;
+      }
+    }
+
+    function levelOrder(root) {
+    }
+  go: |
+    package main
+
+    type TreeNode struct {
+        Val   int
+        Left  *TreeNode
+        Right *TreeNode
+    }
+
+    func levelOrder(root *TreeNode) [][]int {
+        return nil
+    }
+  java: |
+    class TreeNode {
+        int val;
+        TreeNode left;
+        TreeNode right;
+        TreeNode(int val) { this.val = val; }
+    }
+
+    public List<List<Integer>> levelOrder(TreeNode root) {
+        return new ArrayList<>();
+    }
+test_cases:
+  - input: { root: [3, 9, 20, null, null, 15, 7] }
+    expected: [[3], [9, 20], [15, 7]]
+  - input: { root: [1] }
+    expected: [[1]]
+  - input: { root: [] }
+    expected: []
+  - input: { root: [1, 2, 3, 4, 5] }
+    expected: [[1], [2, 3], [4, 5]]
+  - input: { root: [1, null, 2, null, 3] }
+    expected: [[1], [2], [3]]
+solution:
+  python: |
+    from typing import Optional
+    from collections import deque
+
+    class TreeNode:
+        def __init__(self, val=0, left=None, right=None):
+            self.val = val
+            self.left = left
+            self.right = right
+
+    def level_order(root: Optional[TreeNode]) -> list[list[int]]:
+        if root is None:
+            return []
+        result = []
+        queue = deque([root])
+        while queue:
+            level = []
+            for _ in range(len(queue)):
+                node = queue.popleft()
+                level.append(node.val)
+                if node.left:
+                    queue.append(node.left)
+                if node.right:
+                    queue.append(node.right)
+            result.append(level)
+        return result
+  javascript: |
+    class TreeNode {
+      constructor(val = 0, left = null, right = null) {
+        this.val = val;
+        this.left = left;
+        this.right = right;
+      }
+    }
+
+    function levelOrder(root) {
+      if (root === null) return [];
+      const result = [];
+      const queue = [root];
+      while (queue.length > 0) {
+        const level = [];
+        const size = queue.length;
+        for (let i = 0; i < size; i++) {
+          const node = queue.shift();
+          level.push(node.val);
+          if (node.left) queue.push(node.left);
+          if (node.right) queue.push(node.right);
+        }
+        result.push(level);
+      }
+      return result;
+    }
+  go: |
+    package main
+
+    type TreeNode struct {
+        Val   int
+        Left  *TreeNode
+        Right *TreeNode
+    }
+
+    func levelOrder(root *TreeNode) [][]int {
+        if root == nil {
+            return [][]int{}
+        }
+        result := [][]int{}
+        queue := []*TreeNode{root}
+        for len(queue) > 0 {
+            size := len(queue)
+            level := []int{}
+            for i := 0; i < size; i++ {
+                node := queue[0]
+                queue = queue[1:]
+                level = append(level, node.Val)
+                if node.Left != nil {
+                    queue = append(queue, node.Left)
+                }
+                if node.Right != nil {
+                    queue = append(queue, node.Right)
+                }
+            }
+            result = append(result, level)
+        }
+        return result
+    }
+  java: |
+    import java.util.*;
+
+    class TreeNode {
+        int val;
+        TreeNode left;
+        TreeNode right;
+        TreeNode(int val) { this.val = val; }
+    }
+
+    public List<List<Integer>> levelOrder(TreeNode root) {
+        List<List<Integer>> result = new ArrayList<>();
+        if (root == null) return result;
+        Queue<TreeNode> queue = new LinkedList<>();
+        queue.add(root);
+        while (!queue.isEmpty()) {
+            int size = queue.size();
+            List<Integer> level = new ArrayList<>();
+            for (int i = 0; i < size; i++) {
+                TreeNode node = queue.poll();
+                level.add(node.val);
+                if (node.left != null) queue.add(node.left);
+                if (node.right != null) queue.add(node.right);
+            }
+            result.add(level);
+        }
+        return result;
+    }
+hints:
+  - "Think about processing the tree one layer at a time. Which data structure lets you visit nodes in the order they were discovered?"
+  - "Use a queue (BFS). At each step, process all nodes currently in the queue (that is one level), and enqueue their children for the next level."
