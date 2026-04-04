@@ -2,7 +2,7 @@
 title: "Binary Search Trees"
 order: 6
 summary: "BST properties and invariants, core operations (search, insert, delete), why balance matters, and when to reach for a BST over other data structures."
-reading_time_minutes: 5
+reading_time_minutes: 7
 ---
 
 ## Why This Matters
@@ -10,6 +10,8 @@ reading_time_minutes: 5
 Binary search trees are a staple of coding interviews and the foundation for most ordered data structures in real systems. Databases use BST variants (B-trees) for indexing. Language standard libraries use balanced BSTs (red-black trees) for ordered maps and sets. Understanding the core operations and the balance problem gives you a framework for reasoning about logarithmic-time data access.
 
 ## The BST Property
+
+A **binary tree** is a tree where each node has at most two children. A binary **search** tree adds an ordering rule on top of that structure.
 
 A binary search tree is a binary tree where every node satisfies a single invariant:
 
@@ -33,7 +35,26 @@ An in-order traversal of a valid BST produces values in sorted order: 1, 3, 4, 6
 
 ### Search
 
-Start at the root. If the target is less than the current node, go left. If greater, go right. Each comparison eliminates an entire subtree.
+Start at the root. If the target is less than the current node, go left. If greater, go right. Each comparison eliminates an entire subtree -- like a "20 questions" game where each answer cuts the possibilities in half.
+
+```python
+class Node:
+    def __init__(self, val, left=None, right=None):
+        self.val = val
+        self.left = left
+        self.right = right
+
+def search(root, key):
+    while root and root.val != key:
+        if key < root.val:
+            root = root.left
+        else:
+            root = root.right
+    return root  # None if not found
+```
+
+<details>
+<summary>Go equivalent</summary>
 
 ```go
 func search(root *Node, key int) *Node {
@@ -48,13 +69,29 @@ func search(root *Node, key int) *Node {
 }
 ```
 
+</details>
+
 **Time:** O(h), where h is the height. On a balanced tree, h = O(log n). On a skewed tree, h = O(n).
 
 The intuition is identical to binary search on a sorted array: each step halves the search space, but only when the tree is balanced.
 
 ### Insert
 
-Walk the tree as if searching for the new key. When you reach a nil pointer, that is where the new node belongs.
+Walk the tree as if searching for the new key. When you reach a None (nil) pointer, that is where the new node belongs.
+
+```python
+def insert(root, key):
+    if root is None:
+        return Node(key)
+    if key < root.val:
+        root.left = insert(root.left, key)
+    else:
+        root.right = insert(root.right, key)
+    return root
+```
+
+<details>
+<summary>Go equivalent</summary>
 
 ```go
 func insert(root *Node, key int) *Node {
@@ -69,6 +106,8 @@ func insert(root *Node, key int) *Node {
     return root
 }
 ```
+
+</details>
 
 **Time:** O(h) -- same as search, because you are searching for the insertion point.
 
@@ -85,6 +124,31 @@ Deletion has three cases, depending on how many children the target node has.
 **Case 3 -- Two children:** This is the tricky one. You cannot simply remove the node because both subtrees need a parent. The solution: find the node's **in-order successor** (the smallest value in the right subtree), copy its value into the target node, then delete the successor. The successor has at most one child (it cannot have a left child, because then that left child would be smaller and would be the real successor), so deleting it falls into Case 1 or 2.
 
 Alternatively, you can use the **in-order predecessor** (largest value in the left subtree). Both approaches preserve the BST invariant.
+
+```python
+def delete_node(root, key):
+    if root is None:
+        return None
+    if key < root.val:
+        root.left = delete_node(root.left, key)
+    elif key > root.val:
+        root.right = delete_node(root.right, key)
+    else:
+        if root.left is None:
+            return root.right
+        if root.right is None:
+            return root.left
+        # Two children: replace with in-order successor
+        succ = root.right
+        while succ.left:
+            succ = succ.left
+        root.val = succ.val
+        root.right = delete_node(root.right, succ.val)
+    return root
+```
+
+<details>
+<summary>Go equivalent</summary>
 
 ```go
 func deleteNode(root *Node, key int) *Node {
@@ -107,6 +171,8 @@ func deleteNode(root *Node, key int) *Node {
     return root
 }
 ```
+
+</details>
 
 **Time:** O(h) -- finding the node is O(h), finding the successor is O(h), and deleting the successor is O(h). These do not multiply because the successor search starts from the node's right child, not from the root.
 
@@ -137,6 +203,21 @@ The naive approach -- checking that `left.Val < node.Val < right.Val` for each n
 
 The correct approach passes down valid bounds:
 
+```python
+def is_valid_bst(root):
+    def validate(node, low, high):
+        if node is None:
+            return True
+        if node.val <= low or node.val >= high:
+            return False
+        return (validate(node.left, low, node.val) and
+                validate(node.right, node.val, high))
+    return validate(root, float('-inf'), float('inf'))
+```
+
+<details>
+<summary>Go equivalent</summary>
+
 ```go
 func isValidBST(root *Node) bool {
     return validate(root, math.MinInt64, math.MaxInt64)
@@ -149,6 +230,8 @@ func validate(n *Node, min, max int) bool {
            validate(n.Right, n.Val, max)
 }
 ```
+
+</details>
 
 An alternative: perform an in-order traversal and check that the output is strictly increasing. If it is, the tree is a valid BST.
 
@@ -176,3 +259,8 @@ An alternative: perform an in-order traversal and check that the output is stric
 - Inserting sorted data into a plain BST produces a linked list. Self-balancing trees (AVL, red-black) use rotations to guarantee O(log n) height.
 - BST delete with two children uses the in-order successor (smallest in the right subtree) to preserve the invariant.
 - Choose a BST over a hash map when you need ordering, range queries, or sorted traversal.
+
+## Related Problems
+
+- **Invert Binary Tree** -- swap left and right children recursively
+- **Merge Two Sorted Lists** -- similar merge logic to BST in-order output
