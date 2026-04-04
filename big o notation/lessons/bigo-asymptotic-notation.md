@@ -2,6 +2,7 @@
 title: "Asymptotic Notation"
 order: 1
 summary: "What Big O is and why we use it. Growth rate intuition. O, Omega, Theta notation. Best/average/worst case versus asymptotic bounds. Dropping constants and lower-order terms."
+reading_time_minutes: 5
 ---
 
 ## Why This Matters
@@ -10,7 +11,7 @@ When you write an algorithm, two questions matter more than any language choice 
 
 ## What Big O Actually Describes
 
-Big O notation describes an **upper bound on a function's growth rate** as input size n approaches infinity. When we say an algorithm is O(f(n)), we mean: beyond some threshold n₀, the algorithm's resource use (time or space) never exceeds c · f(n) for some constant c.
+Big O notation describes an **upper bound on a function's growth rate** as input size n approaches infinity. Think of it as a speed limit sign: it tells you the maximum speed, not your exact speed. When we say an algorithm is O(f(n)), we mean: beyond some threshold n0, the algorithm's resource use (time or space) never exceeds c * f(n) for some constant c.
 
 Two things to internalize immediately:
 
@@ -28,7 +29,28 @@ Two things to internalize immediately:
 
 In practice, engineers say "O(n)" when they mean "this algorithm grows linearly." Formally, they often mean Θ(n) (a tight bound), but Big O notation is used colloquially for both. When precision matters, Θ distinguishes "exactly linear" from "at most linear."
 
-Example: Insertion sort on a sorted array is Ω(n) (must check every element) and O(n) (no swaps needed), so it is Θ(n). On a reverse-sorted array, it is Θ(n²). The Big O of insertion sort across all inputs is O(n²).
+Example: Insertion sort on a sorted array is Omega(n) (must check every element) and O(n) (no swaps needed), so it is Theta(n). On a reverse-sorted array, it is Theta(n^2). The Big O of insertion sort across all inputs is O(n^2).
+
+```python
+# Demonstrating growth rates
+import time
+
+def linear(n):
+    total = 0
+    for i in range(n):
+        total += i
+    return total
+
+def quadratic(n):
+    total = 0
+    for i in range(n):
+        for j in range(n):
+            total += 1
+    return total
+
+# At n=1000, linear does ~1000 ops, quadratic does ~1,000,000
+# The gap widens dramatically as n grows
+```
 
 ## Best, Average, and Worst Case
 

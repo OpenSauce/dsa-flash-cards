@@ -1,7 +1,8 @@
 ---
 title: "Common Complexity Classes"
 order: 2
-summary: "The seven main complexity classes: O(1), O(log n), O(n), O(n log n), O(n²), O(2ⁿ), O(n!). Concrete examples and growth rate comparisons. Data structure operation complexities explained."
+summary: "The seven main complexity classes: O(1), O(log n), O(n), O(n log n), O(n^2), O(2^n), O(n!). Concrete examples and growth rate comparisons. Data structure operation complexities explained."
+reading_time_minutes: 6
 ---
 
 ## Why This Matters
@@ -20,9 +21,10 @@ Examples:
 - Push/pop on a stack
 - Reading the top of a heap (min or max)
 
-```
-n = 10    → 1 operation
-n = 10^6  → 1 operation
+```python
+# O(1) — constant time regardless of input size
+nums = [10, 20, 30, 40, 50]
+print(nums[2])  # always one operation, no matter how long the list
 ```
 
 ### O(log n) — Logarithmic
@@ -43,6 +45,21 @@ n = 10^6  → ~20 operations
 
 Logarithmic algorithms are extremely fast even at enormous scale. Doubling input size costs you one extra step.
 
+```python
+# O(log n) — halving pattern
+def binary_search(arr, target):
+    lo, hi = 0, len(arr) - 1
+    while lo <= hi:
+        mid = (lo + hi) // 2
+        if arr[mid] == target:
+            return mid
+        elif arr[mid] < target:
+            lo = mid + 1
+        else:
+            hi = mid - 1
+    return -1
+```
+
 ### O(n) — Linear
 
 Cost grows in proportion to input size. The algorithm must touch every element at least once.
@@ -53,9 +70,14 @@ Examples:
 - Linked list traversal
 - Copying an array
 
-```
-n = 100   → 100 operations
-n = 10^6  → 10^6 operations
+```python
+# O(n) — must look at every element
+def find_max(arr):
+    best = arr[0]
+    for x in arr:
+        if x > best:
+            best = x
+    return best
 ```
 
 ### O(n log n) — Linearithmic
@@ -85,13 +107,17 @@ Examples:
 - Matrix multiplication (naive)
 - Nested loops, each running n iterations
 
-```
-n = 100   → 10,000 operations
-n = 1000  → 1,000,000 operations
-n = 10^6  → 10^12 operations  (too slow for large inputs)
+```python
+# O(n^2) — nested loops, each running n times
+def has_duplicate_pair(arr):
+    for i in range(len(arr)):
+        for j in range(i + 1, len(arr)):
+            if arr[i] == arr[j]:
+                return True
+    return False
 ```
 
-Quadratic algorithms become unacceptably slow around n = 10,000–100,000, depending on the constant.
+Quadratic algorithms become unacceptably slow around n = 10,000-100,000, depending on the constant.
 
 ### O(2ⁿ) — Exponential
 
@@ -108,7 +134,16 @@ n = 30  → 1,073,741,824 operations
 n = 50  → ~10^15 operations  (centuries of compute time)
 ```
 
-Exponential algorithms are only feasible for very small inputs (n ≤ 20–30).
+Exponential algorithms are only feasible for very small inputs (n <= 20-30).
+
+```python
+# O(2^n) — naive Fibonacci (each call branches into two)
+def fib(n):
+    if n <= 1:
+        return n
+    return fib(n - 1) + fib(n - 2)
+# fib(30) takes over a billion operations!
+```
 
 ### O(n!) — Factorial
 
