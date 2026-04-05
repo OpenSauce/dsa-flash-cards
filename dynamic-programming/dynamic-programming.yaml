@@ -784,7 +784,7 @@
   Back: |
     `dp[i] = true` iff some `j < i` has `dp[j] == true` **and** `s[j..i-1]` is in the dictionary. `dp[0] = true` (empty prefix). Answer: `dp[n]`.
 
-    O(n^2) pairs × O(k) substring hash lookup; put the dictionary in a hash set.
+    There are O(n^2) `(j, i)` pairs. Naively each check costs O(k) to **form and hash the substring `s[j..i-1]`** before the O(1) hash-set lookup, so total is O(n^2 · k) or O(n^3) worst case (k = O(n)). Avoiding substring creation -- iterating known word lengths and comparing in place, or walking a trie -- gets you to O(n^2) time, O(n) space.
 
 - title: "Longest Increasing Subsequence -- O(n^2) Recurrence"
   difficulty: "medium"

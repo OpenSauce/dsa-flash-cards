@@ -927,7 +927,7 @@
   Front: |
     **Sliding Window Maximum** -- What data structure achieves O(n), and what invariant does it maintain?
   Back: |
-    A **monotonic deque** of indices whose values are strictly decreasing. Before pushing `nums[i]`, pop smaller values from the back (they can never be the max while `nums[i]` is in the window). Pop from the front when its index falls out of the window. The front is always the current max.
+    A **monotonic deque** of indices whose values are monotonic decreasing (non-increasing). Before pushing `nums[i]`, pop values `<= nums[i]` from the back (they can never be the max while `nums[i]` is in the window, and popping equals keeps the max anchored to the newest index). Pop from the front when its index falls out of the window. The front is always the current max.
 
     Each index is pushed and popped at most once → O(n).
 
@@ -968,7 +968,7 @@
     - `nums[mid] > nums[right]` → minimum is strictly right of `mid` (`left = mid + 1`).
     - Otherwise → minimum is at `mid` or to its left (`right = mid`).
 
-    Comparing to `nums[left]` fails when the array is not rotated at all.
+    Left-comparison can be made to work with careful `<=` vs `<` invariants, but right-comparison is cleaner: in an ascending (possibly rotated) array, the rotation pivot is always strictly less than `nums[right]`, giving an unambiguous "is the right half sorted?" check without special-casing the not-rotated input.
 
 - title: "Search 2D Matrix -- Pattern"
   difficulty: "medium"

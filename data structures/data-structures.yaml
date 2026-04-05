@@ -971,9 +971,9 @@
   Front: |
     **Remove Nth Node From End** -- How do you find the n-th-from-last node in one pass?
   Back: |
-    **Two pointers with a gap of n.** Advance `fast` n steps first, then move `fast` and `slow` together until `fast` hits the end. `slow` now points to the node before the one to remove.
+    **Use a dummy head and two pointers with a gap of `n + 1`.** Start both `slow` and `fast` at the dummy. Advance `fast` by `n + 1` steps, then move both together until `fast` is `null`. `slow` now points to the node immediately before the one to remove, so `slow.next = slow.next.next` works even when the target is the head.
 
-    Use a dummy head to handle the "remove the head" case uniformly.
+    The dummy node makes the remove-head case collapse into the general case.
 
 - title: "Reorder List -- Three-Step Pattern"
   difficulty: "medium"
