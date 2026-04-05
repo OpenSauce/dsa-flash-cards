@@ -71,7 +71,8 @@ starter_code:
 test_cases:
   - input: { root: [3, 4, 5, 1, 2], sub_root: [4, 1, 2] }
     expected: true
-  - input: { root: [3, 4, 5, 1, 2, null, null, null, null, 0], sub_root: [4, 1, 2] }
+  - input:
+      { root: [3, 4, 5, 1, 2, null, null, null, null, 0], sub_root: [4, 1, 2] }
     expected: false
   - input: { root: [1, 1], sub_root: [1] }
     expected: true
