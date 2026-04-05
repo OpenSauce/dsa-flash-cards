@@ -18,6 +18,15 @@ starter_code:
   python: |
     def contains_duplicate(nums: list[int]) -> bool:
         pass
+  javascript: |
+    function containsDuplicate(nums) {
+    }
+  go: |
+    func containsDuplicate(nums []int) bool {
+    }
+  java: |
+    public boolean containsDuplicate(int[] nums) {
+    }
 test_cases:
   - input: { nums: [1, 2, 3, 1] }
     expected: true
@@ -38,6 +47,34 @@ solution:
                 return True
             seen.add(num)
         return False
+  javascript: |
+    function containsDuplicate(nums) {
+        const seen = new Set();
+        for (const num of nums) {
+            if (seen.has(num)) return true;
+            seen.add(num);
+        }
+        return false;
+    }
+  go: |
+    func containsDuplicate(nums []int) bool {
+        seen := map[int]bool{}
+        for _, num := range nums {
+            if seen[num] {
+                return true
+            }
+            seen[num] = true
+        }
+        return false
+    }
+  java: |
+    public boolean containsDuplicate(int[] nums) {
+        java.util.Set<Integer> seen = new java.util.HashSet<>();
+        for (int num : nums) {
+            if (!seen.add(num)) return true;
+        }
+        return false;
+    }
 hints:
   - "What data structure can tell you whether you have seen a value before in O(1) time?"
   - "Iterate through the array, adding each element to a set. If an element is already in the set, you have found a duplicate."

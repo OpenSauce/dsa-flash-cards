@@ -21,6 +21,15 @@ starter_code:
   python: |
     def is_anagram(s: str, t: str) -> bool:
         pass
+  javascript: |
+    function isAnagram(s, t) {
+    }
+  go: |
+    func isAnagram(s string, t string) bool {
+    }
+  java: |
+    public boolean isAnagram(String s, String t) {
+    }
 test_cases:
   - input: { s: "anagram", t: "nagaram" }
     expected: true
@@ -43,6 +52,47 @@ solution:
             if counts[char] < 0:
                 return False
         return True
+  javascript: |
+    function isAnagram(s, t) {
+        if (s.length !== t.length) return false;
+        const counts = {};
+        for (const ch of s) {
+            counts[ch] = (counts[ch] || 0) + 1;
+        }
+        for (const ch of t) {
+            counts[ch] = (counts[ch] || 0) - 1;
+            if (counts[ch] < 0) return false;
+        }
+        return true;
+    }
+  go: |
+    func isAnagram(s string, t string) bool {
+        if len(s) != len(t) {
+            return false
+        }
+        counts := map[byte]int{}
+        for i := 0; i < len(s); i++ {
+            counts[s[i]]++
+        }
+        for i := 0; i < len(t); i++ {
+            counts[t[i]]--
+            if counts[t[i]] < 0 {
+                return false
+            }
+        }
+        return true
+    }
+  java: |
+    public boolean isAnagram(String s, String t) {
+        if (s.length() != t.length()) return false;
+        int[] counts = new int[26];
+        for (char ch : s.toCharArray()) counts[ch - 'a']++;
+        for (char ch : t.toCharArray()) {
+            counts[ch - 'a']--;
+            if (counts[ch - 'a'] < 0) return false;
+        }
+        return true;
+    }
 hints:
   - "If two strings are anagrams, what must be true about the frequency of each letter?"
   - "Count the occurrences of each character in both strings and compare the counts. A hash map works well for this."

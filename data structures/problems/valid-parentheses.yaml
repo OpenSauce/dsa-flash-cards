@@ -24,6 +24,15 @@ starter_code:
   python: |
     def is_valid(s: str) -> bool:
         pass
+  javascript: |
+    function isValid(s) {
+    }
+  go: |
+    func isValid(s string) bool {
+    }
+  java: |
+    public boolean isValid(String s) {
+    }
 test_cases:
   - input: { s: "()" }
     expected: true
@@ -50,6 +59,55 @@ solution:
             else:
                 stack.append(char)
         return len(stack) == 0
+  javascript: |
+    function isValid(s) {
+        const stack = [];
+        const pairs = {')': '(', ']': '[', '}': '{'};
+        for (const char of s) {
+            if (char in pairs) {
+                if (stack.length === 0 || stack[stack.length - 1] !== pairs[char]) {
+                    return false;
+                }
+                stack.pop();
+            } else {
+                stack.push(char);
+            }
+        }
+        return stack.length === 0;
+    }
+  go: |
+    func isValid(s string) bool {
+        stack := []byte{}
+        pairs := map[byte]byte{')': '(', ']': '[', '}': '{'}
+        for i := 0; i < len(s); i++ {
+            ch := s[i]
+            if opener, ok := pairs[ch]; ok {
+                if len(stack) == 0 || stack[len(stack)-1] != opener {
+                    return false
+                }
+                stack = stack[:len(stack)-1]
+            } else {
+                stack = append(stack, ch)
+            }
+        }
+        return len(stack) == 0
+    }
+  java: |
+    public boolean isValid(String s) {
+        java.util.Deque<Character> stack = new java.util.ArrayDeque<>();
+        java.util.Map<Character, Character> pairs = java.util.Map.of(')', '(', ']', '[', '}', '{');
+        for (char ch : s.toCharArray()) {
+            if (pairs.containsKey(ch)) {
+                if (stack.isEmpty() || !stack.peek().equals(pairs.get(ch))) {
+                    return false;
+                }
+                stack.pop();
+            } else {
+                stack.push(ch);
+            }
+        }
+        return stack.isEmpty();
+    }
 hints:
   - "What data structure follows a last-in, first-out order?"
   - "Push opening brackets onto a stack. When you encounter a closing bracket, check if the top of the stack is the matching opener."

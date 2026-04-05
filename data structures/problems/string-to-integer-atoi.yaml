@@ -1,0 +1,153 @@
+title: String to Integer (atoi)
+difficulty: medium
+tags: [string]
+description: |
+  Implement a function that converts a string to a 32-bit signed integer,
+  similar to C's `atoi` function.
+
+  The algorithm works as follows:
+  1. Skip any leading whitespace.
+  2. Check for an optional `+` or `-` sign.
+  3. Read digits until a non-digit character or the end of the string.
+  4. Convert the digits to an integer. If no digits were read, return 0.
+  5. Clamp the result to the 32-bit signed integer range [-2^31, 2^31 - 1].
+examples:
+  - input: "s = '42'"
+    output: "42"
+    explanation: "Straightforward numeric conversion."
+  - input: "s = '   -42'"
+    output: "-42"
+    explanation: "Leading whitespace is skipped, then the minus sign is read."
+  - input: "s = '4193 with words'"
+    output: "4193"
+    explanation: "Reading stops at the space since it is not a digit."
+constraints:
+  - "0 <= s.length <= 200"
+  - "s consists of English letters, digits, spaces, and '+'/'-'."
+starter_code:
+  python: |
+    def my_atoi(s: str) -> int:
+        pass
+  javascript: |
+    function myAtoi(s) {
+    }
+  go: |
+    func myAtoi(s string) int {
+    }
+  java: |
+    public int myAtoi(String s) {
+    }
+test_cases:
+  - input: { s: "42" }
+    expected: 42
+  - input: { s: "   -42" }
+    expected: -42
+  - input: { s: "4193 with words" }
+    expected: 4193
+  - input: { s: "" }
+    expected: 0
+  - input: { s: "words and 987" }
+    expected: 0
+  - input: { s: "-91283472332" }
+    expected: -2147483648
+  - input: { s: "+1" }
+    expected: 1
+  - input: { s: "  +0 123" }
+    expected: 0
+solution:
+  python: |
+    def my_atoi(s: str) -> int:
+        INT_MAX = 2**31 - 1
+        INT_MIN = -(2**31)
+        i = 0
+        n = len(s)
+        while i < n and s[i] == ' ':
+            i += 1
+        if i == n:
+            return 0
+        sign = 1
+        if s[i] == '-':
+            sign = -1
+            i += 1
+        elif s[i] == '+':
+            i += 1
+        result = 0
+        while i < n and s[i].isdigit():
+            result = result * 10 + int(s[i])
+            i += 1
+        result *= sign
+        if result < INT_MIN:
+            return INT_MIN
+        if result > INT_MAX:
+            return INT_MAX
+        return result
+  javascript: |
+    function myAtoi(s) {
+        const INT_MAX = 2147483647;
+        const INT_MIN = -2147483648;
+        let i = 0;
+        while (i < s.length && s[i] === ' ') i++;
+        if (i === s.length) return 0;
+        let sign = 1;
+        if (s[i] === '-') { sign = -1; i++; }
+        else if (s[i] === '+') { i++; }
+        let result = 0;
+        while (i < s.length && s[i] >= '0' && s[i] <= '9') {
+            result = result * 10 + (s[i].charCodeAt(0) - 48);
+            if (result * sign > INT_MAX) return INT_MAX;
+            if (result * sign < INT_MIN) return INT_MIN;
+            i++;
+        }
+        return result * sign;
+    }
+  go: |
+    func myAtoi(s string) int {
+        maxInt32 := int(^uint32(0) >> 1)
+        minInt32 := -maxInt32 - 1
+        i, n := 0, len(s)
+        for i < n && s[i] == ' ' {
+            i++
+        }
+        if i == n {
+            return 0
+        }
+        sign := 1
+        if s[i] == '-' {
+            sign = -1
+            i++
+        } else if s[i] == '+' {
+            i++
+        }
+        result := 0
+        for i < n && s[i] >= '0' && s[i] <= '9' {
+            result = result*10 + int(s[i]-'0')
+            if result*sign > maxInt32 {
+                return maxInt32
+            }
+            if result*sign < minInt32 {
+                return minInt32
+            }
+            i++
+        }
+        return result * sign
+    }
+  java: |
+    public int myAtoi(String s) {
+        int i = 0, n = s.length();
+        while (i < n && s.charAt(i) == ' ') i++;
+        if (i == n) return 0;
+        int sign = 1;
+        if (s.charAt(i) == '-') { sign = -1; i++; }
+        else if (s.charAt(i) == '+') { i++; }
+        long result = 0;
+        while (i < n && s.charAt(i) >= '0' && s.charAt(i) <= '9') {
+            result = result * 10 + (s.charAt(i) - '0');
+            if (result * sign > Integer.MAX_VALUE) return Integer.MAX_VALUE;
+            if (result * sign < Integer.MIN_VALUE) return Integer.MIN_VALUE;
+            i++;
+        }
+        return (int)(result * sign);
+    }
+hints:
+  - "Process the string character by character: whitespace, sign, digits. Stop at the first invalid character."
+  - "Be careful with overflow — check the bounds before multiplying by 10 or after each digit is added."

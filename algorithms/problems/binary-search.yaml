@@ -23,6 +23,15 @@ starter_code:
   python: |
     def search(nums: list[int], target: int) -> int:
         pass
+  javascript: |
+    function search(nums, target) {
+    }
+  go: |
+    func search(nums []int, target int) int {
+    }
+  java: |
+    public int search(int[] nums, int target) {
+    }
 test_cases:
   - input: { nums: [-1, 0, 3, 5, 9, 12], target: 9 }
     expected: 4
@@ -47,6 +56,43 @@ solution:
             else:
                 right = mid - 1
         return -1
+  javascript: |
+    function search(nums, target) {
+        let left = 0, right = nums.length - 1;
+        while (left <= right) {
+            const mid = Math.floor((left + right) / 2);
+            if (nums[mid] === target) return mid;
+            else if (nums[mid] < target) left = mid + 1;
+            else right = mid - 1;
+        }
+        return -1;
+    }
+  go: |
+    func search(nums []int, target int) int {
+        left, right := 0, len(nums)-1
+        for left <= right {
+            mid := (left + right) / 2
+            if nums[mid] == target {
+                return mid
+            } else if nums[mid] < target {
+                left = mid + 1
+            } else {
+                right = mid - 1
+            }
+        }
+        return -1
+    }
+  java: |
+    public int search(int[] nums, int target) {
+        int left = 0, right = nums.length - 1;
+        while (left <= right) {
+            int mid = left + (right - left) / 2;
+            if (nums[mid] == target) return mid;
+            else if (nums[mid] < target) left = mid + 1;
+            else right = mid - 1;
+        }
+        return -1;
+    }
 hints:
   - "Since the array is sorted, you can eliminate half the search space with each comparison."
   - "Maintain two pointers for the search range. Compare the middle element to the target: if it is too small, search the right half; if too large, search the left half."

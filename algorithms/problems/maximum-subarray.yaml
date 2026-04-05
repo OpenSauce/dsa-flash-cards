@@ -23,6 +23,15 @@ starter_code:
   python: |
     def max_sub_array(nums: list[int]) -> int:
         pass
+  javascript: |
+    function maxSubArray(nums) {
+    }
+  go: |
+    func maxSubArray(nums []int) int {
+    }
+  java: |
+    public int maxSubArray(int[] nums) {
+    }
 test_cases:
   - input: { nums: [-2, 1, -3, 4, -1, 2, 1, -5, 4] }
     expected: 6
@@ -43,6 +52,42 @@ solution:
             current_sum = max(num, current_sum + num)
             max_sum = max(max_sum, current_sum)
         return max_sum
+  javascript: |
+    function maxSubArray(nums) {
+        let currentSum = nums[0];
+        let maxSum = nums[0];
+        for (let i = 1; i < nums.length; i++) {
+            currentSum = Math.max(nums[i], currentSum + nums[i]);
+            maxSum = Math.max(maxSum, currentSum);
+        }
+        return maxSum;
+    }
+  go: |
+    func maxSubArray(nums []int) int {
+        currentSum := nums[0]
+        maxSum := nums[0]
+        for _, num := range nums[1:] {
+            if num > currentSum+num {
+                currentSum = num
+            } else {
+                currentSum = currentSum + num
+            }
+            if currentSum > maxSum {
+                maxSum = currentSum
+            }
+        }
+        return maxSum
+    }
+  java: |
+    public int maxSubArray(int[] nums) {
+        int currentSum = nums[0];
+        int maxSum = nums[0];
+        for (int i = 1; i < nums.length; i++) {
+            currentSum = Math.max(nums[i], currentSum + nums[i]);
+            maxSum = Math.max(maxSum, currentSum);
+        }
+        return maxSum;
+    }
 hints:
   - "At each position, you have two choices: start a new subarray here, or extend the previous subarray."
   - "This is Kadane's algorithm. Track the maximum sum ending at the current position. If the running sum drops below the current element, reset and start fresh from that element."

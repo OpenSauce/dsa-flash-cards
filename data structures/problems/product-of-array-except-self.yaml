@@ -1,0 +1,110 @@
+title: Product of Array Except Self
+difficulty: medium
+tags: [array]
+description: |
+  Given an integer array `nums`, return an array `result` where `result[i]`
+  is the product of all elements in `nums` except `nums[i]`.
+
+  You must solve it without using division and in O(n) time.
+examples:
+  - input: "nums = [1,2,3,4]"
+    output: "[24,12,8,6]"
+    explanation: "For index 0: 2*3*4=24, index 1: 1*3*4=12, index 2: 1*2*4=8, index 3: 1*2*3=6."
+  - input: "nums = [-1,1,0,-3,3]"
+    output: "[0,0,9,0,0]"
+    explanation: "Any position that excludes the zero gets a product involving zero, so only the position of zero itself gets a nonzero product."
+constraints:
+  - "2 <= nums.length <= 10^5"
+  - "-30 <= nums[i] <= 30"
+  - "The product of any prefix or suffix fits in a 32-bit integer."
+starter_code:
+  python: |
+    def product_except_self(nums: list[int]) -> list[int]:
+        pass
+  javascript: |
+    function productExceptSelf(nums) {
+    }
+  go: |
+    func productExceptSelf(nums []int) []int {
+    }
+  java: |
+    public int[] productExceptSelf(int[] nums) {
+    }
+test_cases:
+  - input: { nums: [1, 2, 3, 4] }
+    expected: [24, 12, 8, 6]
+  - input: { nums: [-1, 1, 0, -3, 3] }
+    expected: [0, 0, 9, 0, 0]
+  - input: { nums: [2, 3] }
+    expected: [3, 2]
+  - input: { nums: [1, 1, 1, 1] }
+    expected: [1, 1, 1, 1]
+  - input: { nums: [0, 0] }
+    expected: [0, 0]
+  - input: { nums: [-1, -1] }
+    expected: [-1, -1]
+solution:
+  python: |
+    def product_except_self(nums: list[int]) -> list[int]:
+        n = len(nums)
+        result = [1] * n
+        prefix = 1
+        for i in range(n):
+            result[i] = prefix
+            prefix *= nums[i]
+        suffix = 1
+        for i in range(n - 1, -1, -1):
+            result[i] *= suffix
+            suffix *= nums[i]
+        return result
+  javascript: |
+    function productExceptSelf(nums) {
+        const n = nums.length;
+        const result = new Array(n).fill(1);
+        let prefix = 1;
+        for (let i = 0; i < n; i++) {
+            result[i] = prefix;
+            prefix *= nums[i];
+        }
+        let suffix = 1;
+        for (let i = n - 1; i >= 0; i--) {
+            result[i] *= suffix;
+            suffix *= nums[i];
+        }
+        return result;
+    }
+  go: |
+    func productExceptSelf(nums []int) []int {
+        n := len(nums)
+        result := make([]int, n)
+        prefix := 1
+        for i := 0; i < n; i++ {
+            result[i] = prefix
+            prefix *= nums[i]
+        }
+        suffix := 1
+        for i := n - 1; i >= 0; i-- {
+            result[i] *= suffix
+            suffix *= nums[i]
+        }
+        return result
+    }
+  java: |
+    public int[] productExceptSelf(int[] nums) {
+        int n = nums.length;
+        int[] result = new int[n];
+        int prefix = 1;
+        for (int i = 0; i < n; i++) {
+            result[i] = prefix;
+            prefix *= nums[i];
+        }
+        int suffix = 1;
+        for (int i = n - 1; i >= 0; i--) {
+            result[i] *= suffix;
+            suffix *= nums[i];
+        }
+        return result;
+    }
+hints:
+  - "Think about computing a prefix product (everything to the left) and a suffix product (everything to the right) for each index."
+  - "First pass left-to-right fills each position with the product of all elements before it. Second pass right-to-left multiplies in the product of all elements after it."

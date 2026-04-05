@@ -1,0 +1,122 @@
+title: Longest Palindromic Substring
+difficulty: medium
+tags: [string, dp]
+description: |
+  Given a string `s`, return the longest substring that reads the same
+  forwards and backwards. If there are multiple answers of the same
+  length, return the one that appears first.
+examples:
+  - input: "s = 'babad'"
+    output: "'bab'"
+    explanation: "'aba' is also a valid answer, but 'bab' appears first when expanding from the center."
+  - input: "s = 'cbbd'"
+    output: "'bb'"
+    explanation: "The longest palindromic substring is 'bb'."
+constraints:
+  - "1 <= s.length <= 1000"
+  - "s consists only of lowercase English letters."
+starter_code:
+  python: |
+    def longest_palindrome(s: str) -> str:
+        pass
+  javascript: |
+    function longestPalindrome(s) {
+    }
+  go: |
+    func longestPalindrome(s string) string {
+    }
+  java: |
+    public String longestPalindrome(String s) {
+    }
+test_cases:
+  - input: { s: "babad" }
+    expected: "bab"
+  - input: { s: "cbbd" }
+    expected: "bb"
+  - input: { s: "a" }
+    expected: "a"
+  - input: { s: "ac" }
+    expected: "a"
+  - input: { s: "racecar" }
+    expected: "racecar"
+  - input: { s: "aacabdkacaa" }
+    expected: "aca"
+solution:
+  python: |
+    def longest_palindrome(s: str) -> str:
+        start, max_len = 0, 0
+        def expand(left, right):
+            nonlocal start, max_len
+            while left >= 0 and right < len(s) and s[left] == s[right]:
+                if right - left + 1 > max_len:
+                    start = left
+                    max_len = right - left + 1
+                left -= 1
+                right += 1
+        for i in range(len(s)):
+            expand(i, i)
+            expand(i, i + 1)
+        return s[start:start + max_len]
+  javascript: |
+    function longestPalindrome(s) {
+        let start = 0, maxLen = 0;
+        function expand(left, right) {
+            while (left >= 0 && right < s.length && s[left] === s[right]) {
+                if (right - left + 1 > maxLen) {
+                    start = left;
+                    maxLen = right - left + 1;
+                }
+                left--;
+                right++;
+            }
+        }
+        for (let i = 0; i < s.length; i++) {
+            expand(i, i);
+            expand(i, i + 1);
+        }
+        return s.substring(start, start + maxLen);
+    }
+  go: |
+    func longestPalindrome(s string) string {
+        start, maxLen := 0, 0
+        expand := func(left, right int) {
+            for left >= 0 && right < len(s) && s[left] == s[right] {
+                if right-left+1 > maxLen {
+                    start = left
+                    maxLen = right - left + 1
+                }
+                left--
+                right++
+            }
+        }
+        for i := 0; i < len(s); i++ {
+            expand(i, i)
+            expand(i, i+1)
+        }
+        return s[start : start+maxLen]
+    }
+  java: |
+    public String longestPalindrome(String s) {
+        int start = 0, maxLen = 0;
+        for (int i = 0; i < s.length(); i++) {
+            int len1 = expand(s, i, i);
+            int len2 = expand(s, i, i + 1);
+            int len = Math.max(len1, len2);
+            if (len > maxLen) {
+                maxLen = len;
+                start = i - (len - 1) / 2;
+            }
+        }
+        return s.substring(start, start + maxLen);
+    }
+
+    private int expand(String s, int left, int right) {
+        while (left >= 0 && right < s.length() && s.charAt(left) == s.charAt(right)) {
+            left--;
+            right++;
+        }
+        return right - left - 1;
+    }
+hints:
+  - "A palindrome mirrors around its center. There are 2n-1 possible centers (each character, and each gap between characters)."
+  - "For each center, expand outward while characters match. Track the longest palindrome found."

@@ -1,0 +1,97 @@
+title: Find Minimum in Rotated Sorted Array
+difficulty: medium
+tags: [binary-search]
+description: |
+  An array of unique integers was sorted in ascending order, then rotated
+  between 1 and n times. For example, `[1,2,3,4,5]` might become
+  `[3,4,5,1,2]`.
+
+  Given the rotated array `nums`, return the minimum element. Your
+  solution must run in O(log n) time.
+examples:
+  - input: "nums = [3,4,5,1,2]"
+    output: "1"
+    explanation: "The original sorted array was [1,2,3,4,5] and it was rotated 3 times."
+  - input: "nums = [4,5,6,7,0,1,2]"
+    output: "0"
+    explanation: "The smallest value is 0."
+  - input: "nums = [11,13,15,17]"
+    output: "11"
+    explanation: "The array was rotated 4 times (full rotation), so the minimum is the first element."
+constraints:
+  - "1 <= nums.length <= 5000"
+  - "-5000 <= nums[i] <= 5000"
+  - "All values in nums are unique."
+starter_code:
+  python: |
+    def find_min(nums: list[int]) -> int:
+        pass
+  javascript: |
+    function findMin(nums) {
+    }
+  go: |
+    func findMin(nums []int) int {
+    }
+  java: |
+    public int findMin(int[] nums) {
+    }
+test_cases:
+  - input: { nums: [3, 4, 5, 1, 2] }
+    expected: 1
+  - input: { nums: [4, 5, 6, 7, 0, 1, 2] }
+    expected: 0
+  - input: { nums: [11, 13, 15, 17] }
+    expected: 11
+  - input: { nums: [2, 1] }
+    expected: 1
+  - input: { nums: [1] }
+    expected: 1
+  - input: { nums: [5, 1, 2, 3, 4] }
+    expected: 1
+solution:
+  python: |
+    def find_min(nums: list[int]) -> int:
+        left, right = 0, len(nums) - 1
+        while left < right:
+            mid = (left + right) // 2
+            if nums[mid] > nums[right]:
+                left = mid + 1
+            else:
+                right = mid
+        return nums[left]
+  javascript: |
+    function findMin(nums) {
+        let left = 0, right = nums.length - 1;
+        while (left < right) {
+            const mid = Math.floor((left + right) / 2);
+            if (nums[mid] > nums[right]) left = mid + 1;
+            else right = mid;
+        }
+        return nums[left];
+    }
+  go: |
+    func findMin(nums []int) int {
+        left, right := 0, len(nums)-1
+        for left < right {
+            mid := (left + right) / 2
+            if nums[mid] > nums[right] {
+                left = mid + 1
+            } else {
+                right = mid
+            }
+        }
+        return nums[left]
+    }
+  java: |
+    public int findMin(int[] nums) {
+        int left = 0, right = nums.length - 1;
+        while (left < right) {
+            int mid = left + (right - left) / 2;
+            if (nums[mid] > nums[right]) left = mid + 1;
+            else right = mid;
+        }
+        return nums[left];
+    }
+hints:
+  - "The minimum is always at the rotation point — where the sorted order breaks."
+  - "Compare the middle element with the rightmost element. If mid > right, the minimum is in the right half. Otherwise it is in the left half (including mid)."

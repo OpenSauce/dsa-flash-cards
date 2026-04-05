@@ -1,0 +1,107 @@
+title: Longest Consecutive Sequence
+difficulty: medium
+tags: [hash-map]
+description: |
+  Given an unsorted array of integers `nums`, find the length of the
+  longest sequence of consecutive elements.
+
+  Your algorithm must run in O(n) time. The elements do not need to
+  be adjacent in the original array — only their values matter.
+examples:
+  - input: "nums = [100,4,200,1,3,2]"
+    output: "4"
+    explanation: "The longest consecutive sequence is [1,2,3,4], which has length 4."
+  - input: "nums = [0,3,7,2,5,8,4,6,0,1]"
+    output: "9"
+    explanation: "The sequence 0 through 8 is the longest, with length 9."
+constraints:
+  - "0 <= nums.length <= 10^5"
+  - "-10^9 <= nums[i] <= 10^9"
+starter_code:
+  python: |
+    def longest_consecutive(nums: list[int]) -> int:
+        pass
+  javascript: |
+    function longestConsecutive(nums) {
+    }
+  go: |
+    func longestConsecutive(nums []int) int {
+    }
+  java: |
+    public int longestConsecutive(int[] nums) {
+    }
+test_cases:
+  - input: { nums: [100, 4, 200, 1, 3, 2] }
+    expected: 4
+  - input: { nums: [0, 3, 7, 2, 5, 8, 4, 6, 0, 1] }
+    expected: 9
+  - input: { nums: [] }
+    expected: 0
+  - input: { nums: [1] }
+    expected: 1
+  - input: { nums: [1, 2, 0, 1] }
+    expected: 3
+  - input: { nums: [9, 1, 4, 7, 3, -1, 0, 5, 8, -1, 6] }
+    expected: 7
+solution:
+  python: |
+    def longest_consecutive(nums: list[int]) -> int:
+        num_set = set(nums)
+        longest = 0
+        for num in num_set:
+            if num - 1 not in num_set:
+                length = 1
+                while num + length in num_set:
+                    length += 1
+                longest = max(longest, length)
+        return longest
+  javascript: |
+    function longestConsecutive(nums) {
+        const numSet = new Set(nums);
+        let longest = 0;
+        for (const num of numSet) {
+            if (!numSet.has(num - 1)) {
+                let length = 1;
+                while (numSet.has(num + length)) length++;
+                longest = Math.max(longest, length);
+            }
+        }
+        return longest;
+    }
+  go: |
+    func longestConsecutive(nums []int) int {
+        numSet := map[int]bool{}
+        for _, n := range nums {
+            numSet[n] = true
+        }
+        longest := 0
+        for n := range numSet {
+            if !numSet[n-1] {
+                length := 1
+                for numSet[n+length] {
+                    length++
+                }
+                if length > longest {
+                    longest = length
+                }
+            }
+        }
+        return longest
+    }
+  java: |
+    public int longestConsecutive(int[] nums) {
+        java.util.Set<Integer> numSet = new java.util.HashSet<>();
+        for (int n : nums) numSet.add(n);
+        int longest = 0;
+        for (int n : numSet) {
+            if (!numSet.contains(n - 1)) {
+                int length = 1;
+                while (numSet.contains(n + length)) length++;
+                longest = Math.max(longest, length);
+            }
+        }
+        return longest;
+    }
+hints:
+  - "A hash set gives O(1) lookups. How can you use that to avoid sorting?"
+  - "Only start counting a sequence from its smallest element — check if num-1 is NOT in the set. Then count upward from there."
