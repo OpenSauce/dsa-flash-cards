@@ -1,0 +1,107 @@
+# =============================================================================
+# Lesson 1: AI/ML Foundations (8 cards)
+# =============================================================================
+
+- title: "AI Foundations - Supervised Learning"
+  difficulty: "easy"
+  tags: ["ml-basics", "learning-types"]
+  lesson: ai-foundations
+  Front: |
+    What is supervised learning?
+  Back: |
+    Training a model on labeled examples so it learns to predict the label for new inputs.
+
+    Example: a spam filter trained on thousands of emails marked spam or not-spam, which then classifies new emails it has never seen.
+
+    Key signal in interviews: the data has known right answers attached.
+
+- title: "AI Foundations - Unsupervised Learning"
+  difficulty: "easy"
+  tags: ["ml-basics", "learning-types"]
+  lesson: ai-foundations
+  Front: |
+    What is unsupervised learning?
+  Back: |
+    Training a model on data with no labels so it finds structure on its own.
+
+    Example: clustering users into behavioral groups from raw usage logs, where nobody predefined what the groups should be.
+
+    Key signal: no right answers in the data. The model is discovering, not predicting.
+
+- title: "AI Foundations - Reinforcement Learning"
+  difficulty: "easy"
+  tags: ["ml-basics", "learning-types"]
+  lesson: ai-foundations
+  Front: |
+    What is reinforcement learning?
+  Back: |
+    An agent takes actions, receives rewards or penalties, and learns to act in ways that maximize long-term reward.
+
+    Example: a game-playing agent that learns to play well by getting a positive signal for winning moves and a negative signal for losing ones.
+
+    Key signal: no labeled examples, just a reward function that scores outcomes.
+
+- title: "AI Foundations - Training vs Inference"
+  difficulty: "medium"
+  tags: ["ml-basics", "training", "inference"]
+  lesson: ai-foundations
+  Front: |
+    In ML systems, what is the difference between training and inference, and why does it matter for system design?
+  Back: |
+    **Training:** fitting the model's parameters to data. Expensive, one-time or periodic, often hours to weeks on specialized hardware.
+
+    **Inference:** running the trained model on new input to get an answer. Cheap per call, fast, happens constantly in production.
+
+    They have completely different cost, hardware, and latency profiles. In ML system design, you locate the two workloads separately because they scale differently.
+
+- title: "AI Foundations - Train/Val/Test Split"
+  difficulty: "medium"
+  tags: ["ml-basics", "evaluation"]
+  lesson: ai-foundations
+  Front: |
+    What are the training set, validation set, and test set, and what is each one for?
+  Back: |
+    - **Training set:** what the model learns from. Parameters are fit on this data.
+    - **Validation set:** used during development to tune hyperparameters and pick between model variants.
+    - **Test set:** touched only once, at the end, for an honest estimate of how the model performs on unseen data.
+
+    Evaluating on training data is meaningless. Leaking test data into training invalidates the final score.
+
+- title: "AI Foundations - Overfitting"
+  difficulty: "medium"
+  tags: ["ml-basics", "overfitting"]
+  lesson: ai-foundations
+  Front: |
+    What is overfitting, and what is its telltale symptom?
+  Back: |
+    Overfitting is when a model memorizes its training data instead of learning general patterns, so it fails on new inputs.
+
+    **Symptom:** high training accuracy, much lower test accuracy.
+
+    Standard mitigations: more training data, a simpler model, regularization, early stopping, dropout. You do not need to explain the mechanisms in depth. Name the symptom and list two or three fixes.
+
+- title: "AI Foundations - Gradient Descent Intuition"
+  difficulty: "medium"
+  tags: ["ml-basics", "training"]
+  lesson: ai-foundations
+  Front: |
+    What is gradient descent, explained without math?
+  Back: |
+    Loss is one number that says "how wrong is the model right now?" Gradient descent is the algorithm that nudges the model's parameters in small steps that push loss downhill, repeated many times until loss stops improving.
+
+    The shape of the idea: training is a search for parameters that make the loss small, and gradient descent is the search strategy. You do not need calculus to talk about this in interviews.
+
+- title: "AI Foundations - AI vs ML vs DL"
+  difficulty: "easy"
+  tags: ["ml-basics", "terminology"]
+  lesson: ai-foundations
+  Front: |
+    What is the relationship between AI, ML, and deep learning?
+  Back: |
+    Nested subsets, from broadest to narrowest:
+
+    - **AI:** the goal of building systems that do things we would call intelligent.
+    - **ML:** the dominant approach, where systems learn patterns from data instead of following hand-written rules. A subset of AI.
+    - **Deep learning:** ML using neural networks with many layers. A subset of ML.
+
+    Every deep learning system is an ML system, and every ML system is an AI system. The reverse is not true.
