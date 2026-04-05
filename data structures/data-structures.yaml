@@ -787,3 +787,339 @@
     **Directed:** During DFS, track the current path (not just visited globally). A back edge to a vertex still on the current path means a cycle.
 
     **Undirected:** During BFS/DFS, if you reach an already-visited vertex that is not the parent of the current vertex, a cycle exists.
+
+# =============================================================================
+# Problem-anchored: Arrays & Hashing
+# =============================================================================
+
+- title: "Two Sum -- Pattern"
+  difficulty: "easy"
+  tags: ["hash map", "two sum", "pattern"]
+  lesson: ds-hash-tables
+  Front: |
+    **Two Sum** -- What pattern turns the naive O(n^2) pair search into O(n)?
+  Back: |
+    **Hash map of complements.** For each `nums[i]`, check if `target - nums[i]` is already in the map; if not, store `nums[i] -> i`. One pass, O(n) time, O(n) space.
+
+    Practice: Two Sum, Two Sum II (sorted -- use two pointers instead).
+
+- title: "Two Sum -- Why a Hash Map"
+  difficulty: "easy"
+  tags: ["hash map", "two sum", "insight"]
+  lesson: ds-hash-tables
+  Front: |
+    **Two Sum** -- Why does the hash-map solution store `value -> index` and not `index -> value`?
+  Back: |
+    You look up the *complement* (`target - nums[i]`), which is a value. Hashing by value lets you answer "have I seen the number I need?" in O(1). The stored index is what the problem asks you to return.
+
+- title: "Contains Duplicate -- Pattern"
+  difficulty: "easy"
+  tags: ["hash set", "contains duplicate", "pattern"]
+  lesson: ds-hash-tables
+  Front: |
+    **Contains Duplicate** -- What is the optimal approach?
+  Back: |
+    Insert into a hash set while scanning. Return `true` the moment you try to insert a value already present. O(n) time, O(n) space.
+
+    Sorting also works in O(n log n) time and O(1) extra space -- use it when memory is the constraint.
+
+- title: "Valid Anagram -- Pattern"
+  difficulty: "easy"
+  tags: ["hash map", "anagram", "pattern", "counting"]
+  lesson: ds-hash-tables
+  Front: |
+    **Valid Anagram** -- What is the O(n) approach, and how does it beat sorting?
+  Back: |
+    Count characters in `s` (increment) and `t` (decrement) in one array of size 26 (or a hash map). Anagrams leave all counts at zero. O(n) time vs O(n log n) for the sort-and-compare approach.
+
+- title: "Group Anagrams -- Canonical Key"
+  difficulty: "medium"
+  tags: ["hash map", "anagram", "canonical key"]
+  lesson: ds-hash-tables
+  Front: |
+    **Group Anagrams** -- What key groups anagrams together in a hash map?
+  Back: |
+    A canonical form of the string: either the sorted characters (`"eat" -> "aet"`) or a character-count tuple (`(1,0,1,...,1,0)`). All anagrams collapse to the same key.
+
+    Sorted key: O(n * k log k). Count-tuple key: O(n * k). k = string length.
+
+- title: "Longest Consecutive Sequence -- Key Insight"
+  difficulty: "medium"
+  tags: ["hash set", "longest consecutive", "insight"]
+  lesson: ds-hash-tables
+  Front: |
+    **Longest Consecutive Sequence** -- How do you achieve O(n) without sorting?
+  Back: |
+    Put all numbers in a hash set. For each number, **only start counting a streak if `n-1` is NOT in the set** -- meaning `n` is the start of a run. Walk upward from there.
+
+    Each number is visited at most twice across all runs, so total work is O(n) despite the nested loop.
+
+- title: "Product of Array Except Self -- Pattern"
+  difficulty: "medium"
+  tags: ["prefix product", "product except self", "pattern"]
+  lesson: ds-arrays-and-strings
+  Front: |
+    **Product of Array Except Self** -- How do you build the result in O(n) without division?
+  Back: |
+    Two passes: first fill the output with **prefix products** (product of all elements to the left). Second pass walks right-to-left, multiplying each entry by a running **suffix product**.
+
+    O(n) time, O(1) extra space (output array doesn't count). Division would fail on arrays containing zero.
+
+- title: "Encode and Decode Strings -- Pattern"
+  difficulty: "medium"
+  tags: ["encoding", "serialization", "length prefix"]
+  lesson: ds-arrays-and-strings
+  Front: |
+    **Encode and Decode Strings** -- Why is a length prefix (e.g. `"5#hello"`) better than a delimiter like `,`?
+  Back: |
+    Any delimiter can appear inside the input strings, breaking the split. A length prefix is unambiguous: read digits until `#`, then read exactly that many characters. Works for arbitrary content, including empty strings.
+
+# =============================================================================
+# Problem-anchored: Two Pointers & Sliding Window (strings)
+# =============================================================================
+
+- title: "Three Sum -- Pattern"
+  difficulty: "medium"
+  tags: ["two pointers", "three sum", "sorting", "pattern"]
+  lesson: ds-arrays-and-strings
+  Front: |
+    **Three Sum** -- How do sorting plus two pointers reach O(n^2)?
+  Back: |
+    Sort the array. Fix each index `i`; run a two-pointer sweep on `nums[i+1..n-1]` looking for `-nums[i]`. Skip duplicate values at every level (outer `i` and the inner pointers) to avoid duplicate triplets.
+
+    Sort: O(n log n). Sweep: n iterations × O(n) = O(n^2). Total O(n^2).
+
+- title: "Valid Palindrome -- Pattern"
+  difficulty: "easy"
+  tags: ["two pointers", "palindrome", "pattern"]
+  lesson: ds-arrays-and-strings
+  Front: |
+    **Valid Palindrome** -- What pattern checks a palindrome in O(n) and O(1) space?
+  Back: |
+    **Opposite-direction two pointers.** `left` starts at 0, `right` at n-1. Skip non-alphanumerics, compare case-insensitively, move inward. Mismatch → not a palindrome.
+
+- title: "Longest Substring Without Repeating Characters -- Pattern"
+  difficulty: "medium"
+  tags: ["sliding window", "hash set", "longest substring"]
+  lesson: ds-hash-tables
+  Front: |
+    **Longest Substring Without Repeating Characters** -- What pattern solves this in O(n)?
+  Back: |
+    **Variable-size sliding window** with a hash set (or `lastSeen` map). Expand `right`; if `s[right]` is a duplicate, advance `left` past its previous occurrence. Track the max window size seen.
+
+- title: "Longest Substring Without Repeating -- Why O(n)"
+  difficulty: "medium"
+  tags: ["sliding window", "amortized", "insight"]
+  lesson: ds-hash-tables
+  Front: |
+    **Longest Substring Without Repeating Characters** -- Why is the sliding-window solution O(n), not O(n^2), despite the nested loop feel?
+  Back: |
+    Each character is added to the window once and removed at most once. `left` only moves forward, so total work across both pointers is 2n -- amortized O(1) per step.
+
+- title: "Longest Palindromic Substring -- Expand Around Center"
+  difficulty: "medium"
+  tags: ["two pointers", "palindrome", "expand around center"]
+  lesson: ds-arrays-and-strings
+  Front: |
+    **Longest Palindromic Substring** -- What pattern finds the longest palindrome in O(n^2) time and O(1) space?
+  Back: |
+    **Expand around center.** Try every index as a center (both odd-length `s[i]` and even-length `s[i],s[i+1]`) and expand two pointers outward while characters match. 2n-1 centers, up to O(n) expansion each.
+
+# =============================================================================
+# Problem-anchored: Stack
+# =============================================================================
+
+- title: "Valid Parentheses -- Pattern"
+  difficulty: "easy"
+  tags: ["stack", "parentheses", "pattern"]
+  lesson: ds-stacks-and-queues
+  Front: |
+    **Valid Parentheses** -- What pattern verifies balanced brackets in one pass?
+  Back: |
+    **Stack of open brackets.** Push opens; on a close bracket, the stack top must be the matching open -- otherwise invalid. The string is valid iff the stack is empty at the end.
+
+    LIFO matches the nesting structure of brackets.
+
+# =============================================================================
+# Problem-anchored: Linked Lists
+# =============================================================================
+
+- title: "Reverse Linked List -- Three Pointers"
+  difficulty: "easy"
+  tags: ["linked list", "reverse", "pointers"]
+  lesson: ds-linked-lists
+  Front: |
+    **Reverse Linked List** -- Why does the iterative solution need three pointers?
+  Back: |
+    `prev`, `curr`, and `next`. Before flipping `curr.next = prev`, you must save the original `curr.next` in `next` -- otherwise you lose the rest of the list.
+
+    Loop: save next, flip link, advance prev and curr. Returns `prev` as the new head.
+
+- title: "Merge Two Sorted Lists -- Dummy Head Trick"
+  difficulty: "easy"
+  tags: ["linked list", "merge", "dummy head"]
+  lesson: ds-linked-lists
+  Front: |
+    **Merge Two Sorted Lists** -- Why use a dummy head node?
+  Back: |
+    It eliminates the edge case of picking the first node. You always append to `tail.next`, and at the end return `dummy.next`. No special logic for "is this the first element?".
+
+- title: "Remove Nth Node From End -- Pattern"
+  difficulty: "medium"
+  tags: ["linked list", "two pointers", "fast-slow"]
+  lesson: ds-linked-lists
+  Front: |
+    **Remove Nth Node From End** -- How do you find the n-th-from-last node in one pass?
+  Back: |
+    **Two pointers with a gap of n.** Advance `fast` n steps first, then move `fast` and `slow` together until `fast` hits the end. `slow` now points to the node before the one to remove.
+
+    Use a dummy head to handle the "remove the head" case uniformly.
+
+- title: "Reorder List -- Three-Step Pattern"
+  difficulty: "medium"
+  tags: ["linked list", "reorder", "compound pattern"]
+  lesson: ds-linked-lists
+  Front: |
+    **Reorder List** -- What three sub-problems does the O(n) in-place solution decompose into?
+  Back: |
+    1. **Find the middle** with fast/slow pointers.
+    2. **Reverse the second half** in place.
+    3. **Merge the two halves** by alternating nodes.
+
+    Each step is O(n), total O(n) time, O(1) space.
+
+- title: "Add Two Numbers -- Carry Pattern"
+  difficulty: "medium"
+  tags: ["linked list", "add two numbers", "carry"]
+  lesson: ds-linked-lists
+  Front: |
+    **Add Two Numbers** (digits in reverse order) -- What is the loop invariant?
+  Back: |
+    At each step, sum = `l1.val + l2.val + carry`. The new digit is `sum % 10`, the new carry is `sum / 10`. Continue while either list has nodes OR carry is non-zero -- forgetting the trailing carry is the classic bug.
+
+# =============================================================================
+# Problem-anchored: Trees
+# =============================================================================
+
+- title: "Invert Binary Tree -- Pattern"
+  difficulty: "easy"
+  tags: ["tree", "recursion", "invert"]
+  lesson: ds-trees-and-traversals
+  Front: |
+    **Invert Binary Tree** -- What is the recursive structure?
+  Back: |
+    Swap `root.left` and `root.right`, then recurse into both children. Base case: `null` returns `null`. O(n) time, O(h) recursion space.
+
+- title: "Maximum Depth of Binary Tree -- Pattern"
+  difficulty: "easy"
+  tags: ["tree", "recursion", "depth"]
+  lesson: ds-trees-and-traversals
+  Front: |
+    **Maximum Depth of Binary Tree** -- What is the one-line recurrence?
+  Back: |
+    `depth(node) = 1 + max(depth(node.left), depth(node.right))`, with `depth(null) = 0`. Pure post-order DFS.
+
+- title: "Same Tree -- Pattern"
+  difficulty: "easy"
+  tags: ["tree", "recursion", "equality"]
+  lesson: ds-trees-and-traversals
+  Front: |
+    **Same Tree** -- What are the three recursive cases?
+  Back: |
+    1. Both `null` → true.
+    2. One `null`, the other not → false.
+    3. Values equal AND left subtrees same AND right subtrees same.
+
+    Any other ordering misses an edge case.
+
+- title: "Subtree of Another Tree -- Pattern"
+  difficulty: "easy"
+  tags: ["tree", "recursion", "subtree"]
+  lesson: ds-trees-and-traversals
+  Front: |
+    **Subtree of Another Tree** -- How does it reuse Same Tree?
+  Back: |
+    For every node in `root`, check if `sameTree(node, subRoot)`. Recurse down `root` searching for a match. O(m * n) in the worst case.
+
+    **Trick:** serialize both trees with null markers and check substring in O(m + n).
+
+- title: "Level Order Traversal -- Pattern"
+  difficulty: "medium"
+  tags: ["tree", "bfs", "level order"]
+  lesson: ds-trees-and-traversals
+  Front: |
+    **Binary Tree Level Order Traversal** -- How do you group nodes by level using BFS?
+  Back: |
+    At the start of each outer iteration, **snapshot the current queue size** -- that's the count of nodes on this level. Process exactly that many nodes into the current level's list, then loop.
+
+    Without the snapshot, you can't tell where one level ends and the next begins.
+
+- title: "Validate BST -- Range Pattern"
+  difficulty: "medium"
+  tags: ["bst", "validation", "range"]
+  lesson: ds-binary-search-trees
+  Front: |
+    **Validate BST** -- Why does checking `node.left.val < node.val < node.right.val` at each node fail?
+  Back: |
+    It only enforces the local parent-child constraint. A right-subtree node might be less than an ancestor further up. The correct approach passes a `(low, high)` range down: left child tightens `high`, right child tightens `low`. Every value must lie strictly inside its inherited range.
+
+- title: "LCA of BST -- Key Insight"
+  difficulty: "easy"
+  tags: ["bst", "lca", "insight"]
+  lesson: ds-binary-search-trees
+  Front: |
+    **Lowest Common Ancestor of a BST** -- Why is the BST version O(h) instead of O(n)?
+  Back: |
+    BST ordering lets you choose a direction at every node:
+    - Both `p` and `q` less than node → go left.
+    - Both greater → go right.
+    - Otherwise (split) → current node is the LCA.
+
+    No backtracking needed -- you walk a single root-to-LCA path.
+
+- title: "Kth Smallest in BST -- Pattern"
+  difficulty: "medium"
+  tags: ["bst", "inorder", "kth smallest"]
+  lesson: ds-binary-search-trees
+  Front: |
+    **Kth Smallest Element in a BST** -- Why does in-order traversal solve this?
+  Back: |
+    In-order traversal of a BST visits nodes in ascending order. Count nodes as you visit; return the k-th one. Early-exit when the counter hits k. O(h + k) with an iterative stack.
+
+- title: "Binary Tree Max Path Sum -- Pattern"
+  difficulty: "hard"
+  tags: ["tree", "path sum", "post-order"]
+  lesson: ds-trees-and-traversals
+  Front: |
+    **Binary Tree Maximum Path Sum** -- Why does each recursive call return a *different* value than the one tracked globally?
+  Back: |
+    The recursion returns the best **single-direction** path ending at the current node (used by the parent). The global answer considers the best **bending** path at this node: `node.val + maxLeft + maxRight`. You can't propagate a bending path upward -- a parent can only extend one side.
+
+    Clamp child returns at 0 to skip negative contributions.
+
+# =============================================================================
+# Problem-anchored: String / Misc
+# =============================================================================
+
+- title: "String to Integer (atoi) -- Order of Operations"
+  difficulty: "medium"
+  tags: ["string", "atoi", "parsing"]
+  lesson: ds-arrays-and-strings
+  Front: |
+    **String to Integer (atoi)** -- What is the required parsing order, and why does it matter?
+  Back: |
+    1. Skip leading whitespace.
+    2. Read optional `+` or `-` sign.
+    3. Read consecutive digits.
+    4. Clamp to `INT_MIN` / `INT_MAX` on overflow.
+
+    Doing clamping only at the end risks overflow during the multiply-accumulate step. Check `result > (INT_MAX - digit) / 10` *before* each update.
+
+- title: "Minimum Window Substring -- Pattern"
+  difficulty: "hard"
+  tags: ["sliding window", "hash map", "min window"]
+  lesson: ds-hash-tables
+  Front: |
+    **Minimum Window Substring** -- What pattern, and what does the `have/need` counter track?
+  Back: |
+    **Variable-size sliding window** with a frequency map of `t`. `need` = number of distinct chars in `t`; `have` = number of distinct chars in the window whose count meets the required quota. When `have == need`, shrink from the left while still valid; record the smallest window.

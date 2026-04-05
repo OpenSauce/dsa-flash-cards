@@ -811,3 +811,253 @@
     | Optimize, but greedy fails on counterexamples | DP |
 
     Greedy decides once. Backtracking tries everything and undoes. DP tries everything and remembers.
+
+# =============================================================================
+# Problem-anchored: Two Pointers
+# =============================================================================
+
+- title: "Two Sum II (Sorted) -- Pattern"
+  difficulty: "easy"
+  tags: ["two pointers", "two sum", "sorted", "pattern"]
+  lesson: algorithms-array-techniques
+  Front: |
+    **Two Sum II -- Input Array Is Sorted** -- Why can you drop the hash map and use two pointers?
+  Back: |
+    Sorted input lets you compare `nums[left] + nums[right]` to `target`:
+    - Too small → move `left` right (increase sum).
+    - Too large → move `right` left (decrease sum).
+
+    O(n) time, O(1) space -- strictly better than the hash-map version for sorted input.
+
+- title: "Container With Most Water -- Pattern"
+  difficulty: "medium"
+  tags: ["two pointers", "container", "insight"]
+  lesson: algorithms-array-techniques
+  Front: |
+    **Container With Most Water** -- Which pointer do you move, and why is it correct?
+  Back: |
+    Always move the pointer at the **shorter** line inward. The container's height is capped by the shorter side, so moving the taller one can only decrease (or tie) the area -- width also shrinks. Moving the shorter side is the only move that can possibly yield a larger area.
+
+- title: "Trapping Rain Water -- Key Insight"
+  difficulty: "hard"
+  tags: ["two pointers", "trapping rain water", "insight"]
+  lesson: algorithms-array-techniques
+  Front: |
+    **Trapping Rain Water** -- What determines how much water sits above index `i`?
+  Back: |
+    `water[i] = min(maxLeft[i], maxRight[i]) - height[i]`. The shorter of the two tallest bars on either side caps the water level; subtract the bar's own height.
+
+    O(n) two-pointer version: advance from the side with the smaller max, which guarantees the other side has a taller wall.
+
+- title: "Move Zeroes -- Pattern"
+  difficulty: "easy"
+  tags: ["two pointers", "move zeroes", "in-place"]
+  lesson: algorithms-array-techniques
+  Front: |
+    **Move Zeroes** -- What pattern moves all zeros to the end in place, in O(n)?
+  Back: |
+    **Same-direction two pointers.** `write` tracks where the next non-zero goes; `read` scans. When `nums[read]` is non-zero, swap with `nums[write]` and advance `write`. Zeros are pushed to the tail with relative order preserved.
+
+- title: "Remove Duplicates from Sorted Array -- Pattern"
+  difficulty: "easy"
+  tags: ["two pointers", "deduplication", "in-place"]
+  lesson: algorithms-array-techniques
+  Front: |
+    **Remove Duplicates from Sorted Array** -- Why does a same-direction two-pointer work only on sorted input?
+  Back: |
+    Duplicates are adjacent in a sorted array, so you only need to compare each element to its predecessor. `write` stays one behind a run of equal values and jumps forward on each new value. Unsorted input would need a hash set.
+
+# =============================================================================
+# Problem-anchored: Sliding Window
+# =============================================================================
+
+- title: "Best Time to Buy and Sell Stock -- Pattern"
+  difficulty: "easy"
+  tags: ["sliding window", "stock", "running minimum"]
+  lesson: algorithms-array-techniques
+  Front: |
+    **Best Time to Buy and Sell Stock** -- How is this solved in one pass?
+  Back: |
+    Track the running minimum price seen so far and the best profit. For each price, `profit = max(profit, price - minSoFar)`, then update `minSoFar`. One O(n) sweep, O(1) space.
+
+- title: "Best Time to Buy and Sell Stock II -- Pattern"
+  difficulty: "medium"
+  tags: ["greedy", "stock", "insight"]
+  lesson: algorithms-greedy-and-backtracking
+  Front: |
+    **Best Time to Buy and Sell Stock II** (unlimited transactions) -- Why does summing every positive delta give the optimal profit?
+  Back: |
+    Any multi-day gain `p[j] - p[i]` telescopes into a sum of consecutive deltas `(p[i+1]-p[i]) + ... + (p[j]-p[j-1])`. Keeping only positive deltas is equivalent to buying before every uphill and selling at every peak. Pure greedy, O(n).
+
+- title: "Longest Repeating Character Replacement -- Pattern"
+  difficulty: "medium"
+  tags: ["sliding window", "character replacement", "insight"]
+  lesson: algorithms-array-techniques
+  Front: |
+    **Longest Repeating Character Replacement** -- What is the window-validity condition?
+  Back: |
+    `(window length) - (count of the most frequent char in window) <= k`. The "other" characters are the ones you'd replace; they must fit the budget `k`. Expand `right`; if invalid, shrink `left` by one and retry.
+
+    Trick: you don't need to recompute max-frequency on shrink -- the answer only grows when a genuinely better window appears.
+
+- title: "Permutation in String -- Pattern"
+  difficulty: "medium"
+  tags: ["sliding window", "anagram", "fixed window"]
+  lesson: algorithms-array-techniques
+  Front: |
+    **Permutation in String** -- What makes this a fixed-size sliding window problem?
+  Back: |
+    A permutation of `s1` is exactly `len(s1)` characters with the same character frequencies. Slide a window of that fixed width across `s2` and compare its frequency map to `s1`'s. O(n) with incremental add/remove updates.
+
+- title: "Minimum Size Subarray Sum -- Pattern"
+  difficulty: "medium"
+  tags: ["sliding window", "subarray sum", "variable window"]
+  lesson: algorithms-array-techniques
+  Front: |
+    **Minimum Size Subarray Sum** -- Why does a variable-size sliding window work (and what constraint does it rely on)?
+  Back: |
+    All values are positive, so the running sum is monotonic in window length. Expand `right` until sum ≥ target, then shrink `left` as far as possible while still valid, recording the minimum length. O(n).
+
+    Negative values would break monotonicity -- you'd need prefix sums + a deque instead.
+
+- title: "Sliding Window Maximum -- Pattern"
+  difficulty: "hard"
+  tags: ["sliding window", "deque", "monotonic"]
+  lesson: algorithms-array-techniques
+  Front: |
+    **Sliding Window Maximum** -- What data structure achieves O(n), and what invariant does it maintain?
+  Back: |
+    A **monotonic deque** of indices whose values are strictly decreasing. Before pushing `nums[i]`, pop smaller values from the back (they can never be the max while `nums[i]` is in the window). Pop from the front when its index falls out of the window. The front is always the current max.
+
+    Each index is pushed and popped at most once → O(n).
+
+# =============================================================================
+# Problem-anchored: Binary Search
+# =============================================================================
+
+- title: "Binary Search -- Canonical Loop Invariant"
+  difficulty: "easy"
+  tags: ["binary search", "invariant"]
+  lesson: algorithms-searching
+  Front: |
+    **Binary Search** (classic) -- What is the loop invariant, and when do you stop?
+  Back: |
+    Invariant: if `target` is in the array, it lies in `[left, right]`. Loop while `left <= right`. Compute `mid = left + (right - left) / 2` to avoid overflow, then shrink the half that cannot contain `target`. Return `-1` when the range is empty.
+
+- title: "Search in Rotated Sorted Array -- Key Insight"
+  difficulty: "medium"
+  tags: ["binary search", "rotated array", "insight"]
+  lesson: algorithms-searching
+  Front: |
+    **Search in Rotated Sorted Array** -- How do you decide which half to recurse into?
+  Back: |
+    Compare `nums[mid]` to `nums[left]`:
+    - If `nums[left] <= nums[mid]`, the **left half is sorted**. If `target` lies in `[nums[left], nums[mid])`, go left; else go right.
+    - Otherwise the right half is sorted. Apply the symmetric check.
+
+    At every step, exactly one half is sorted -- that's what keeps it O(log n).
+
+- title: "Find Minimum in Rotated Sorted Array -- Key Insight"
+  difficulty: "medium"
+  tags: ["binary search", "rotated array", "minimum"]
+  lesson: algorithms-searching
+  Front: |
+    **Find Minimum in Rotated Sorted Array** -- Why compare `nums[mid]` to `nums[right]` instead of `nums[left]`?
+  Back: |
+    Comparing to `nums[right]` cleanly disambiguates:
+    - `nums[mid] > nums[right]` → minimum is strictly right of `mid` (`left = mid + 1`).
+    - Otherwise → minimum is at `mid` or to its left (`right = mid`).
+
+    Comparing to `nums[left]` fails when the array is not rotated at all.
+
+- title: "Search 2D Matrix -- Pattern"
+  difficulty: "medium"
+  tags: ["binary search", "2d matrix"]
+  lesson: algorithms-searching
+  Front: |
+    **Search a 2D Matrix** (rows sorted, first element of each row > last of previous) -- What is the O(log(m*n)) approach?
+  Back: |
+    Treat the matrix as a flattened sorted array of length `m*n`. Binary search on index `k`, mapping to `row = k / n`, `col = k % n`. One search, no two-step row-then-column.
+
+- title: "Koko Eating Bananas -- Binary Search on Answer"
+  difficulty: "medium"
+  tags: ["binary search", "answer space", "koko"]
+  lesson: algorithms-searching
+  Front: |
+    **Koko Eating Bananas** -- Why is this binary search on the *answer*, not on an array?
+  Back: |
+    The feasibility function `canFinish(k)` is monotonic: if speed `k` works, any speed > k also works. Binary-search over the integer range `[1, max(piles)]`, shrinking toward the smallest feasible `k`. O(n log max(piles)).
+
+- title: "Time Based Key-Value Store -- Pattern"
+  difficulty: "medium"
+  tags: ["binary search", "time based", "design"]
+  lesson: algorithms-searching
+  Front: |
+    **Time Based Key-Value Store** -- What data structure supports `get(key, timestamp)` in O(log n)?
+  Back: |
+    For each key, store a list of `(timestamp, value)` pairs in insertion order (timestamps are guaranteed strictly increasing, so the list is sorted). `get` does a **rightmost binary search** for the largest timestamp ≤ the query timestamp.
+
+# =============================================================================
+# Problem-anchored: Graphs & Intervals
+# =============================================================================
+
+- title: "Number of Islands -- Pattern"
+  difficulty: "medium"
+  tags: ["dfs", "bfs", "grid", "islands"]
+  lesson: algorithms-graph-traversal
+  Front: |
+    **Number of Islands** -- What pattern counts connected components on a grid?
+  Back: |
+    Scan the grid. On each unvisited `'1'`, increment the counter and **flood fill** (DFS or BFS) the whole island, marking cells as visited (in-place by setting to `'0'`, or via a separate visited set).
+
+    Total work: every cell visited once → O(m*n).
+
+- title: "Clone Graph -- Pattern"
+  difficulty: "medium"
+  tags: ["graph", "dfs", "hash map", "clone"]
+  lesson: algorithms-graph-traversal
+  Front: |
+    **Clone Graph** -- How do you avoid infinite recursion on cycles?
+  Back: |
+    Maintain a hash map from original node to its clone. When visiting a node, check the map first: if already cloned, return the existing clone. Otherwise create the clone, store it in the map **before** recursing on neighbors, then recurse. The map both deduplicates and breaks cycles.
+
+- title: "Pacific Atlantic Water Flow -- Key Insight"
+  difficulty: "medium"
+  tags: ["bfs", "dfs", "reverse search", "insight"]
+  lesson: algorithms-graph-traversal
+  Front: |
+    **Pacific Atlantic Water Flow** -- Why run BFS/DFS from the ocean edges *inward* instead of from each cell outward?
+  Back: |
+    Forward search from every cell is O((m*n)^2). Searching backward -- "which cells can reach this ocean?" -- visits each cell at most twice (once per ocean). Flip the flow direction: from each edge, climb to non-lower neighbors. The answer is the intersection of the two reachable sets. O(m*n).
+
+- title: "Course Schedule -- Pattern"
+  difficulty: "medium"
+  tags: ["topological sort", "cycle detection", "course schedule"]
+  lesson: algorithms-graph-traversal
+  Front: |
+    **Course Schedule** -- What does this problem reduce to?
+  Back: |
+    Detecting a cycle in the directed prerequisite graph -- courses can all be finished iff the graph is a DAG. Use either Kahn's algorithm (BFS on in-degrees: valid iff all nodes get processed) or DFS with a recursion-stack set (cycle iff a back edge is found).
+
+- title: "Number of Connected Components -- Pattern"
+  difficulty: "medium"
+  tags: ["union-find", "dfs", "connected components"]
+  lesson: algorithms-graph-traversal
+  Front: |
+    **Number of Connected Components in an Undirected Graph** -- What two approaches both work, and which is simpler?
+  Back: |
+    1. **DFS/BFS:** iterate nodes; on each unvisited node, traverse its component and increment the counter. O(V + E).
+    2. **Union-Find:** start with `n` components; for each edge, union the endpoints -- each successful union decrements the count.
+
+    DFS is simpler for one-shot counting; Union-Find shines when edges stream in dynamically.
+
+- title: "Merge Intervals -- Pattern"
+  difficulty: "medium"
+  tags: ["sorting", "intervals", "merge"]
+  lesson: algorithms-sorting-fundamentals
+  Front: |
+    **Merge Intervals** -- What is the pattern, and why does sorting by start time work?
+  Back: |
+    Sort intervals by start. Sweep once: if the current interval's start ≤ the previous merged interval's end, extend the end; otherwise append a new interval.
+
+    Sorting by start guarantees any overlap with earlier intervals has already been folded in -- you only ever compare to the most recent merged interval. O(n log n).
