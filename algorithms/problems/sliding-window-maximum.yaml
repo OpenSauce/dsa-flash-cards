@@ -1,0 +1,110 @@
+title: Sliding Window Maximum
+difficulty: hard
+tags: [sliding-window, deque]
+description: |
+  You are given an array of integers `nums` and an integer `k` representing
+  the size of a sliding window that moves from left to right across the
+  array. At each position the window covers `k` consecutive elements.
+  Return an array containing the maximum value in each window position.
+
+  The window starts covering `nums[0..k-1]` and slides one element right
+  each step until it covers `nums[n-k..n-1]`.
+examples:
+  - input: "nums = [1,3,-1,-3,5,3,6,7], k = 3"
+    output: "[3,3,5,5,6,7]"
+    explanation: "Window positions and their maxima: [1,3,-1]=3, [3,-1,-3]=3, [-1,-3,5]=5, [-3,5,3]=5, [5,3,6]=6, [3,6,7]=7."
+  - input: "nums = [1], k = 1"
+    output: "[1]"
+    explanation: "Single element window returns that element."
+constraints:
+  - "1 <= nums.length <= 10^5"
+  - "-10^4 <= nums[i] <= 10^4"
+  - "1 <= k <= nums.length"
+starter_code:
+  python: |
+    def max_sliding_window(nums: list[int], k: int) -> list[int]:
+        pass
+  javascript: |
+    function maxSlidingWindow(nums, k) {
+    }
+  go: |
+    func maxSlidingWindow(nums []int, k int) []int {
+        return nil
+    }
+  java: |
+    public int[] maxSlidingWindow(int[] nums, int k) {
+        return new int[]{};
+    }
+test_cases:
+  - input: { nums: [1, 3, -1, -3, 5, 3, 6, 7], k: 3 }
+    expected: [3, 3, 5, 5, 6, 7]
+  - input: { nums: [1], k: 1 }
+    expected: [1]
+  - input: { nums: [9, 11], k: 2 }
+    expected: [11]
+  - input: { nums: [4, -2, 3, 1, 5], k: 2 }
+    expected: [4, 3, 3, 5]
+  - input: { nums: [7, 7, 7, 7], k: 3 }
+    expected: [7, 7]
+solution:
+  python: |
+    from collections import deque
+
+    def max_sliding_window(nums: list[int], k: int) -> list[int]:
+        dq = deque()
+        result = []
+        for i in range(len(nums)):
+            while dq and dq[0] < i - k + 1:
+                dq.popleft()
+            while dq and nums[dq[-1]] <= nums[i]:
+                dq.pop()
+            dq.append(i)
+            if i >= k - 1:
+                result.append(nums[dq[0]])
+        return result
+  javascript: |
+    function maxSlidingWindow(nums, k) {
+        const dq = [];
+        const result = [];
+        for (let i = 0; i < nums.length; i++) {
+            while (dq.length && dq[0] < i - k + 1) dq.shift();
+            while (dq.length && nums[dq[dq.length - 1]] <= nums[i]) dq.pop();
+            dq.push(i);
+            if (i >= k - 1) result.push(nums[dq[0]]);
+        }
+        return result;
+    }
+  go: |
+    func maxSlidingWindow(nums []int, k int) []int {
+        dq := []int{}
+        result := []int{}
+        for i := 0; i < len(nums); i++ {
+            for len(dq) > 0 && dq[0] < i-k+1 {
+                dq = dq[1:]
+            }
+            for len(dq) > 0 && nums[dq[len(dq)-1]] <= nums[i] {
+                dq = dq[:len(dq)-1]
+            }
+            dq = append(dq, i)
+            if i >= k-1 {
+                result = append(result, nums[dq[0]])
+            }
+        }
+        return result
+    }
+  java: |
+    public int[] maxSlidingWindow(int[] nums, int k) {
+        java.util.ArrayDeque<Integer> dq = new java.util.ArrayDeque<>();
+        int[] result = new int[nums.length - k + 1];
+        int ri = 0;
+        for (int i = 0; i < nums.length; i++) {
+            while (!dq.isEmpty() && dq.peekFirst() < i - k + 1) dq.pollFirst();
+            while (!dq.isEmpty() && nums[dq.peekLast()] <= nums[i]) dq.pollLast();
+            dq.offerLast(i);
+            if (i >= k - 1) result[ri++] = nums[dq.peekFirst()];
+        }
+        return result;
+    }
+hints:
+  - "A brute force approach checks all k elements per window. Can you maintain a data structure that gives you the max in O(1)?"
+  - "Use a monotonic decreasing deque that stores indices. As you slide the window, remove indices that fall outside the window from the front, and remove indices whose values are smaller than the new element from the back. The front of the deque is always the maximum."

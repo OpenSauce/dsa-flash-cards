@@ -1,0 +1,110 @@
+title: Permutation in String
+difficulty: medium
+tags: [sliding-window, string]
+description: |
+  Given two strings `s1` and `s2`, return `true` if `s2` contains a
+  permutation of `s1`, or `false` otherwise.
+
+  In other words, return true if any substring of `s2` is an anagram of `s1`.
+examples:
+  - input: "s1 = 'ab', s2 = 'eidbaooo'"
+    output: "true"
+    explanation: "The substring 'ba' in s2 is a permutation of 'ab'."
+  - input: "s1 = 'ab', s2 = 'eidboaoo'"
+    output: "false"
+    explanation: "No substring of s2 is a permutation of 'ab'."
+constraints:
+  - "1 <= s1.length, s2.length <= 10^4"
+  - "s1 and s2 consist of lowercase English letters."
+starter_code:
+  python: |
+    def check_inclusion(s1: str, s2: str) -> bool:
+        pass
+  javascript: |
+    function checkInclusion(s1, s2) {
+    }
+  go: |
+    func checkInclusion(s1 string, s2 string) bool {
+        return false
+    }
+  java: |
+    public boolean checkInclusion(String s1, String s2) {
+        return false;
+    }
+test_cases:
+  - input: { s1: "ab", s2: "eidbaooo" }
+    expected: true
+  - input: { s1: "ab", s2: "eidboaoo" }
+    expected: false
+  - input: { s1: "a", s2: "a" }
+    expected: true
+  - input: { s1: "abc", s2: "bbbca" }
+    expected: true
+  - input: { s1: "hello", s2: "world" }
+    expected: false
+solution:
+  python: |
+    def check_inclusion(s1: str, s2: str) -> bool:
+        if len(s1) > len(s2):
+            return False
+        count1 = [0] * 26
+        count2 = [0] * 26
+        for c in s1:
+            count1[ord(c) - ord('a')] += 1
+        for i in range(len(s2)):
+            count2[ord(s2[i]) - ord('a')] += 1
+            if i >= len(s1):
+                count2[ord(s2[i - len(s1)]) - ord('a')] -= 1
+            if count1 == count2:
+                return True
+        return False
+  javascript: |
+    function checkInclusion(s1, s2) {
+        if (s1.length > s2.length) return false;
+        const count1 = new Array(26).fill(0);
+        const count2 = new Array(26).fill(0);
+        const a = 'a'.charCodeAt(0);
+        for (const c of s1) count1[c.charCodeAt(0) - a]++;
+        for (let i = 0; i < s2.length; i++) {
+            count2[s2.charCodeAt(i) - a]++;
+            if (i >= s1.length) count2[s2.charCodeAt(i - s1.length) - a]--;
+            if (count1.every((v, j) => v === count2[j])) return true;
+        }
+        return false;
+    }
+  go: |
+    func checkInclusion(s1 string, s2 string) bool {
+        if len(s1) > len(s2) {
+            return false
+        }
+        var count1, count2 [26]int
+        for _, c := range s1 {
+            count1[c-'a']++
+        }
+        for i := 0; i < len(s2); i++ {
+            count2[s2[i]-'a']++
+            if i >= len(s1) {
+                count2[s2[i-len(s1)]-'a']--
+            }
+            if count1 == count2 {
+                return true
+            }
+        }
+        return false
+    }
+  java: |
+    public boolean checkInclusion(String s1, String s2) {
+        if (s1.length() > s2.length()) return false;
+        int[] count1 = new int[26];
+        int[] count2 = new int[26];
+        for (char c : s1.toCharArray()) count1[c - 'a']++;
+        for (int i = 0; i < s2.length(); i++) {
+            count2[s2.charAt(i) - 'a']++;
+            if (i >= s1.length()) count2[s2.charAt(i - s1.length()) - 'a']--;
+            if (java.util.Arrays.equals(count1, count2)) return true;
+        }
+        return false;
+    }
+hints:
+  - "A permutation of s1 is just a rearrangement — so any matching substring has the same character frequencies as s1."
+  - "Slide a window of length s1 over s2. Maintain a frequency count of the window and compare it to the frequency count of s1. If they match, you found a permutation."

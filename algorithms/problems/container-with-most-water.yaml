@@ -1,0 +1,118 @@
+title: Container With Most Water
+difficulty: medium
+tags: [two-pointers, array]
+description: |
+  You are given an array of positive integers `height` where each element
+  represents the height of a vertical line drawn at that index. Find two
+  lines that, together with the x-axis, form a container that holds the
+  most water. Return the maximum amount of water the container can store.
+
+  The container's width is the distance between the two chosen indices, and
+  its height is the shorter of the two lines. You may not tilt the container.
+examples:
+  - input: "height = [1,8,6,2,5,4,8,3,7]"
+    output: "49"
+    explanation: "Lines at index 1 (height 8) and index 8 (height 7) form a container of width 7 and height 7, holding 49 units."
+  - input: "height = [1,1]"
+    output: "1"
+    explanation: "The only possible container uses both lines, giving width 1 and height 1."
+constraints:
+  - "2 <= height.length <= 10^5"
+  - "0 <= height[i] <= 10^4"
+starter_code:
+  python: |
+    def max_area(height: list[int]) -> int:
+        pass
+  javascript: |
+    function maxArea(height) {
+    }
+  go: |
+    func maxArea(height []int) int {
+        return 0
+    }
+  java: |
+    public int maxArea(int[] height) {
+        return 0;
+    }
+test_cases:
+  - input: { height: [1, 8, 6, 2, 5, 4, 8, 3, 7] }
+    expected: 49
+  - input: { height: [1, 1] }
+    expected: 1
+  - input: { height: [4, 3, 2, 1, 4] }
+    expected: 16
+  - input: { height: [1, 2, 1] }
+    expected: 2
+  - input: { height: [1, 0, 0, 0, 0, 0, 0, 2, 2] }
+    expected: 8
+solution:
+  python: |
+    def max_area(height: list[int]) -> int:
+        left, right = 0, len(height) - 1
+        best = 0
+        while left < right:
+            w = right - left
+            h = min(height[left], height[right])
+            best = max(best, w * h)
+            if height[left] < height[right]:
+                left += 1
+            else:
+                right -= 1
+        return best
+  javascript: |
+    function maxArea(height) {
+        let left = 0, right = height.length - 1;
+        let best = 0;
+        while (left < right) {
+            const w = right - left;
+            const h = Math.min(height[left], height[right]);
+            best = Math.max(best, w * h);
+            if (height[left] < height[right]) {
+                left++;
+            } else {
+                right--;
+            }
+        }
+        return best;
+    }
+  go: |
+    func maxArea(height []int) int {
+        left, right := 0, len(height)-1
+        best := 0
+        for left < right {
+            w := right - left
+            h := height[left]
+            if height[right] < h {
+                h = height[right]
+            }
+            area := w * h
+            if area > best {
+                best = area
+            }
+            if height[left] < height[right] {
+                left++
+            } else {
+                right--
+            }
+        }
+        return best
+    }
+  java: |
+    public int maxArea(int[] height) {
+        int left = 0, right = height.length - 1;
+        int best = 0;
+        while (left < right) {
+            int w = right - left;
+            int h = Math.min(height[left], height[right]);
+            best = Math.max(best, w * h);
+            if (height[left] < height[right]) {
+                left++;
+            } else {
+                right--;
+            }
+        }
+        return best;
+    }
+hints:
+  - "Start with the widest possible container and try to find a taller one."
+  - "Use two pointers at the ends of the array. Move the pointer pointing to the shorter line inward, since moving the taller one can only decrease the width without any guarantee of increasing height."

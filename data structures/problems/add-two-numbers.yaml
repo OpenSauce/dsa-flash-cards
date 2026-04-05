@@ -1,0 +1,172 @@
+title: Add Two Numbers
+difficulty: medium
+tags: [linked-list]
+description: |
+  You are given two non-empty linked lists representing two non-negative
+  integers. The digits are stored in reverse order, and each node contains
+  a single digit. Add the two numbers and return the sum as a linked list
+  in the same reversed digit order.
+
+  Neither number has leading zeros, except the number 0 itself.
+examples:
+  - input: "l1 = [2,4,3], l2 = [5,6,4]"
+    output: "[7,0,8]"
+    explanation: "342 + 465 = 807, stored in reverse as [7,0,8]."
+  - input: "l1 = [0], l2 = [0]"
+    output: "[0]"
+    explanation: "0 + 0 = 0."
+  - input: "l1 = [9,9,9], l2 = [1]"
+    output: "[0,0,0,1]"
+    explanation: "999 + 1 = 1000, stored in reverse as [0,0,0,1]."
+constraints:
+  - "1 <= number of nodes in each list <= 100"
+  - "0 <= Node.val <= 9"
+  - "The numbers do not have leading zeros (except 0 itself)."
+starter_code:
+  python: |
+    from typing import Optional
+
+    class ListNode:
+        def __init__(self, val=0, next=None):
+            self.val = val
+            self.next = next
+
+    def add_two_numbers(l1: Optional[ListNode], l2: Optional[ListNode]) -> Optional[ListNode]:
+        pass
+  javascript: |
+    class ListNode {
+        constructor(val = 0, next = null) {
+            this.val = val;
+            this.next = next;
+        }
+    }
+
+    function addTwoNumbers(l1, l2) {
+    }
+  go: |
+    type ListNode struct {
+        Val  int
+        Next *ListNode
+    }
+
+    func addTwoNumbers(l1 *ListNode, l2 *ListNode) *ListNode {
+        return nil
+    }
+  java: |
+    class ListNode {
+        int val;
+        ListNode next;
+        ListNode(int x) { val = x; }
+    }
+
+    public ListNode addTwoNumbers(ListNode l1, ListNode l2) {
+        return null;
+    }
+test_cases:
+  - input: { l1: [2, 4, 3], l2: [5, 6, 4] }
+    expected: [7, 0, 8]
+  - input: { l1: [0], l2: [0] }
+    expected: [0]
+  - input: { l1: [9, 9, 9], l2: [1] }
+    expected: [0, 0, 0, 1]
+  - input: { l1: [1], l2: [9, 9, 9, 9] }
+    expected: [0, 0, 0, 0, 1]
+  - input: { l1: [5], l2: [5] }
+    expected: [0, 1]
+solution:
+  python: |
+    from typing import Optional
+
+    class ListNode:
+        def __init__(self, val=0, next=None):
+            self.val = val
+            self.next = next
+
+    def add_two_numbers(l1: Optional[ListNode], l2: Optional[ListNode]) -> Optional[ListNode]:
+        dummy = ListNode(0)
+        current = dummy
+        carry = 0
+        while l1 or l2 or carry:
+            total = carry
+            if l1:
+                total += l1.val
+                l1 = l1.next
+            if l2:
+                total += l2.val
+                l2 = l2.next
+            carry, digit = divmod(total, 10)
+            current.next = ListNode(digit)
+            current = current.next
+        return dummy.next
+  javascript: |
+    class ListNode {
+        constructor(val = 0, next = null) {
+            this.val = val;
+            this.next = next;
+        }
+    }
+
+    function addTwoNumbers(l1, l2) {
+        const dummy = new ListNode(0);
+        let current = dummy;
+        let carry = 0;
+        while (l1 || l2 || carry) {
+            let total = carry;
+            if (l1) { total += l1.val; l1 = l1.next; }
+            if (l2) { total += l2.val; l2 = l2.next; }
+            carry = Math.floor(total / 10);
+            current.next = new ListNode(total % 10);
+            current = current.next;
+        }
+        return dummy.next;
+    }
+  go: |
+    type ListNode struct {
+        Val  int
+        Next *ListNode
+    }
+
+    func addTwoNumbers(l1 *ListNode, l2 *ListNode) *ListNode {
+        dummy := &ListNode{}
+        current := dummy
+        carry := 0
+        for l1 != nil || l2 != nil || carry != 0 {
+            total := carry
+            if l1 != nil {
+                total += l1.Val
+                l1 = l1.Next
+            }
+            if l2 != nil {
+                total += l2.Val
+                l2 = l2.Next
+            }
+            carry = total / 10
+            current.Next = &ListNode{Val: total % 10}
+            current = current.Next
+        }
+        return dummy.Next
+    }
+  java: |
+    class ListNode {
+        int val;
+        ListNode next;
+        ListNode(int x) { val = x; }
+    }
+
+    public ListNode addTwoNumbers(ListNode l1, ListNode l2) {
+        ListNode dummy = new ListNode(0);
+        ListNode current = dummy;
+        int carry = 0;
+        while (l1 != null || l2 != null || carry != 0) {
+            int total = carry;
+            if (l1 != null) { total += l1.val; l1 = l1.next; }
+            if (l2 != null) { total += l2.val; l2 = l2.next; }
+            carry = total / 10;
+            current.next = new ListNode(total % 10);
+            current = current.next;
+        }
+        return dummy.next;
+    }
+hints:
+  - "Since digits are in reverse order, you can add them left to right just like elementary addition."
+  - "Walk both lists simultaneously, adding corresponding digits plus any carry from the previous step. Create a new node for each digit of the result. Don't forget to handle a final carry."
