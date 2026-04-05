@@ -1,0 +1,56 @@
+title: "AI/ML Foundations"
+lesson_slug: "ai-foundations"
+questions:
+  - question: "Which of the following is an example of unsupervised learning?"
+    options:
+      - "Training a spam filter on emails labeled spam or not-spam"
+      - "Clustering users into behavioral groups from usage logs with no predefined categories"
+      - "Teaching a game-playing agent by rewarding it for winning moves"
+      - "Predicting house prices from a dataset of homes with known sale prices"
+    correct: 1
+    explanation: "Unsupervised learning works on unlabeled data and finds structure on its own. Clustering users from raw usage logs is the canonical example. The spam filter and house-price predictor are supervised (labeled data), and the game-playing agent is reinforcement learning (reward signal)."
+
+  - question: "In an ML system, which workload is typically the expensive, one-time or periodic process, and which is typically cheaper per call in production?"
+    options:
+      - "Training is cheap per call; inference is the expensive one-time process"
+      - "Training is the expensive one-time or periodic process; inference is typically cheaper per call than training"
+      - "Both training and inference are equally expensive"
+      - "Training and inference are the same workload with different names"
+    correct: 1
+    explanation: "Training fits the model's parameters and can take hours to weeks on specialized hardware. Inference is running the finished model on new inputs and is typically cheaper per call than training. This split is a fault line in ML system design because the two workloads have completely different scaling and hardware profiles."
+
+  - question: "Why can you not evaluate a model's real-world accuracy by measuring its performance on the training set?"
+    options:
+      - "The training set is usually too small for reliable numbers"
+      - "Training data is stored in a different format than production data"
+      - "The model has already seen those examples and may have memorized them, so the score does not reflect performance on new data"
+      - "Training set accuracy is always zero by definition"
+    correct: 2
+    explanation: "Evaluating on training data tells you how well the model memorized its training examples, not how well it generalizes. A model can score perfectly on training and still fail on anything new. The test set exists precisely to give an honest estimate on data the model has never seen."
+
+  - question: "What pattern in training and test accuracy is the clearest symptom of overfitting?"
+    options:
+      - "Training accuracy is low and test accuracy is also low"
+      - "Training accuracy is high and test accuracy is high"
+      - "Training accuracy is high and test accuracy is much lower"
+      - "Training accuracy is low but test accuracy is high"
+    correct: 2
+    explanation: "Overfitting means the model has memorized the training data instead of learning general patterns. The telltale sign is great training accuracy and much worse test accuracy. Standard mitigations include more data, a simpler model, regularization, early stopping, and dropout."
+
+  - question: "What is the role of the validation set, and how does it differ from the training set and the test set?"
+    options:
+      - "It is a backup copy of the training set used if training data is lost"
+      - "It is used to tune hyperparameters and pick between model variants, sitting between the training set (which fits the model) and the test set (final honest evaluation)"
+      - "It is the same as the test set, just renamed"
+      - "It is used to generate additional training examples"
+    correct: 1
+    explanation: "The training set teaches the model, the validation set is used to pick hyperparameters and model variants during development, and the test set is touched only once at the end for an honest final score. Using the test set for tuning contaminates it and invalidates the final number."
+
+  - question: "What is the correct relationship between AI, ML, and deep learning?"
+    options:
+      - "AI, ML, and deep learning are three names for the same thing"
+      - "Deep learning is a subset of machine learning, which is a subset of AI"
+      - "Machine learning is a subset of deep learning, which is a subset of AI"
+      - "AI is a subset of machine learning"
+    correct: 1
+    explanation: "AI is the broad goal of building intelligent systems. ML is the dominant approach, where systems learn patterns from data instead of following hand-written rules. Deep learning is a subset of ML that uses neural networks with many layers. Every deep learning system is an ML system, and every ML system is an AI system."
