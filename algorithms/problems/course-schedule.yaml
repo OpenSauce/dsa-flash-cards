@@ -1,0 +1,158 @@
+title: Course Schedule
+difficulty: medium
+tags: [graph, topological-sort]
+description: |
+  You need to take `num_courses` courses labeled from `0` to
+  `num_courses - 1`. Some courses have prerequisites: the pair
+  `[a, b]` means you must complete course `b` before taking course `a`.
+
+  Given the total number of courses and a list of prerequisite pairs,
+  determine whether it is possible to finish all courses. Return `true`
+  if a valid ordering exists, or `false` if there is a circular
+  dependency that makes it impossible.
+examples:
+  - input: "num_courses = 2, prerequisites = [[1,0]]"
+    output: "true"
+    explanation: "Take course 0 first, then course 1."
+  - input: "num_courses = 2, prerequisites = [[1,0],[0,1]]"
+    output: "false"
+    explanation: "Courses 0 and 1 depend on each other, creating a cycle."
+constraints:
+  - "1 <= num_courses <= 2000"
+  - "0 <= prerequisites.length <= 5000"
+  - "prerequisites[i].length == 2"
+  - "0 <= a, b < num_courses"
+  - "All prerequisite pairs are unique."
+starter_code:
+  python: |
+    def can_finish(num_courses: int, prerequisites: list[list[int]]) -> bool:
+        pass
+  javascript: |
+    function canFinish(numCourses, prerequisites) {
+    }
+  go: |
+    package main
+
+    func canFinish(numCourses int, prerequisites [][]int) bool {
+        return false
+    }
+  java: |
+    public boolean canFinish(int numCourses, int[][] prerequisites) {
+        return false;
+    }
+test_cases:
+  - input: { num_courses: 2, prerequisites: [[1, 0]] }
+    expected: true
+  - input: { num_courses: 2, prerequisites: [[1, 0], [0, 1]] }
+    expected: false
+  - input: { num_courses: 1, prerequisites: [] }
+    expected: true
+  - input: { num_courses: 4, prerequisites: [[1, 0], [2, 1], [3, 2]] }
+    expected: true
+  - input: { num_courses: 3, prerequisites: [[0, 1], [1, 2], [2, 0]] }
+    expected: false
+solution:
+  python: |
+    def can_finish(num_courses: int, prerequisites: list[list[int]]) -> bool:
+        graph = [[] for _ in range(num_courses)]
+        in_degree = [0] * num_courses
+        for a, b in prerequisites:
+            graph[b].append(a)
+            in_degree[a] += 1
+        queue = [i for i in range(num_courses) if in_degree[i] == 0]
+        visited = 0
+        while queue:
+            node = queue.pop(0)
+            visited += 1
+            for neighbor in graph[node]:
+                in_degree[neighbor] -= 1
+                if in_degree[neighbor] == 0:
+                    queue.append(neighbor)
+        return visited == num_courses
+  javascript: |
+    function canFinish(numCourses, prerequisites) {
+      const graph = Array.from({ length: numCourses }, () => []);
+      const inDegree = new Array(numCourses).fill(0);
+      for (const [a, b] of prerequisites) {
+        graph[b].push(a);
+        inDegree[a]++;
+      }
+      const queue = [];
+      for (let i = 0; i < numCourses; i++) {
+        if (inDegree[i] === 0) queue.push(i);
+      }
+      let visited = 0;
+      while (queue.length > 0) {
+        const node = queue.shift();
+        visited++;
+        for (const neighbor of graph[node]) {
+          inDegree[neighbor]--;
+          if (inDegree[neighbor] === 0) queue.push(neighbor);
+        }
+      }
+      return visited === numCourses;
+    }
+  go: |
+    package main
+
+    func canFinish(numCourses int, prerequisites [][]int) bool {
+        graph := make([][]int, numCourses)
+        inDegree := make([]int, numCourses)
+        for i := range graph {
+            graph[i] = []int{}
+        }
+        for _, p := range prerequisites {
+            a, b := p[0], p[1]
+            graph[b] = append(graph[b], a)
+            inDegree[a]++
+        }
+        queue := []int{}
+        for i := 0; i < numCourses; i++ {
+            if inDegree[i] == 0 {
+                queue = append(queue, i)
+            }
+        }
+        visited := 0
+        for len(queue) > 0 {
+            node := queue[0]
+            queue = queue[1:]
+            visited++
+            for _, neighbor := range graph[node] {
+                inDegree[neighbor]--
+                if inDegree[neighbor] == 0 {
+                    queue = append(queue, neighbor)
+                }
+            }
+        }
+        return visited == numCourses
+    }
+  java: |
+    import java.util.*;
+
+    public boolean canFinish(int numCourses, int[][] prerequisites) {
+        List<List<Integer>> graph = new ArrayList<>();
+        int[] inDegree = new int[numCourses];
+        for (int i = 0; i < numCourses; i++) graph.add(new ArrayList<>());
+        for (int[] p : prerequisites) {
+            graph.get(p[1]).add(p[0]);
+            inDegree[p[0]]++;
+        }
+        Queue<Integer> queue = new LinkedList<>();
+        for (int i = 0; i < numCourses; i++) {
+            if (inDegree[i] == 0) queue.add(i);
+        }
+        int visited = 0;
+        while (!queue.isEmpty()) {
+            int node = queue.poll();
+            visited++;
+            for (int neighbor : graph.get(node)) {
+                inDegree[neighbor]--;
+                if (inDegree[neighbor] == 0) queue.add(neighbor);
+            }
+        }
+        return visited == numCourses;
+    }
+hints:
+  - "This is a cycle detection problem on a directed graph. If there is a cycle among prerequisites, you cannot finish all courses."
+  - "Build a directed graph from prerequisites. Use topological sort (BFS with in-degrees): start with nodes that have no prerequisites, process them, and decrement neighbors' in-degrees."
+  - "If the number of processed nodes equals num_courses, there is no cycle and all courses can be completed."

@@ -1,0 +1,104 @@
+title: House Robber
+difficulty: medium
+tags: [dynamic-programming]
+description: |
+  You are a burglar planning to rob houses along a street. Each house
+  has a certain amount of money stashed. The only constraint is that
+  you cannot rob two adjacent houses (the alarm system will trigger).
+
+  Given a list of non-negative integers representing the amount of
+  money in each house, return the maximum amount you can rob tonight
+  without alerting the police.
+examples:
+  - input: "nums = [1,2,3,1]"
+    output: "4"
+    explanation: "Rob house 0 (1) and house 2 (3) for a total of 4."
+  - input: "nums = [2,7,9,3,1]"
+    output: "12"
+    explanation: "Rob house 0 (2), house 2 (9), and house 4 (1) for a total of 12."
+constraints:
+  - "1 <= nums.length <= 100"
+  - "0 <= nums[i] <= 400"
+starter_code:
+  python: |
+    def rob(nums: list[int]) -> int:
+        pass
+  javascript: |
+    function rob(nums) {
+    }
+  go: |
+    package main
+
+    func rob(nums []int) int {
+        return 0
+    }
+  java: |
+    public int rob(int[] nums) {
+        return 0;
+    }
+test_cases:
+  - input: { nums: [1, 2, 3, 1] }
+    expected: 4
+  - input: { nums: [2, 7, 9, 3, 1] }
+    expected: 12
+  - input: { nums: [0] }
+    expected: 0
+  - input: { nums: [5] }
+    expected: 5
+  - input: { nums: [2, 1, 1, 2] }
+    expected: 4
+  - input: { nums: [1, 2] }
+    expected: 2
+solution:
+  python: |
+    def rob(nums: list[int]) -> int:
+        if len(nums) == 1:
+            return nums[0]
+        prev2 = 0
+        prev1 = 0
+        for num in nums:
+            current = max(prev1, prev2 + num)
+            prev2 = prev1
+            prev1 = current
+        return prev1
+  javascript: |
+    function rob(nums) {
+      let prev2 = 0;
+      let prev1 = 0;
+      for (const num of nums) {
+        const current = Math.max(prev1, prev2 + num);
+        prev2 = prev1;
+        prev1 = current;
+      }
+      return prev1;
+    }
+  go: |
+    package main
+
+    func rob(nums []int) int {
+        prev2 := 0
+        prev1 := 0
+        for _, num := range nums {
+            current := prev2 + num
+            if prev1 > current {
+                current = prev1
+            }
+            prev2 = prev1
+            prev1 = current
+        }
+        return prev1
+    }
+  java: |
+    public int rob(int[] nums) {
+        int prev2 = 0;
+        int prev1 = 0;
+        for (int num : nums) {
+            int current = Math.max(prev1, prev2 + num);
+            prev2 = prev1;
+            prev1 = current;
+        }
+        return prev1;
+    }
+hints:
+  - "At each house, you have two choices: rob it (and add to the best total from two houses back) or skip it (and keep the best total from the previous house)."
+  - "Define dp[i] as the max money from the first i houses. The recurrence is dp[i] = max(dp[i-1], dp[i-2] + nums[i]). You only need two variables instead of a full array."

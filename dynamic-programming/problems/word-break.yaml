@@ -1,0 +1,121 @@
+title: Word Break
+difficulty: medium
+tags: [dynamic-programming]
+description: |
+  Given a string `s` and a list of words `word_dict`, determine whether
+  `s` can be segmented into a sequence of one or more words from
+  `word_dict`. Each word in the dictionary may be used multiple times.
+examples:
+  - input: 's = "applepenapple", word_dict = ["apple","pen"]'
+    output: "true"
+    explanation: '"applepenapple" can be split into "apple" + "pen" + "apple".'
+  - input: 's = "catsandog", word_dict = ["cats","dog","sand","and","cat"]'
+    output: "false"
+    explanation: "There is no way to segment the entire string using the given words."
+  - input: 's = "cars", word_dict = ["car","ca","rs"]'
+    output: "true"
+    explanation: '"cars" can be split into "ca" + "rs".'
+constraints:
+  - "1 <= s.length <= 300"
+  - "1 <= word_dict.length <= 1000"
+  - "1 <= word_dict[i].length <= 20"
+  - "s and word_dict[i] consist of lowercase English letters."
+starter_code:
+  python: |
+    def word_break(s: str, word_dict: list[str]) -> bool:
+        pass
+  javascript: |
+    function wordBreak(s, wordDict) {
+    }
+  go: |
+    package main
+
+    func wordBreak(s string, wordDict []string) bool {
+        return false
+    }
+  java: |
+    public boolean wordBreak(String s, String[] wordDict) {
+        return false;
+    }
+test_cases:
+  - input: { s: "applepenapple", word_dict: ["apple", "pen"] }
+    expected: true
+  - input: { s: "catsandog", word_dict: ["cats", "dog", "sand", "and", "cat"] }
+    expected: false
+  - input: { s: "cars", word_dict: ["car", "ca", "rs"] }
+    expected: true
+  - input: { s: "a", word_dict: ["a"] }
+    expected: true
+  - input: { s: "ab", word_dict: ["a", "b"] }
+    expected: true
+solution:
+  python: |
+    def word_break(s: str, word_dict: list[str]) -> bool:
+        word_set = set(word_dict)
+        n = len(s)
+        dp = [False] * (n + 1)
+        dp[0] = True
+        for i in range(1, n + 1):
+            for j in range(i):
+                if dp[j] and s[j:i] in word_set:
+                    dp[i] = True
+                    break
+        return dp[n]
+  javascript: |
+    function wordBreak(s, wordDict) {
+      const wordSet = new Set(wordDict);
+      const n = s.length;
+      const dp = new Array(n + 1).fill(false);
+      dp[0] = true;
+      for (let i = 1; i <= n; i++) {
+        for (let j = 0; j < i; j++) {
+          if (dp[j] && wordSet.has(s.substring(j, i))) {
+            dp[i] = true;
+            break;
+          }
+        }
+      }
+      return dp[n];
+    }
+  go: |
+    package main
+
+    func wordBreak(s string, wordDict []string) bool {
+        wordSet := make(map[string]bool)
+        for _, w := range wordDict {
+            wordSet[w] = true
+        }
+        n := len(s)
+        dp := make([]bool, n+1)
+        dp[0] = true
+        for i := 1; i <= n; i++ {
+            for j := 0; j < i; j++ {
+                if dp[j] && wordSet[s[j:i]] {
+                    dp[i] = true
+                    break
+                }
+            }
+        }
+        return dp[n]
+    }
+  java: |
+    import java.util.*;
+
+    public boolean wordBreak(String s, String[] wordDict) {
+        Set<String> wordSet = new HashSet<>(Arrays.asList(wordDict));
+        int n = s.length();
+        boolean[] dp = new boolean[n + 1];
+        dp[0] = true;
+        for (int i = 1; i <= n; i++) {
+            for (int j = 0; j < i; j++) {
+                if (dp[j] && wordSet.contains(s.substring(j, i))) {
+                    dp[i] = true;
+                    break;
+                }
+            }
+        }
+        return dp[n];
+    }
+hints:
+  - "Think of it as: can you split s[0..i] into valid words? That depends on whether there is some split point j where s[0..j] is valid and s[j..i] is a word in the dictionary."
+  - "Let dp[i] = true if s[0..i] can be segmented. For each i, check all j < i: if dp[j] is true and s[j..i] is in the dictionary, then dp[i] is true."

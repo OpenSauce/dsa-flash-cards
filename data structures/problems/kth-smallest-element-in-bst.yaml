@@ -1,0 +1,182 @@
+title: Kth Smallest Element in BST
+difficulty: medium
+tags: [tree, dfs]
+description: |
+  Given the root of a binary search tree and an integer `k`, return the
+  kth smallest value (1-indexed) among all node values in the tree.
+
+  Because the tree is a BST, an inorder traversal visits nodes in
+  ascending order. Use this property to find the answer efficiently.
+examples:
+  - input: "root = [3,1,4,null,2], k = 1"
+    output: "1"
+    explanation: "The sorted values are [1,2,3,4]. The 1st smallest is 1."
+  - input: "root = [5,3,6,2,4,null,null,1], k = 3"
+    output: "3"
+    explanation: "The sorted values are [1,2,3,4,5,6]. The 3rd smallest is 3."
+constraints:
+  - "1 <= k <= number of nodes <= 10^4"
+  - "0 <= Node.val <= 10^4"
+starter_code:
+  python: |
+    from typing import Optional
+
+    class TreeNode:
+        def __init__(self, val=0, left=None, right=None):
+            self.val = val
+            self.left = left
+            self.right = right
+
+    def kth_smallest(root: Optional[TreeNode], k: int) -> int:
+        pass
+  javascript: |
+    class TreeNode {
+      constructor(val = 0, left = null, right = null) {
+        this.val = val;
+        this.left = left;
+        this.right = right;
+      }
+    }
+
+    function kthSmallest(root, k) {
+    }
+  go: |
+    package main
+
+    type TreeNode struct {
+        Val   int
+        Left  *TreeNode
+        Right *TreeNode
+    }
+
+    func kthSmallest(root *TreeNode, k int) int {
+        return 0
+    }
+  java: |
+    class TreeNode {
+        int val;
+        TreeNode left;
+        TreeNode right;
+        TreeNode(int val) { this.val = val; }
+    }
+
+    public int kthSmallest(TreeNode root, int k) {
+        return 0;
+    }
+test_cases:
+  - input: { root: [3, 1, 4, null, 2], k: 1 }
+    expected: 1
+  - input: { root: [5, 3, 6, 2, 4, null, null, 1], k: 3 }
+    expected: 3
+  - input: { root: [1], k: 1 }
+    expected: 1
+  - input: { root: [3, 1, 4, null, 2], k: 4 }
+    expected: 4
+  - input: { root: [5, 3, 6, 2, 4, null, null, 1], k: 6 }
+    expected: 6
+solution:
+  python: |
+    from typing import Optional
+
+    class TreeNode:
+        def __init__(self, val=0, left=None, right=None):
+            self.val = val
+            self.left = left
+            self.right = right
+
+    def kth_smallest(root: Optional[TreeNode], k: int) -> int:
+        stack = []
+        node = root
+        count = 0
+        while stack or node:
+            while node:
+                stack.append(node)
+                node = node.left
+            node = stack.pop()
+            count += 1
+            if count == k:
+                return node.val
+            node = node.right
+        return -1
+  javascript: |
+    class TreeNode {
+      constructor(val = 0, left = null, right = null) {
+        this.val = val;
+        this.left = left;
+        this.right = right;
+      }
+    }
+
+    function kthSmallest(root, k) {
+      const stack = [];
+      let node = root;
+      let count = 0;
+      while (stack.length > 0 || node !== null) {
+        while (node !== null) {
+          stack.push(node);
+          node = node.left;
+        }
+        node = stack.pop();
+        count++;
+        if (count === k) return node.val;
+        node = node.right;
+      }
+      return -1;
+    }
+  go: |
+    package main
+
+    type TreeNode struct {
+        Val   int
+        Left  *TreeNode
+        Right *TreeNode
+    }
+
+    func kthSmallest(root *TreeNode, k int) int {
+        stack := []*TreeNode{}
+        node := root
+        count := 0
+        for len(stack) > 0 || node != nil {
+            for node != nil {
+                stack = append(stack, node)
+                node = node.Left
+            }
+            node = stack[len(stack)-1]
+            stack = stack[:len(stack)-1]
+            count++
+            if count == k {
+                return node.Val
+            }
+            node = node.Right
+        }
+        return -1
+    }
+  java: |
+    import java.util.*;
+
+    class TreeNode {
+        int val;
+        TreeNode left;
+        TreeNode right;
+        TreeNode(int val) { this.val = val; }
+    }
+
+    public int kthSmallest(TreeNode root, int k) {
+        Deque<TreeNode> stack = new ArrayDeque<>();
+        TreeNode node = root;
+        int count = 0;
+        while (!stack.isEmpty() || node != null) {
+            while (node != null) {
+                stack.push(node);
+                node = node.left;
+            }
+            node = stack.pop();
+            count++;
+            if (count == k) return node.val;
+            node = node.right;
+        }
+        return -1;
+    }
+hints:
+  - "How does an inorder traversal of a BST relate to sorted order?"
+  - "Perform an iterative inorder traversal using a stack. Count each node you visit; when the count reaches k, you have your answer."

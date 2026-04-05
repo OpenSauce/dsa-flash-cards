@@ -1,0 +1,141 @@
+title: Maximum Depth of Binary Tree
+difficulty: easy
+tags: [tree, dfs]
+description: |
+  Given the root of a binary tree, return its maximum depth.
+
+  The maximum depth is the number of nodes along the longest path from the
+  root node down to the farthest leaf node. A tree with only a root has
+  depth 1. An empty tree has depth 0.
+examples:
+  - input: "root = [3,9,20,null,null,15,7]"
+    output: "3"
+    explanation: "The longest path is 3 → 20 → 15 (or 3 → 20 → 7), which has 3 nodes."
+  - input: "root = [1,null,2]"
+    output: "2"
+    explanation: "The tree has two levels: the root and its right child."
+  - input: "root = []"
+    output: "0"
+    explanation: "An empty tree has depth 0."
+constraints:
+  - "0 <= number of nodes <= 10^4"
+  - "-100 <= Node.val <= 100"
+starter_code:
+  python: |
+    from typing import Optional
+
+    class TreeNode:
+        def __init__(self, val=0, left=None, right=None):
+            self.val = val
+            self.left = left
+            self.right = right
+
+    def max_depth(root: Optional[TreeNode]) -> int:
+        pass
+  javascript: |
+    class TreeNode {
+      constructor(val = 0, left = null, right = null) {
+        this.val = val;
+        this.left = left;
+        this.right = right;
+      }
+    }
+
+    function maxDepth(root) {
+    }
+  go: |
+    package main
+
+    type TreeNode struct {
+        Val   int
+        Left  *TreeNode
+        Right *TreeNode
+    }
+
+    func maxDepth(root *TreeNode) int {
+        return 0
+    }
+  java: |
+    class TreeNode {
+        int val;
+        TreeNode left;
+        TreeNode right;
+        TreeNode(int val) { this.val = val; }
+    }
+
+    public int maxDepth(TreeNode root) {
+        return 0;
+    }
+test_cases:
+  - input: { root: [3, 9, 20, null, null, 15, 7] }
+    expected: 3
+  - input: { root: [1, null, 2] }
+    expected: 2
+  - input: { root: [] }
+    expected: 0
+  - input: { root: [1] }
+    expected: 1
+  - input: { root: [1, 2, 3, 4, 5] }
+    expected: 3
+solution:
+  python: |
+    from typing import Optional
+
+    class TreeNode:
+        def __init__(self, val=0, left=None, right=None):
+            self.val = val
+            self.left = left
+            self.right = right
+
+    def max_depth(root: Optional[TreeNode]) -> int:
+        if root is None:
+            return 0
+        return 1 + max(max_depth(root.left), max_depth(root.right))
+  javascript: |
+    class TreeNode {
+      constructor(val = 0, left = null, right = null) {
+        this.val = val;
+        this.left = left;
+        this.right = right;
+      }
+    }
+
+    function maxDepth(root) {
+      if (root === null) return 0;
+      return 1 + Math.max(maxDepth(root.left), maxDepth(root.right));
+    }
+  go: |
+    package main
+
+    type TreeNode struct {
+        Val   int
+        Left  *TreeNode
+        Right *TreeNode
+    }
+
+    func maxDepth(root *TreeNode) int {
+        if root == nil {
+            return 0
+        }
+        left := maxDepth(root.Left)
+        right := maxDepth(root.Right)
+        if left > right {
+            return 1 + left
+        }
+        return 1 + right
+    }
+  java: |
+    class TreeNode {
+        int val;
+        TreeNode left;
+        TreeNode right;
+        TreeNode(int val) { this.val = val; }
+    }
+
+    public int maxDepth(TreeNode root) {
+        if (root == null) return 0;
+        return 1 + Math.max(maxDepth(root.left), maxDepth(root.right));
+    }
+hints:
+  - "Think about how the depth of a tree relates to the depth of its subtrees."
+  - "The depth of a tree is 1 plus the maximum of its left and right subtree depths. Use recursion with a base case of 0 for null nodes."

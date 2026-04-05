@@ -1,0 +1,99 @@
+title: Unique Paths
+difficulty: medium
+tags: [dynamic-programming]
+description: |
+  A robot is located at the top-left corner of an `m x n` grid. It can
+  only move either right or down at each step. The robot is trying to
+  reach the bottom-right corner of the grid.
+
+  Return the number of unique paths from the top-left to the
+  bottom-right corner.
+examples:
+  - input: "m = 3, n = 7"
+    output: "28"
+    explanation: "In a 3x7 grid, there are 28 distinct paths using only right and down moves."
+  - input: "m = 3, n = 2"
+    output: "3"
+    explanation: "The three paths are: Right→Down→Down, Down→Down→Right, Down→Right→Down."
+  - input: "m = 1, n = 1"
+    output: "1"
+    explanation: "The robot is already at the destination."
+constraints:
+  - "1 <= m, n <= 100"
+starter_code:
+  python: |
+    def unique_paths(m: int, n: int) -> int:
+        pass
+  javascript: |
+    function uniquePaths(m, n) {
+    }
+  go: |
+    package main
+
+    func uniquePaths(m int, n int) int {
+        return 0
+    }
+  java: |
+    public int uniquePaths(int m, int n) {
+        return 0;
+    }
+test_cases:
+  - input: { m: 3, n: 7 }
+    expected: 28
+  - input: { m: 3, n: 2 }
+    expected: 3
+  - input: { m: 1, n: 1 }
+    expected: 1
+  - input: { m: 2, n: 2 }
+    expected: 2
+  - input: { m: 7, n: 3 }
+    expected: 28
+  - input: { m: 4, n: 4 }
+    expected: 20
+solution:
+  python: |
+    def unique_paths(m: int, n: int) -> int:
+        dp = [1] * n
+        for _ in range(1, m):
+            for j in range(1, n):
+                dp[j] += dp[j - 1]
+        return dp[n - 1]
+  javascript: |
+    function uniquePaths(m, n) {
+      const dp = new Array(n).fill(1);
+      for (let i = 1; i < m; i++) {
+        for (let j = 1; j < n; j++) {
+          dp[j] += dp[j - 1];
+        }
+      }
+      return dp[n - 1];
+    }
+  go: |
+    package main
+
+    func uniquePaths(m int, n int) int {
+        dp := make([]int, n)
+        for j := range dp {
+            dp[j] = 1
+        }
+        for i := 1; i < m; i++ {
+            for j := 1; j < n; j++ {
+                dp[j] += dp[j-1]
+            }
+        }
+        return dp[n-1]
+    }
+  java: |
+    public int uniquePaths(int m, int n) {
+        int[] dp = new int[n];
+        java.util.Arrays.fill(dp, 1);
+        for (int i = 1; i < m; i++) {
+            for (int j = 1; j < n; j++) {
+                dp[j] += dp[j - 1];
+            }
+        }
+        return dp[n - 1];
+    }
+hints:
+  - "The number of paths to any cell equals the number of paths to the cell above it plus the number of paths to the cell to its left."
+  - "dp[i][j] = dp[i-1][j] + dp[i][j-1]. The first row and first column are all 1s (only one way to reach them). You can optimize space to a single row."

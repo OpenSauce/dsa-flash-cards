@@ -1,0 +1,163 @@
+title: Validate Binary Search Tree
+difficulty: medium
+tags: [tree, dfs]
+description: |
+  Given the root of a binary tree, determine whether it is a valid
+  binary search tree (BST).
+
+  A valid BST satisfies these rules for every node:
+  - All values in its left subtree are strictly less than the node's value.
+  - All values in its right subtree are strictly greater than the node's value.
+  - Both left and right subtrees must also be valid BSTs.
+examples:
+  - input: "root = [2,1,3]"
+    output: "true"
+    explanation: "1 < 2 < 3, so the BST property holds."
+  - input: "root = [5,1,4,null,null,3,6]"
+    output: "false"
+    explanation: "The right child 4 is less than the root 5, violating the BST rule."
+  - input: "root = [5,4,6,null,null,3,7]"
+    output: "false"
+    explanation: "Node 3 is in the right subtree of 5 but is less than 5."
+constraints:
+  - "1 <= number of nodes <= 10^4"
+  - "-2^31 <= Node.val <= 2^31 - 1"
+starter_code:
+  python: |
+    from typing import Optional
+
+    class TreeNode:
+        def __init__(self, val=0, left=None, right=None):
+            self.val = val
+            self.left = left
+            self.right = right
+
+    def is_valid_bst(root: Optional[TreeNode]) -> bool:
+        pass
+  javascript: |
+    class TreeNode {
+      constructor(val = 0, left = null, right = null) {
+        this.val = val;
+        this.left = left;
+        this.right = right;
+      }
+    }
+
+    function isValidBST(root) {
+    }
+  go: |
+    package main
+
+    import "math"
+
+    type TreeNode struct {
+        Val   int
+        Left  *TreeNode
+        Right *TreeNode
+    }
+
+    func isValidBST(root *TreeNode) bool {
+        return false
+    }
+  java: |
+    class TreeNode {
+        int val;
+        TreeNode left;
+        TreeNode right;
+        TreeNode(int val) { this.val = val; }
+    }
+
+    public boolean isValidBST(TreeNode root) {
+        return false;
+    }
+test_cases:
+  - input: { root: [2, 1, 3] }
+    expected: true
+  - input: { root: [5, 1, 4, null, null, 3, 6] }
+    expected: false
+  - input: { root: [1] }
+    expected: true
+  - input: { root: [5, 4, 6, null, null, 3, 7] }
+    expected: false
+  - input: { root: [2, 2, 2] }
+    expected: false
+solution:
+  python: |
+    from typing import Optional
+
+    class TreeNode:
+        def __init__(self, val=0, left=None, right=None):
+            self.val = val
+            self.left = left
+            self.right = right
+
+    def is_valid_bst(root: Optional[TreeNode]) -> bool:
+        def validate(node, low, high):
+            if node is None:
+                return True
+            if node.val <= low or node.val >= high:
+                return False
+            return validate(node.left, low, node.val) and validate(node.right, node.val, high)
+        return validate(root, float('-inf'), float('inf'))
+  javascript: |
+    class TreeNode {
+      constructor(val = 0, left = null, right = null) {
+        this.val = val;
+        this.left = left;
+        this.right = right;
+      }
+    }
+
+    function isValidBST(root) {
+      function validate(node, low, high) {
+        if (node === null) return true;
+        if (node.val <= low || node.val >= high) return false;
+        return validate(node.left, low, node.val) && validate(node.right, node.val, high);
+      }
+      return validate(root, -Infinity, Infinity);
+    }
+  go: |
+    package main
+
+    import "math"
+
+    type TreeNode struct {
+        Val   int
+        Left  *TreeNode
+        Right *TreeNode
+    }
+
+    func isValidBST(root *TreeNode) bool {
+        return validate(root, math.MinInt64, math.MaxInt64)
+    }
+
+    func validate(node *TreeNode, low int, high int) bool {
+        if node == nil {
+            return true
+        }
+        if node.Val <= low || node.Val >= high {
+            return false
+        }
+        return validate(node.Left, low, node.Val) && validate(node.Right, node.Val, high)
+    }
+  java: |
+    class TreeNode {
+        int val;
+        TreeNode left;
+        TreeNode right;
+        TreeNode(int val) { this.val = val; }
+    }
+
+    public boolean isValidBST(TreeNode root) {
+        return validate(root, Long.MIN_VALUE, Long.MAX_VALUE);
+    }
+
+    private boolean validate(TreeNode node, long low, long high) {
+        if (node == null) return true;
+        if (node.val <= low || node.val >= high) return false;
+        return validate(node.left, low, node.val) && validate(node.right, node.val, high);
+    }
+hints:
+  - "It is not enough to check that each node is greater than its left child and less than its right child. Why?"
+  - "Pass an allowed range (low, high) down the recursion. For the left child, the upper bound becomes the current value. For the right child, the lower bound becomes the current value."
+  - "Start with the range (-infinity, +infinity) and narrow it at each step."

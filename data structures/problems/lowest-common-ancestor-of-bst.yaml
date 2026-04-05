@@ -1,0 +1,168 @@
+title: Lowest Common Ancestor of BST
+difficulty: medium
+tags: [tree, bst]
+description: |
+  Given a binary search tree (BST) and two nodes `p` and `q` that exist
+  in the tree, find their lowest common ancestor (LCA).
+
+  The lowest common ancestor of two nodes is the deepest node that has
+  both `p` and `q` as descendants (a node is allowed to be a descendant
+  of itself). Because this is a BST, you can use the ordering property
+  to guide your search without visiting every node.
+examples:
+  - input: "root = [6,2,8,0,4,7,9,null,null,3,5], p = 2, q = 8"
+    output: "6"
+    explanation: "Node 2 is in the left subtree and node 8 is in the right subtree of 6, so 6 is the LCA."
+  - input: "root = [6,2,8,0,4,7,9,null,null,3,5], p = 2, q = 4"
+    output: "2"
+    explanation: "Node 4 is a descendant of node 2, so node 2 is the LCA."
+  - input: "root = [2,1], p = 2, q = 1"
+    output: "2"
+    explanation: "The root is an ancestor of every node, including itself."
+constraints:
+  - "2 <= number of nodes <= 10^5"
+  - "-10^9 <= Node.val <= 10^9"
+  - "All node values are unique."
+  - "p != q"
+  - "Both p and q exist in the tree."
+starter_code:
+  python: |
+    class TreeNode:
+        def __init__(self, val=0, left=None, right=None):
+            self.val = val
+            self.left = left
+            self.right = right
+
+    def lowest_common_ancestor(root: TreeNode, p: int, q: int) -> int:
+        pass
+  javascript: |
+    class TreeNode {
+      constructor(val = 0, left = null, right = null) {
+        this.val = val;
+        this.left = left;
+        this.right = right;
+      }
+    }
+
+    function lowestCommonAncestor(root, p, q) {
+    }
+  go: |
+    package main
+
+    type TreeNode struct {
+        Val   int
+        Left  *TreeNode
+        Right *TreeNode
+    }
+
+    func lowestCommonAncestor(root *TreeNode, p int, q int) int {
+        return 0
+    }
+  java: |
+    class TreeNode {
+        int val;
+        TreeNode left;
+        TreeNode right;
+        TreeNode(int val) { this.val = val; }
+    }
+
+    public int lowestCommonAncestor(TreeNode root, int p, int q) {
+        return 0;
+    }
+test_cases:
+  - input: { root: [6, 2, 8, 0, 4, 7, 9, null, null, 3, 5], p: 2, q: 8 }
+    expected: 6
+  - input: { root: [6, 2, 8, 0, 4, 7, 9, null, null, 3, 5], p: 2, q: 4 }
+    expected: 2
+  - input: { root: [2, 1], p: 2, q: 1 }
+    expected: 2
+  - input: { root: [6, 2, 8, 0, 4, 7, 9, null, null, 3, 5], p: 3, q: 5 }
+    expected: 4
+  - input: { root: [6, 2, 8, 0, 4, 7, 9, null, null, 3, 5], p: 7, q: 9 }
+    expected: 8
+solution:
+  python: |
+    class TreeNode:
+        def __init__(self, val=0, left=None, right=None):
+            self.val = val
+            self.left = left
+            self.right = right
+
+    def lowest_common_ancestor(root: TreeNode, p: int, q: int) -> int:
+        node = root
+        while node:
+            if p < node.val and q < node.val:
+                node = node.left
+            elif p > node.val and q > node.val:
+                node = node.right
+            else:
+                return node.val
+        return -1
+  javascript: |
+    class TreeNode {
+      constructor(val = 0, left = null, right = null) {
+        this.val = val;
+        this.left = left;
+        this.right = right;
+      }
+    }
+
+    function lowestCommonAncestor(root, p, q) {
+      let node = root;
+      while (node !== null) {
+        if (p < node.val && q < node.val) {
+          node = node.left;
+        } else if (p > node.val && q > node.val) {
+          node = node.right;
+        } else {
+          return node.val;
+        }
+      }
+      return -1;
+    }
+  go: |
+    package main
+
+    type TreeNode struct {
+        Val   int
+        Left  *TreeNode
+        Right *TreeNode
+    }
+
+    func lowestCommonAncestor(root *TreeNode, p int, q int) int {
+        node := root
+        for node != nil {
+            if p < node.Val && q < node.Val {
+                node = node.Left
+            } else if p > node.Val && q > node.Val {
+                node = node.Right
+            } else {
+                return node.Val
+            }
+        }
+        return -1
+    }
+  java: |
+    class TreeNode {
+        int val;
+        TreeNode left;
+        TreeNode right;
+        TreeNode(int val) { this.val = val; }
+    }
+
+    public int lowestCommonAncestor(TreeNode root, int p, int q) {
+        TreeNode node = root;
+        while (node != null) {
+            if (p < node.val && q < node.val) {
+                node = node.left;
+            } else if (p > node.val && q > node.val) {
+                node = node.right;
+            } else {
+                return node.val;
+            }
+        }
+        return -1;
+    }
+hints:
+  - "In a BST, all values in the left subtree are smaller than the root and all values in the right subtree are larger."
+  - "If both p and q are smaller than the current node, the LCA must be in the left subtree. If both are larger, it must be in the right. Otherwise, the current node is the split point — it is the LCA."

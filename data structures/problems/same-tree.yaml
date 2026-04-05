@@ -1,0 +1,143 @@
+title: Same Tree
+difficulty: easy
+tags: [tree, dfs]
+description: |
+  Given the roots of two binary trees `p` and `q`, determine whether
+  the two trees are structurally identical and have the same node values.
+
+  Two trees are considered the same if they share the exact same shape
+  and every corresponding node holds the same value.
+examples:
+  - input: "p = [1,2,3], q = [1,2,3]"
+    output: "true"
+    explanation: "Both trees have the same structure and values."
+  - input: "p = [1,2], q = [1,null,2]"
+    output: "false"
+    explanation: "The left child of p is 2, but the left child of q is null."
+  - input: "p = [1,2,1], q = [1,1,2]"
+    output: "false"
+    explanation: "The values at the second level are swapped."
+constraints:
+  - "0 <= number of nodes <= 100"
+  - "-10^4 <= Node.val <= 10^4"
+starter_code:
+  python: |
+    from typing import Optional
+
+    class TreeNode:
+        def __init__(self, val=0, left=None, right=None):
+            self.val = val
+            self.left = left
+            self.right = right
+
+    def is_same_tree(p: Optional[TreeNode], q: Optional[TreeNode]) -> bool:
+        pass
+  javascript: |
+    class TreeNode {
+      constructor(val = 0, left = null, right = null) {
+        this.val = val;
+        this.left = left;
+        this.right = right;
+      }
+    }
+
+    function isSameTree(p, q) {
+    }
+  go: |
+    package main
+
+    type TreeNode struct {
+        Val   int
+        Left  *TreeNode
+        Right *TreeNode
+    }
+
+    func isSameTree(p *TreeNode, q *TreeNode) bool {
+        return false
+    }
+  java: |
+    class TreeNode {
+        int val;
+        TreeNode left;
+        TreeNode right;
+        TreeNode(int val) { this.val = val; }
+    }
+
+    public boolean isSameTree(TreeNode p, TreeNode q) {
+        return false;
+    }
+test_cases:
+  - input: { p: [1, 2, 3], q: [1, 2, 3] }
+    expected: true
+  - input: { p: [1, 2], q: [1, null, 2] }
+    expected: false
+  - input: { p: [1, 2, 1], q: [1, 1, 2] }
+    expected: false
+  - input: { p: [], q: [] }
+    expected: true
+  - input: { p: [1], q: [] }
+    expected: false
+solution:
+  python: |
+    from typing import Optional
+
+    class TreeNode:
+        def __init__(self, val=0, left=None, right=None):
+            self.val = val
+            self.left = left
+            self.right = right
+
+    def is_same_tree(p: Optional[TreeNode], q: Optional[TreeNode]) -> bool:
+        if p is None and q is None:
+            return True
+        if p is None or q is None:
+            return False
+        return p.val == q.val and is_same_tree(p.left, q.left) and is_same_tree(p.right, q.right)
+  javascript: |
+    class TreeNode {
+      constructor(val = 0, left = null, right = null) {
+        this.val = val;
+        this.left = left;
+        this.right = right;
+      }
+    }
+
+    function isSameTree(p, q) {
+      if (p === null && q === null) return true;
+      if (p === null || q === null) return false;
+      return p.val === q.val && isSameTree(p.left, q.left) && isSameTree(p.right, q.right);
+    }
+  go: |
+    package main
+
+    type TreeNode struct {
+        Val   int
+        Left  *TreeNode
+        Right *TreeNode
+    }
+
+    func isSameTree(p *TreeNode, q *TreeNode) bool {
+        if p == nil && q == nil {
+            return true
+        }
+        if p == nil || q == nil {
+            return false
+        }
+        return p.Val == q.Val && isSameTree(p.Left, q.Left) && isSameTree(p.Right, q.Right)
+    }
+  java: |
+    class TreeNode {
+        int val;
+        TreeNode left;
+        TreeNode right;
+        TreeNode(int val) { this.val = val; }
+    }
+
+    public boolean isSameTree(TreeNode p, TreeNode q) {
+        if (p == null && q == null) return true;
+        if (p == null || q == null) return false;
+        return p.val == q.val && isSameTree(p.left, q.left) && isSameTree(p.right, q.right);
+    }
+hints:
+  - "Two empty trees are the same. If one is empty and the other is not, they differ."
+  - "Compare the current nodes' values, then recursively check that the left subtrees match and the right subtrees match."
