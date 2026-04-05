@@ -1,0 +1,112 @@
+title: Time Based Key-Value Store
+difficulty: medium
+tags: [binary-search, design]
+description: |
+  You are given a list of entries where each entry is `[timestamp, value]`,
+  all sorted by timestamp in ascending order. These represent the history
+  of values stored for a single key.
+
+  Given the entries and a query timestamp, return the value with the
+  largest timestamp less than or equal to the query timestamp. If no
+  such value exists, return an empty string.
+
+  This is the core lookup operation in a time-based key-value store.
+examples:
+  - input: "timestamps = [1,4], values = ['bar','bar2'], timestamp = 4"
+    output: "'bar2'"
+    explanation: "Timestamp 4 has an exact match, so 'bar2' is returned."
+  - input: "timestamps = [1,4], values = ['bar','bar2'], timestamp = 3"
+    output: "'bar'"
+    explanation: "No value at timestamp 3, so the value at the largest timestamp <= 3 (which is 1) is returned."
+constraints:
+  - "1 <= timestamps.length <= 10^5"
+  - "1 <= timestamp <= 10^7"
+  - "All timestamps are strictly increasing."
+  - "timestamps.length == values.length"
+starter_code:
+  python: |
+    def time_map_get(timestamps: list[int], values: list[str], timestamp: int) -> str:
+        pass
+  javascript: |
+    function timeMapGet(timestamps, values, timestamp) {
+    }
+  go: |
+    func timeMapGet(timestamps []int, values []string, timestamp int) string {
+    }
+  java: |
+    public String timeMapGet(int[] timestamps, String[] values, int timestamp) {
+    }
+test_cases:
+  - input: { timestamps: [1, 4], values: ["bar", "bar2"], timestamp: 1 }
+    expected: "bar"
+  - input: { timestamps: [1, 4], values: ["bar", "bar2"], timestamp: 3 }
+    expected: "bar"
+  - input: { timestamps: [1, 4], values: ["bar", "bar2"], timestamp: 4 }
+    expected: "bar2"
+  - input: { timestamps: [1, 4], values: ["bar", "bar2"], timestamp: 5 }
+    expected: "bar2"
+  - input: { timestamps: [1, 4], values: ["bar", "bar2"], timestamp: 0 }
+    expected: ""
+  - input: { timestamps: [10], values: ["only"], timestamp: 10 }
+    expected: "only"
+solution:
+  python: |
+    def time_map_get(timestamps: list[int], values: list[str], timestamp: int) -> str:
+        left, right = 0, len(timestamps) - 1
+        result = ""
+        while left <= right:
+            mid = (left + right) // 2
+            if timestamps[mid] <= timestamp:
+                result = values[mid]
+                left = mid + 1
+            else:
+                right = mid - 1
+        return result
+  javascript: |
+    function timeMapGet(timestamps, values, timestamp) {
+        let left = 0, right = timestamps.length - 1;
+        let result = "";
+        while (left <= right) {
+            const mid = Math.floor((left + right) / 2);
+            if (timestamps[mid] <= timestamp) {
+                result = values[mid];
+                left = mid + 1;
+            } else {
+                right = mid - 1;
+            }
+        }
+        return result;
+    }
+  go: |
+    func timeMapGet(timestamps []int, values []string, timestamp int) string {
+        left, right := 0, len(timestamps)-1
+        result := ""
+        for left <= right {
+            mid := (left + right) / 2
+            if timestamps[mid] <= timestamp {
+                result = values[mid]
+                left = mid + 1
+            } else {
+                right = mid - 1
+            }
+        }
+        return result
+    }
+  java: |
+    public String timeMapGet(int[] timestamps, String[] values, int timestamp) {
+        int left = 0, right = timestamps.length - 1;
+        String result = "";
+        while (left <= right) {
+            int mid = left + (right - left) / 2;
+            if (timestamps[mid] <= timestamp) {
+                result = values[mid];
+                left = mid + 1;
+            } else {
+                right = mid - 1;
+            }
+        }
+        return result;
+    }
+hints:
+  - "Since timestamps are stored in sorted order, you can binary search for the largest timestamp that does not exceed the query timestamp."
+  - "Binary search for the rightmost entry with timestamp <= the query. Track the best answer as you go, updating it whenever you find a valid entry."

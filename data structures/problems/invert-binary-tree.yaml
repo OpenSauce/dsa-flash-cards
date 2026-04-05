@@ -33,6 +33,29 @@ starter_code:
 
     def invert_tree(root: Optional[TreeNode]) -> Optional[TreeNode]:
         pass
+  javascript: |
+    class TreeNode {
+        constructor(val = 0, left = null, right = null) {
+            this.val = val;
+            this.left = left;
+            this.right = right;
+        }
+    }
+
+    function invertTree(root) {
+    }
+  go: |
+    type TreeNode struct {
+        Val   int
+        Left  *TreeNode
+        Right *TreeNode
+    }
+
+    func invertTree(root *TreeNode) *TreeNode {
+    }
+  java: |
+    public TreeNode invertTree(TreeNode root) {
+    }
 test_cases:
   - input: { root: [4, 2, 7, 1, 3, 6, 9] }
     expected: [4, 7, 2, 9, 6, 3, 1]
@@ -59,6 +82,50 @@ solution:
         invert_tree(root.left)
         invert_tree(root.right)
         return root
+  javascript: |
+    class TreeNode {
+        constructor(val = 0, left = null, right = null) {
+            this.val = val;
+            this.left = left;
+            this.right = right;
+        }
+    }
+
+    function invertTree(root) {
+        if (root === null) return null;
+        const temp = root.left;
+        root.left = root.right;
+        root.right = temp;
+        invertTree(root.left);
+        invertTree(root.right);
+        return root;
+    }
+  go: |
+    type TreeNode struct {
+        Val   int
+        Left  *TreeNode
+        Right *TreeNode
+    }
+
+    func invertTree(root *TreeNode) *TreeNode {
+        if root == nil {
+            return nil
+        }
+        root.Left, root.Right = root.Right, root.Left
+        invertTree(root.Left)
+        invertTree(root.Right)
+        return root
+    }
+  java: |
+    public TreeNode invertTree(TreeNode root) {
+        if (root == null) return null;
+        TreeNode temp = root.left;
+        root.left = root.right;
+        root.right = temp;
+        invertTree(root.left);
+        invertTree(root.right);
+        return root;
+    }
 hints:
   - "What is the simplest operation you can do at a single node to start mirroring the tree?"
   - "Swap the left and right children of the current node, then recursively invert each subtree."

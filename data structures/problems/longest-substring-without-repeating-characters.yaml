@@ -1,0 +1,109 @@
+title: Longest Substring Without Repeating Characters
+difficulty: medium
+tags: [string, sliding-window]
+description: |
+  Given a string `s`, find the length of the longest substring that
+  contains no duplicate characters.
+
+  A substring is a contiguous sequence of characters within the string.
+examples:
+  - input: "s = 'abcabcbb'"
+    output: "3"
+    explanation: "The longest substring without repeating characters is 'abc', with length 3."
+  - input: "s = 'bbbbb'"
+    output: "1"
+    explanation: "Every character is 'b', so the longest unique substring is just 'b'."
+  - input: "s = 'pwwkew'"
+    output: "3"
+    explanation: "'wke' is the longest substring without repeats. Note that 'pwke' is a subsequence, not a substring."
+constraints:
+  - "0 <= s.length <= 5 * 10^4"
+  - "s consists of English letters, digits, symbols, and spaces."
+starter_code:
+  python: |
+    def length_of_longest_substring(s: str) -> int:
+        pass
+  javascript: |
+    function lengthOfLongestSubstring(s) {
+    }
+  go: |
+    func lengthOfLongestSubstring(s string) int {
+    }
+  java: |
+    public int lengthOfLongestSubstring(String s) {
+    }
+test_cases:
+  - input: { s: "abcabcbb" }
+    expected: 3
+  - input: { s: "bbbbb" }
+    expected: 1
+  - input: { s: "pwwkew" }
+    expected: 3
+  - input: { s: "" }
+    expected: 0
+  - input: { s: " " }
+    expected: 1
+  - input: { s: "dvdf" }
+    expected: 3
+  - input: { s: "abcdef" }
+    expected: 6
+solution:
+  python: |
+    def length_of_longest_substring(s: str) -> int:
+        char_index = {}
+        left = 0
+        max_len = 0
+        for right in range(len(s)):
+            if s[right] in char_index and char_index[s[right]] >= left:
+                left = char_index[s[right]] + 1
+            char_index[s[right]] = right
+            max_len = max(max_len, right - left + 1)
+        return max_len
+  javascript: |
+    function lengthOfLongestSubstring(s) {
+        const charIndex = {};
+        let left = 0;
+        let maxLen = 0;
+        for (let right = 0; right < s.length; right++) {
+            if (s[right] in charIndex && charIndex[s[right]] >= left) {
+                left = charIndex[s[right]] + 1;
+            }
+            charIndex[s[right]] = right;
+            maxLen = Math.max(maxLen, right - left + 1);
+        }
+        return maxLen;
+    }
+  go: |
+    func lengthOfLongestSubstring(s string) int {
+        charIndex := map[byte]int{}
+        left := 0
+        maxLen := 0
+        for right := 0; right < len(s); right++ {
+            if idx, ok := charIndex[s[right]]; ok && idx >= left {
+                left = idx + 1
+            }
+            charIndex[s[right]] = right
+            if right-left+1 > maxLen {
+                maxLen = right - left + 1
+            }
+        }
+        return maxLen
+    }
+  java: |
+    public int lengthOfLongestSubstring(String s) {
+        java.util.Map<Character, Integer> charIndex = new java.util.HashMap<>();
+        int left = 0;
+        int maxLen = 0;
+        for (int right = 0; right < s.length(); right++) {
+            char ch = s.charAt(right);
+            if (charIndex.containsKey(ch) && charIndex.get(ch) >= left) {
+                left = charIndex.get(ch) + 1;
+            }
+            charIndex.put(ch, right);
+            maxLen = Math.max(maxLen, right - left + 1);
+        }
+        return maxLen;
+    }
+hints:
+  - "Use a sliding window with two pointers. When do you need to shrink the window?"
+  - "Maintain a hash map of each character's most recent index. When you encounter a duplicate inside the current window, jump the left pointer past the previous occurrence."

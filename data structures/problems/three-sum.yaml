@@ -1,0 +1,162 @@
+title: 3Sum
+difficulty: medium
+tags: [array, two-pointers]
+description: |
+  Given an integer array `nums`, return all unique triplets `[nums[i],
+  nums[j], nums[k]]` such that `i != j`, `i != k`, `j != k`, and
+  `nums[i] + nums[j] + nums[k] == 0`.
+
+  The result must not contain duplicate triplets. The order of triplets
+  and the order within each triplet does not matter.
+examples:
+  - input: "nums = [-1,0,1,2,-1,-4]"
+    output: "[[-1,-1,2],[-1,0,1]]"
+    explanation: "The two unique triplets that sum to zero are [-1,-1,2] and [-1,0,1]."
+  - input: "nums = [0,1,1]"
+    output: "[]"
+    explanation: "No three elements sum to zero."
+  - input: "nums = [0,0,0]"
+    output: "[[0,0,0]]"
+    explanation: "The only triplet sums to zero."
+constraints:
+  - "3 <= nums.length <= 3000"
+  - "-10^5 <= nums[i] <= 10^5"
+starter_code:
+  python: |
+    def three_sum(nums: list[int]) -> list[list[int]]:
+        pass
+  javascript: |
+    function threeSum(nums) {
+    }
+  go: |
+    func threeSum(nums []int) [][]int {
+    }
+  java: |
+    public List<List<Integer>> threeSum(int[] nums) {
+    }
+test_cases:
+  - input: { nums: [-1, 0, 1, 2, -1, -4] }
+    expected: [[-1, -1, 2], [-1, 0, 1]]
+  - input: { nums: [0, 1, 1] }
+    expected: []
+  - input: { nums: [0, 0, 0] }
+    expected: [[0, 0, 0]]
+  - input: { nums: [-2, 0, 1, 1, 2] }
+    expected: [[-2, 0, 2], [-2, 1, 1]]
+  - input: { nums: [1, -1, -1, 0] }
+    expected: [[-1, 0, 1]]
+  - input: { nums: [-4, -2, -1, 0, 1, 2, 3] }
+    expected: [[-4, 1, 3], [-2, -1, 3], [-2, 0, 2], [-1, 0, 1]]
+solution:
+  python: |
+    def three_sum(nums: list[int]) -> list[list[int]]:
+        nums.sort()
+        result = []
+        for i in range(len(nums) - 2):
+            if i > 0 and nums[i] == nums[i - 1]:
+                continue
+            left, right = i + 1, len(nums) - 1
+            while left < right:
+                total = nums[i] + nums[left] + nums[right]
+                if total < 0:
+                    left += 1
+                elif total > 0:
+                    right -= 1
+                else:
+                    result.append([nums[i], nums[left], nums[right]])
+                    while left < right and nums[left] == nums[left + 1]:
+                        left += 1
+                    while left < right and nums[right] == nums[right - 1]:
+                        right -= 1
+                    left += 1
+                    right -= 1
+        return result
+  javascript: |
+    function threeSum(nums) {
+        nums.sort((a, b) => a - b);
+        const result = [];
+        for (let i = 0; i < nums.length - 2; i++) {
+            if (i > 0 && nums[i] === nums[i - 1]) continue;
+            let left = i + 1, right = nums.length - 1;
+            while (left < right) {
+                const total = nums[i] + nums[left] + nums[right];
+                if (total < 0) { left++; }
+                else if (total > 0) { right--; }
+                else {
+                    result.push([nums[i], nums[left], nums[right]]);
+                    while (left < right && nums[left] === nums[left + 1]) left++;
+                    while (left < right && nums[right] === nums[right - 1]) right--;
+                    left++;
+                    right--;
+                }
+            }
+        }
+        return result;
+    }
+  go: |
+    func sortInts(nums []int) {
+        for i := 1; i < len(nums); i++ {
+            key := nums[i]
+            j := i - 1
+            for j >= 0 && nums[j] > key {
+                nums[j+1] = nums[j]
+                j--
+            }
+            nums[j+1] = key
+        }
+    }
+
+    func threeSum(nums []int) [][]int {
+        sortInts(nums)
+        result := [][]int{}
+        for i := 0; i < len(nums)-2; i++ {
+            if i > 0 && nums[i] == nums[i-1] {
+                continue
+            }
+            left, right := i+1, len(nums)-1
+            for left < right {
+                total := nums[i] + nums[left] + nums[right]
+                if total < 0 {
+                    left++
+                } else if total > 0 {
+                    right--
+                } else {
+                    result = append(result, []int{nums[i], nums[left], nums[right]})
+                    for left < right && nums[left] == nums[left+1] {
+                        left++
+                    }
+                    for left < right && nums[right] == nums[right-1] {
+                        right--
+                    }
+                    left++
+                    right--
+                }
+            }
+        }
+        return result
+    }
+  java: |
+    public List<List<Integer>> threeSum(int[] nums) {
+        Arrays.sort(nums);
+        List<List<Integer>> result = new ArrayList<>();
+        for (int i = 0; i < nums.length - 2; i++) {
+            if (i > 0 && nums[i] == nums[i - 1]) continue;
+            int left = i + 1, right = nums.length - 1;
+            while (left < right) {
+                int total = nums[i] + nums[left] + nums[right];
+                if (total < 0) { left++; }
+                else if (total > 0) { right--; }
+                else {
+                    result.add(Arrays.asList(nums[i], nums[left], nums[right]));
+                    while (left < right && nums[left] == nums[left + 1]) left++;
+                    while (left < right && nums[right] == nums[right - 1]) right--;
+                    left++;
+                    right--;
+                }
+            }
+        }
+        return result;
+    }
+hints:
+  - "Sort the array first. Then for each element, use two pointers to find pairs that sum to the element's negation."
+  - "To avoid duplicate triplets, skip elements that are the same as the previous one at each level (the outer loop and after finding a valid triplet)."

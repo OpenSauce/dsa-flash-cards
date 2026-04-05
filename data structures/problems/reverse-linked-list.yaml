@@ -29,6 +29,27 @@ starter_code:
 
     def reverse_list(head: Optional[ListNode]) -> Optional[ListNode]:
         pass
+  javascript: |
+    class ListNode {
+        constructor(val = 0, next = null) {
+            this.val = val;
+            this.next = next;
+        }
+    }
+
+    function reverseList(head) {
+    }
+  go: |
+    type ListNode struct {
+        Val  int
+        Next *ListNode
+    }
+
+    func reverseList(head *ListNode) *ListNode {
+    }
+  java: |
+    public ListNode reverseList(ListNode head) {
+    }
 test_cases:
   - input: { head: [1, 2, 3, 4, 5] }
     expected: [5, 4, 3, 2, 1]
@@ -56,6 +77,54 @@ solution:
             prev = current
             current = next_node
         return prev
+  javascript: |
+    class ListNode {
+        constructor(val = 0, next = null) {
+            this.val = val;
+            this.next = next;
+        }
+    }
+
+    function reverseList(head) {
+        let prev = null;
+        let current = head;
+        while (current) {
+            const nextNode = current.next;
+            current.next = prev;
+            prev = current;
+            current = nextNode;
+        }
+        return prev;
+    }
+  go: |
+    type ListNode struct {
+        Val  int
+        Next *ListNode
+    }
+
+    func reverseList(head *ListNode) *ListNode {
+        var prev *ListNode
+        current := head
+        for current != nil {
+            nextNode := current.Next
+            current.Next = prev
+            prev = current
+            current = nextNode
+        }
+        return prev
+    }
+  java: |
+    public ListNode reverseList(ListNode head) {
+        ListNode prev = null;
+        ListNode current = head;
+        while (current != null) {
+            ListNode nextNode = current.next;
+            current.next = prev;
+            prev = current;
+            current = nextNode;
+        }
+        return prev;
+    }
 hints:
   - "You need to change each node's next pointer to point to the previous node instead."
   - "Keep track of three pointers: the previous node, the current node, and the next node. At each step, reverse the current node's pointer, then advance all three."

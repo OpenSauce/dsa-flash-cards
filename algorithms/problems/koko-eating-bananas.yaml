@@ -1,0 +1,112 @@
+title: Koko Eating Bananas
+difficulty: medium
+tags: [binary-search]
+description: |
+  Koko has `n` piles of bananas. The i-th pile has `piles[i]` bananas.
+  She has `h` hours to eat them all. Each hour she picks one pile and
+  eats up to `k` bananas from it. If the pile has fewer than `k`
+  bananas, she eats the whole pile and does not eat from another pile
+  that hour.
+
+  Return the minimum integer `k` such that she can eat all bananas
+  within `h` hours.
+examples:
+  - input: "piles = [3,6,7,11], h = 8"
+    output: "4"
+    explanation: "At speed 4, hours needed per pile are 1+2+2+3=8, which fits in 8 hours."
+  - input: "piles = [30,11,23,4,20], h = 5"
+    output: "30"
+    explanation: "With only 5 hours and 5 piles, she must eat the largest pile in one hour."
+constraints:
+  - "1 <= piles.length <= 10^4"
+  - "1 <= piles[i] <= 10^9"
+  - "piles.length <= h <= 10^9"
+starter_code:
+  python: |
+    def min_eating_speed(piles: list[int], h: int) -> int:
+        pass
+  javascript: |
+    function minEatingSpeed(piles, h) {
+    }
+  go: |
+    func minEatingSpeed(piles []int, h int) int {
+    }
+  java: |
+    public int minEatingSpeed(int[] piles, int h) {
+    }
+test_cases:
+  - input: { piles: [3, 6, 7, 11], h: 8 }
+    expected: 4
+  - input: { piles: [30, 11, 23, 4, 20], h: 5 }
+    expected: 30
+  - input: { piles: [30, 11, 23, 4, 20], h: 6 }
+    expected: 23
+  - input: { piles: [1], h: 1 }
+    expected: 1
+  - input: { piles: [1000000000], h: 2 }
+    expected: 500000000
+solution:
+  python: |
+    import math
+
+    def min_eating_speed(piles: list[int], h: int) -> int:
+        left, right = 1, max(piles)
+        while left < right:
+            mid = (left + right) // 2
+            hours = sum(math.ceil(p / mid) for p in piles)
+            if hours <= h:
+                right = mid
+            else:
+                left = mid + 1
+        return left
+  javascript: |
+    function minEatingSpeed(piles, h) {
+        let left = 1, right = Math.max(...piles);
+        while (left < right) {
+            const mid = Math.floor((left + right) / 2);
+            let hours = 0;
+            for (const p of piles) hours += Math.ceil(p / mid);
+            if (hours <= h) right = mid;
+            else left = mid + 1;
+        }
+        return left;
+    }
+  go: |
+    func minEatingSpeed(piles []int, h int) int {
+        maxPile := 0
+        for _, p := range piles {
+            if p > maxPile {
+                maxPile = p
+            }
+        }
+        left, right := 1, maxPile
+        for left < right {
+            mid := (left + right) / 2
+            hours := 0
+            for _, p := range piles {
+                hours += (p + mid - 1) / mid
+            }
+            if hours <= h {
+                right = mid
+            } else {
+                left = mid + 1
+            }
+        }
+        return left
+    }
+  java: |
+    public int minEatingSpeed(int[] piles, int h) {
+        int left = 1, right = 0;
+        for (int p : piles) right = Math.max(right, p);
+        while (left < right) {
+            int mid = left + (right - left) / 2;
+            long hours = 0;
+            for (int p : piles) hours += (p + mid - 1) / mid;
+            if (hours <= h) right = mid;
+            else left = mid + 1;
+        }
+        return left;
+    }
+hints:
+  - "Binary search on the answer: the eating speed k. What range of k values is possible?"
+  - "The minimum speed is 1, the maximum is the largest pile. For a given speed, calculate the total hours needed. If it fits within h, try a smaller speed; otherwise try a larger one."

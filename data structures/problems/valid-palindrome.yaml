@@ -1,0 +1,119 @@
+title: Valid Palindrome
+difficulty: easy
+tags: [string, two-pointers]
+description: |
+  Given a string `s`, determine if it is a palindrome after converting
+  all uppercase letters to lowercase and removing all non-alphanumeric
+  characters.
+
+  A palindrome reads the same forwards and backwards.
+examples:
+  - input: "s = 'A man, a plan, a canal: Panama'"
+    output: "true"
+    explanation: "After cleanup the string becomes 'amanaplanacanalpanama', which is a palindrome."
+  - input: "s = 'race a car'"
+    output: "false"
+    explanation: "After cleanup: 'raceacar', which reads differently backwards."
+constraints:
+  - "1 <= s.length <= 2 * 10^5"
+  - "s consists only of printable ASCII characters."
+starter_code:
+  python: |
+    def is_palindrome(s: str) -> bool:
+        pass
+  javascript: |
+    function isPalindrome(s) {
+    }
+  go: |
+    func isPalindrome(s string) bool {
+    }
+  java: |
+    public boolean isPalindrome(String s) {
+    }
+test_cases:
+  - input: { s: "A man, a plan, a canal: Panama" }
+    expected: true
+  - input: { s: "race a car" }
+    expected: false
+  - input: { s: " " }
+    expected: true
+  - input: { s: "a" }
+    expected: true
+  - input: { s: "0P" }
+    expected: false
+  - input: { s: "ab_a" }
+    expected: true
+solution:
+  python: |
+    def is_palindrome(s: str) -> bool:
+        left, right = 0, len(s) - 1
+        while left < right:
+            while left < right and not s[left].isalnum():
+                left += 1
+            while left < right and not s[right].isalnum():
+                right -= 1
+            if s[left].lower() != s[right].lower():
+                return False
+            left += 1
+            right -= 1
+        return True
+  javascript: |
+    function isPalindrome(s) {
+        let left = 0, right = s.length - 1;
+        while (left < right) {
+            while (left < right && !isAlphaNum(s[left])) left++;
+            while (left < right && !isAlphaNum(s[right])) right--;
+            if (s[left].toLowerCase() !== s[right].toLowerCase()) return false;
+            left++;
+            right--;
+        }
+        return true;
+    }
+
+    function isAlphaNum(c) {
+        return /[a-zA-Z0-9]/.test(c);
+    }
+  go: |
+    func toLower(c byte) byte {
+        if c >= 'A' && c <= 'Z' {
+            return c + 32
+        }
+        return c
+    }
+
+    func isAlphaNum(c byte) bool {
+        return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9')
+    }
+
+    func isPalindrome(s string) bool {
+        left, right := 0, len(s)-1
+        for left < right {
+            for left < right && !isAlphaNum(s[left]) {
+                left++
+            }
+            for left < right && !isAlphaNum(s[right]) {
+                right--
+            }
+            if toLower(s[left]) != toLower(s[right]) {
+                return false
+            }
+            left++
+            right--
+        }
+        return true
+    }
+  java: |
+    public boolean isPalindrome(String s) {
+        int left = 0, right = s.length() - 1;
+        while (left < right) {
+            while (left < right && !Character.isLetterOrDigit(s.charAt(left))) left++;
+            while (left < right && !Character.isLetterOrDigit(s.charAt(right))) right--;
+            if (Character.toLowerCase(s.charAt(left)) != Character.toLowerCase(s.charAt(right))) return false;
+            left++;
+            right--;
+        }
+        return true;
+    }
+hints:
+  - "Use two pointers starting from both ends of the string, moving inward."
+  - "Skip non-alphanumeric characters at each pointer. Compare the lowercase versions of the characters at the two pointers."

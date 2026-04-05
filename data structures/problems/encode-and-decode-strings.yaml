@@ -1,0 +1,144 @@
+title: Encode and Decode Strings
+difficulty: medium
+tags: [string]
+description: |
+  Design an algorithm to encode a list of strings into a single string,
+  and decode that single string back into the original list.
+
+  The encoded string must be able to handle any characters within the
+  input strings, including special characters and empty strings.
+
+  Implement a function that takes a list of strings, encodes them into
+  a single string, then decodes that string back and returns the
+  original list. The round-trip must be lossless.
+examples:
+  - input: "strs = ['hello','world']"
+    output: "['hello','world']"
+    explanation: "The list is encoded into one string and decoded back to the original."
+  - input: "strs = ['']"
+    output: "['']"
+    explanation: "A list with one empty string is correctly round-tripped."
+constraints:
+  - "0 <= strs.length <= 200"
+  - "0 <= strs[i].length <= 200"
+  - "strs[i] can contain any valid ASCII character."
+starter_code:
+  python: |
+    def codec(strs: list[str]) -> list[str]:
+        pass
+  javascript: |
+    function codec(strs) {
+    }
+  go: |
+    func codec(strs []string) []string {
+    }
+  java: |
+    public List<String> codec(String[] strs) {
+    }
+test_cases:
+  - input: { strs: ["hello", "world"] }
+    expected: ["hello", "world"]
+  - input: { strs: [""] }
+    expected: [""]
+  - input: { strs: [] }
+    expected: []
+  - input: { strs: ["a", "b", "c"] }
+    expected: ["a", "b", "c"]
+  - input: { strs: ["we", "say", ":", "yes"] }
+    expected: ["we", "say", ":", "yes"]
+  - input: { strs: ["4#abc", "5#hello"] }
+    expected: ["4#abc", "5#hello"]
+solution:
+  python: |
+    def codec(strs: list[str]) -> list[str]:
+        # Encode
+        encoded = []
+        for s in strs:
+            encoded.append(str(len(s)) + '#' + s)
+        encoded_str = ''.join(encoded)
+        # Decode
+        result = []
+        i = 0
+        while i < len(encoded_str):
+            j = encoded_str.index('#', i)
+            length = int(encoded_str[i:j])
+            result.append(encoded_str[j + 1:j + 1 + length])
+            i = j + 1 + length
+        return result
+  javascript: |
+    function codec(strs) {
+        // Encode
+        let encoded = '';
+        for (const s of strs) {
+            encoded += s.length + '#' + s;
+        }
+        // Decode
+        const result = [];
+        let i = 0;
+        while (i < encoded.length) {
+            const j = encoded.indexOf('#', i);
+            const length = parseInt(encoded.substring(i, j));
+            result.push(encoded.substring(j + 1, j + 1 + length));
+            i = j + 1 + length;
+        }
+        return result;
+    }
+  go: |
+    func codec(strs []string) []string {
+        // Encode: length#string for each
+        encoded := ""
+        for _, s := range strs {
+            length := len(s)
+            prefix := ""
+            if length == 0 {
+                prefix = "0"
+            } else {
+                digits := ""
+                n := length
+                for n > 0 {
+                    digits = string(rune('0'+n%10)) + digits
+                    n /= 10
+                }
+                prefix = digits
+            }
+            encoded += prefix + "#" + s
+        }
+        // Decode
+        result := []string{}
+        i := 0
+        for i < len(encoded) {
+            j := i
+            for encoded[j] != '#' {
+                j++
+            }
+            length := 0
+            for k := i; k < j; k++ {
+                length = length*10 + int(encoded[k]-'0')
+            }
+            result = append(result, encoded[j+1:j+1+length])
+            i = j + 1 + length
+        }
+        return result
+    }
+  java: |
+    public List<String> codec(String[] strs) {
+        // Encode
+        StringBuilder sb = new StringBuilder();
+        for (String s : strs) {
+            sb.append(s.length()).append('#').append(s);
+        }
+        String encoded = sb.toString();
+        // Decode
+        List<String> result = new ArrayList<>();
+        int i = 0;
+        while (i < encoded.length()) {
+            int j = encoded.indexOf('#', i);
+            int length = Integer.parseInt(encoded.substring(i, j));
+            result.add(encoded.substring(j + 1, j + 1 + length));
+            i = j + 1 + length;
+        }
+        return result;
+    }
+hints:
+  - "The tricky part is that strings can contain any character, including your delimiter. How can you make the delimiter unambiguous?"
+  - "Prefix each string with its length followed by a special character like '#'. When decoding, read the length first to know exactly how many characters to consume."

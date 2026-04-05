@@ -22,6 +22,15 @@ starter_code:
   python: |
     def max_profit(prices: list[int]) -> int:
         pass
+  javascript: |
+    function maxProfit(prices) {
+    }
+  go: |
+    func maxProfit(prices []int) int {
+    }
+  java: |
+    public int maxProfit(int[] prices) {
+    }
 test_cases:
   - input: { prices: [7, 1, 5, 3, 6, 4] }
     expected: 5
@@ -44,6 +53,45 @@ solution:
             elif price - min_price > max_profit:
                 max_profit = price - min_price
         return max_profit
+  javascript: |
+    function maxProfit(prices) {
+        let minPrice = Infinity;
+        let maxProfit = 0;
+        for (const price of prices) {
+            if (price < minPrice) {
+                minPrice = price;
+            } else if (price - minPrice > maxProfit) {
+                maxProfit = price - minPrice;
+            }
+        }
+        return maxProfit;
+    }
+  go: |
+    func maxProfit(prices []int) int {
+        minPrice := prices[0]
+        maxProfit := 0
+        for _, price := range prices[1:] {
+            if price < minPrice {
+                minPrice = price
+            } else if price-minPrice > maxProfit {
+                maxProfit = price - minPrice
+            }
+        }
+        return maxProfit
+    }
+  java: |
+    public int maxProfit(int[] prices) {
+        int minPrice = Integer.MAX_VALUE;
+        int maxProfit = 0;
+        for (int price : prices) {
+            if (price < minPrice) {
+                minPrice = price;
+            } else if (price - minPrice > maxProfit) {
+                maxProfit = price - minPrice;
+            }
+        }
+        return maxProfit;
+    }
 hints:
   - "You need to find the largest difference between a later element and an earlier element."
   - "Track the minimum price seen so far as you scan left to right. At each position, calculate the profit if you sold today and update your best result."
