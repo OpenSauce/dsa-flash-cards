@@ -734,3 +734,76 @@
     **Knapsack:** state is a capacity or target value; you process items one by one and decide to include or exclude each. The input is a collection of items.
 
     Ask: "Am I combining subranges of a sequence?" → interval DP. "Am I selecting from a set of items with a budget?" → knapsack.
+
+# =============================================================================
+# Problem-anchored: DP problems
+# =============================================================================
+
+- title: "Climbing Stairs -- Problem Identification"
+  difficulty: "easy"
+  tags: ["dynamic programming", "climbing stairs", "pattern"]
+  lesson: dp-linear-and-counting
+  Front: |
+    **Climbing Stairs** -- What makes this a "counting DP" problem rather than an optimization problem?
+  Back: |
+    The question asks "how many distinct ways?" not "the minimum/maximum". Counting DP sums the child states (`dp[i-1] + dp[i-2]`); optimization DP takes max or min over them. Same recurrence shape, different combiner.
+
+- title: "House Robber II -- Key Insight"
+  difficulty: "medium"
+  tags: ["dynamic programming", "house robber", "circular", "reduction"]
+  lesson: dp-linear-and-counting
+  Front: |
+    **House Robber II** (houses in a circle) -- How do you reduce it to the linear House Robber?
+  Back: |
+    Houses 0 and n-1 are now adjacent, so at most one can be robbed. Run linear House Robber twice on two subarrays -- `nums[0..n-2]` (exclude last) and `nums[1..n-1]` (exclude first) -- and return the max. Handles the circular constraint without touching the core recurrence.
+
+- title: "Decode Ways -- Edge Case"
+  difficulty: "medium"
+  tags: ["dynamic programming", "decode ways", "edge cases"]
+  lesson: dp-linear-and-counting
+  Front: |
+    **Decode Ways** -- Why does the presence of `'0'` in the string break a naive `dp[i] = dp[i-1] + dp[i-2]`?
+  Back: |
+    A standalone `'0'` decodes to nothing (no letter maps to 0), so the `dp[i-1]` branch contributes only if `s[i-1] != '0'`. The `dp[i-2]` branch contributes only if `s[i-2..i-1]` is in `10..26`. Every transition is gated by these validity checks.
+
+- title: "Coin Change -- Why DP Over Greedy"
+  difficulty: "medium"
+  tags: ["dynamic programming", "coin change", "greedy fails"]
+  lesson: dp-knapsack-and-subset
+  Front: |
+    **Coin Change** (minimum coins) -- Why does greedy (always take the largest coin that fits) fail?
+  Back: |
+    Greedy fails on non-canonical coin systems. Example: coins `[1, 3, 4]`, amount `6`. Greedy takes `4 + 1 + 1 = 3 coins`; optimal is `3 + 3 = 2 coins`. DP tries every coin at every amount and caches the minimum, so it never misses a better combination.
+
+- title: "Word Break -- Pattern"
+  difficulty: "medium"
+  tags: ["dynamic programming", "word break", "string dp"]
+  lesson: dp-string-dp
+  Front: |
+    **Word Break** -- What is the recurrence?
+  Back: |
+    `dp[i] = true` iff some `j < i` has `dp[j] == true` **and** `s[j..i-1]` is in the dictionary. `dp[0] = true` (empty prefix). Answer: `dp[n]`.
+
+    There are O(n^2) `(j, i)` pairs. Naively each check costs O(k) to **form and hash the substring `s[j..i-1]`** before the O(1) hash-set lookup, so total is O(n^2 · k) or O(n^3) worst case (k = O(n)). Avoiding substring creation -- iterating known word lengths and comparing in place, or walking a trie -- gets you to O(n^2) time, O(n) space.
+
+- title: "Longest Increasing Subsequence -- O(n^2) Recurrence"
+  difficulty: "medium"
+  tags: ["dynamic programming", "LIS", "longest increasing subsequence"]
+  lesson: dp-interval-and-advanced
+  Front: |
+    **Longest Increasing Subsequence** -- What is the O(n^2) DP recurrence?
+  Back: |
+    `dp[i]` = length of the LIS ending at index `i`. `dp[i] = 1 + max(dp[j])` over all `j < i` with `nums[j] < nums[i]`, or 1 if no such `j`. Answer: `max(dp)`.
+
+    The O(n log n) patience-sorting approach beats this but the quadratic version is easier to reason about under pressure.
+
+- title: "Unique Paths -- Recurrence"
+  difficulty: "easy"
+  tags: ["dynamic programming", "unique paths", "grid"]
+  lesson: dp-grid-and-path
+  Front: |
+    **Unique Paths** (m×n grid, move right or down only) -- What is the recurrence and its base cases?
+  Back: |
+    `dp[i][j] = dp[i-1][j] + dp[i][j-1]`. Base: the entire first row and first column are 1 (only one way to reach them). Answer: `dp[m-1][n-1]`.
+
+    Space optimization: a single row, updated left-to-right in place.
