@@ -35,9 +35,11 @@ starter_code:
     public boolean searchMatrix(int[][] matrix, int target) {
     }
 test_cases:
-  - input: { matrix: [[1, 3, 5, 7], [10, 11, 16, 20], [23, 30, 34, 60]], target: 3 }
+  - input:
+      { matrix: [[1, 3, 5, 7], [10, 11, 16, 20], [23, 30, 34, 60]], target: 3 }
     expected: true
-  - input: { matrix: [[1, 3, 5, 7], [10, 11, 16, 20], [23, 30, 34, 60]], target: 13 }
+  - input:
+      { matrix: [[1, 3, 5, 7], [10, 11, 16, 20], [23, 30, 34, 60]], target: 13 }
     expected: false
   - input: { matrix: [[1]], target: 1 }
     expected: true
