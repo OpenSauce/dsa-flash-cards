@@ -50,7 +50,7 @@
   Back: |
     **Training:** fitting the model's parameters to data. Expensive, one-time or periodic, often hours to weeks on specialized hardware.
 
-    **Inference:** running the trained model on new input to get an answer. Cheap per call, fast, happens constantly in production.
+    **Inference:** running the trained model on new input to get an answer. Typically cheaper per call than training, fast, and happens constantly in production, though it can still be a major cost at scale.
 
     They have completely different cost, hardware, and latency profiles. In ML system design, you locate the two workloads separately because they scale differently.
 

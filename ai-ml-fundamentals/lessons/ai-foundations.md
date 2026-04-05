@@ -1,6 +1,6 @@
 ---
 title: "AI/ML Foundations"
-summary: "The vocabulary every non-ML engineer needs: supervised vs unsupervised, training vs inference, overfitting, and why model choice is a tradeoff."
+summary: "The vocabulary every non-ML engineer needs: supervised vs unsupervised, training vs inference, and overfitting."
 reading_time_minutes: 4
 order: 1
 ---
@@ -27,7 +27,7 @@ Almost every ML technique you will hear about falls into one of three categories
 
 ## Training vs Inference
 
-This is the single most important distinction in ML system design. **Training** is the expensive process of fitting the model's parameters to data. It usually happens once, or periodically, and it can take hours, days, or weeks on specialized hardware. **Inference** is running the finished model on new input to get an answer. Inference is cheap per call, fast, and happens constantly in production. When someone asks "where does the cost live in your ML system", they are asking you to locate the training and inference workloads separately, because they have completely different scaling profiles, hardware needs, and latency requirements.
+This is the single most important distinction in ML system design. **Training** is the expensive process of fitting the model's parameters to data. It usually happens once, or periodically, and it can take hours, days, or weeks on specialized hardware. **Inference** is running the finished model on new input to get an answer. Inference is cheaper per call than training and happens constantly in production, though it can still be a major cost at scale. When someone asks "where does the cost live in your ML system", they are asking you to locate the training and inference workloads separately, because they have completely different scaling profiles, hardware needs, and latency requirements.
 
 ## Train/Val/Test Split
 
